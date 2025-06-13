@@ -1,2 +1,1 @@
 # graduate-or-die-server
-?
