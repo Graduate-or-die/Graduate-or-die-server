@@ -1,3 +1,25 @@
-/gradlew text eol=lf
-*.bat text eol=crlf
-*.jar binary
+# 기본값: 자동 줄바꿈 변환 (text 파일이면 OS에 맞게 CRLF/LF 변환)
+* text=auto
+
+# 명시적 설정
+*.java     text eol=lf
+*.gradle   text eol=lf
+*.groovy   text eol=lf
+*.kt       text eol=lf
+*.kts      text eol=lf
+*.md       text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.xml      text eol=lf
+*.properties text eol=lf
+
+# 스크립트
+/gradlew       text eol=lf
+*.sh           text eol=lf
+*.bat          text eol=crlf
+
+# 바이너리 파일 (줄바꿈 변환 방지)
+/*.jar         binary
+*.png          binary
+*.jpg          binary
+*.pdf          binary
