@@ -1,11 +1,9 @@
 package server.pome.global.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@AllArgsConstructor
 public enum BaseResponseStatus {
 
   // 1000번대: 성공
@@ -27,4 +25,11 @@ public enum BaseResponseStatus {
   private final HttpStatus httpStatus;
   private final int code;
   private final String message;
+
+  BaseResponseStatus(boolean isSuccess, HttpStatus httpStatus, int code, String message) {
+    this.isSuccess = isSuccess;
+    this.httpStatus = httpStatus;
+    this.code = code;
+    this.message = message;
+  }
 }
