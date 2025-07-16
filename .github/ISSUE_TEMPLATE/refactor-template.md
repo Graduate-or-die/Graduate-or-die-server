@@ -1,8 +1,8 @@
 ---
 name: Refactor Template
 about: 리팩토링할 기능 템플릿
-title: ''
-labels: ''
+title: '[Refactor] '
+labels: '🔨 Refactor'
 assignees: ''
 ---
 
@@ -21,6 +21,3 @@ assignees: ''
 
 <br>
 
-## 💡 참고자료
-
-- (없다면 지워도 됩니다!)
