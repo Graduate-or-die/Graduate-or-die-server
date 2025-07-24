@@ -36,7 +36,8 @@ public class Portfolio {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "portfolio_visibility", joinColumns = @JoinColumn(name = "portfolio_id"))
-    @Column(name = "visibility_map")
+    @MapKeyColumn(name = "target")
+    @Column(name = "is_visible")
     @Comment("알람 여부 매핑")
     private Map<String, Boolean> visibilityMap = new HashMap<>();
 }
