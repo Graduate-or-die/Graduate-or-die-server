@@ -1,56 +1,44 @@
 package server.pome.global.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import server.pome.global.domain.BaseResponse;
 
-import static org.springframework.http.HttpStatus.*;
-import static server.pome.global.exception.BaseResponseStatus.*;
-
+@RestControllerAdvice
 @Slf4j
-@ControllerAdvice
 public class GlobalExceptionHandler {
 
-  // 커스텀 BaseException 처리
+  // 커스텀 예외 처리
   @ExceptionHandler(BaseException.class)
-  public ResponseEntity<BaseResponse<?>> handlerHttpMessageException(BaseException e) {
-    BaseResponseStatus status = e.getStatus();
-    String message = e.getCustomMessage() != null ? e.getCustomMessage() : e.getMessage();
-
-    log.warn("[BaseException] code = {}, message = {}", status.getCode(), message);
-
+  public ResponseEntity<BaseResponse<?>> handleBaseException(BaseException e) {
+    log.warn("[BaseException] code={}, message={}", e.getStatus().getCode(), e.getMessage());
     return ResponseEntity
-        .status(status.getHttpStatus())
-        .body(BaseResponse.error(status, message));
+        .status(e.getStatus().getHttpStatus())
+        .body(BaseResponse.error(e.getStatus(), e.getMessage()));
   }
 
-  // Valid 예외 처리
+  // 유효성 검증 실패 처리
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<BaseResponse<?>> handleValidationException(
-      MethodArgumentNotValidException e) {
-    String errorMessage = e.getBindingResult().getFieldErrors().stream()
+  public ResponseEntity<BaseResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
+    String message = e.getBindingResult().getFieldErrors().stream()
         .map(err -> err.getField() + ": " + err.getDefaultMessage())
         .findFirst()
         .orElse("입력값이 올바르지 않습니다.");
-
-    log.warn("[ValidationException] {}", errorMessage);
-
     return ResponseEntity
-        .badRequest()
-        .body(BaseResponse.error(REQUEST_ERROR, errorMessage));
+        .status(HttpStatus.BAD_REQUEST)
+        .body(BaseResponse.error(BaseResponseStatus.REQUEST_ERROR, message));
   }
 
-  // 처리되지 않은 예외 처리
+  // 처리되지 않음 모든 예외에 대한 기본 처리
   @ExceptionHandler(Exception.class)
   public ResponseEntity<BaseResponse<?>> handleUnhandledException(Exception e) {
-    log.error("[UnhandledException] {}", e.getMessage(), e);
-
+    log.error("[UnhandledException] ", e);
     return ResponseEntity
-        .status(SERVER_ERROR.getHttpStatus())
-        .body(BaseResponse.error(SERVER_ERROR));
+        .status(BaseResponseStatus.SERVER_ERROR.getHttpStatus())
+        .body(BaseResponse.error(BaseResponseStatus.SERVER_ERROR));
   }
 }
