@@ -1,0 +1,30 @@
+package server.pome.portfolio.type;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
+
+@Getter
+@AllArgsConstructor
+
+public enum TypeEnum {
+    EDUCATIONS(1L),
+    EXPERIENCES(2L),
+    ACTIVITIES(3L),
+    AWARDS(4L),
+    QUALIFICATIONS(5L),
+    PROJECTS(6L),
+    ETCS(7L);
+
+    private final Long id;
+
+    public static TypeEnum fromId(Long id) {
+        for (TypeEnum typeEnum : TypeEnum.values()) {
+            if (typeEnum.getId().equals(id)) {
+                return typeEnum;
+            }
+        }
+        throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+    }
+}
