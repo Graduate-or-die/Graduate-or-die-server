@@ -13,6 +13,7 @@ public enum BaseResponseStatus {
   REQUEST_ERROR(false, HttpStatus.BAD_REQUEST, 2000, "입력값을 확인해주세요."),
   INVALID_USER(false, HttpStatus.UNAUTHORIZED, 2001, "유효하지 않은 사용자입니다."),
   INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED, 2002, "유효하지 않은 토큰입니다."),
+  INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
 
   // users
   USER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2003, "존재하지 않는 사용자입니다."),
