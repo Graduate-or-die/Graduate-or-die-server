@@ -67,8 +67,11 @@ public class UserService {
   public GetUserResponse getUserInfo(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
+
+    // 포트폴리오 태그 저장
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     List<String> tags = (portfolio != null) ? portfolio.getTag() : new ArrayList<>();
+
     return GetUserResponse.from(user, tags);
   }
 
@@ -84,7 +87,9 @@ public class UserService {
     String introduction = Optional.ofNullable(request.getIntroduction()).orElse(user.getIntroduction());
     String job = Optional.ofNullable(request.getJob()).orElse(user.getJob());
 
+    // 회원 정보 수정
     user.updateUserInfo(name, nickname, matching, introduction, job);
+
     return UpdateUserResponse.from(user);
   }
 
