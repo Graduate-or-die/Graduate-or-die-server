@@ -5,6 +5,9 @@ import lombok.Getter;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 @AllArgsConstructor
 
@@ -26,5 +29,12 @@ public enum TypeEnum {
             }
         }
         throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+    }
+
+    // 기본 구조 (비공개)
+    public static Map<Long, Boolean> defaultVisibilityMap() {
+        Map<Long, Boolean> m = new HashMap<>();
+        for (TypeEnum t : values()) m.put(t.getId(), false);
+        return m;
     }
 }

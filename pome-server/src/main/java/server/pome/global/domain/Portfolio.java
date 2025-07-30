@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import server.pome.portfolio.type.TypeEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,4 +41,10 @@ public class Portfolio {
     @Column(name = "is_visible")
     @Comment("알람 여부 매핑")
     private Map<Long, Boolean> visibilityMap = new HashMap<>();
+
+    public Portfolio(User user, Map<Long, Boolean> visibilityMap) {
+        this.user = user;
+        this.visibilityMap = visibilityMap;
+    }
+
 }
