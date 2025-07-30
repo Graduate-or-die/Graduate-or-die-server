@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.global.domain.Portfolio;
+import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
@@ -20,12 +21,19 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
 
+
+    public void createInitialPortfolio(User user) {
+        Portfolio portfolio = new Portfolio(user, TypeEnum.defaultVisibilityMap());
+        portfolioRepository.save(portfolio);
+    }
+
     @Transactional
     public boolean toggleVisible(Long userId, Long typeId) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (portfolio == null) {
             throw new BaseException(BaseResponseStatus.INVALID_USER);
         }
+        TypeEnum typeEnum = TypeEnum.fromId(typeId);
 
         Map<Long, Boolean> visibilityMap = portfolio.getVisibilityMap();
 

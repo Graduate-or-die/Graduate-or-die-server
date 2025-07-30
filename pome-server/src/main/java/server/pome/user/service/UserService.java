@@ -12,6 +12,7 @@ import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.portfolio.service.PortfolioService;
 import server.pome.portfolio.type.TypeEnum;
 import server.pome.user.dto.request.CreateUserRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
@@ -29,6 +30,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PortfolioRepository portfolioRepository;
+  private final PortfolioService portfolioService;
 
   // 회원가입 (API 테스트용 임시 코드)
   public CreateUserResponse createUser(CreateUserRequest request) {
@@ -50,13 +52,7 @@ public class UserService {
     );
 
     userRepository.save(user);
-    userRepository.flush();
-
-
-    Portfolio portfolio = new Portfolio(
-            user, TypeEnum.defaultVisibilityMap()
-    );
-    portfolioRepository.save(portfolio);
+    portfolioService.createInitialPortfolio(user);
 
     return CreateUserResponse.builder()
         .userId(user.getId())
