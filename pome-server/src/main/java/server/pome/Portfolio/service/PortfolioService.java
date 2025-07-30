@@ -7,10 +7,13 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
+import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.portfolio.type.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -27,13 +30,12 @@ public class PortfolioService {
         portfolioRepository.save(portfolio);
     }
 
-    @Transactional
     public boolean toggleVisible(Long userId, Long typeId) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (portfolio == null) {
             throw new BaseException(BaseResponseStatus.INVALID_USER);
         }
-        TypeEnum typeEnum = TypeEnum.fromId(typeId);
+        TypeEnum.fromId(typeId);
 
         Map<Long, Boolean> visibilityMap = portfolio.getVisibilityMap();
 
@@ -50,7 +52,22 @@ public class PortfolioService {
         boolean current = visibilityMap.getOrDefault(typeId, false);
         boolean newValue = !current;
         visibilityMap.put(typeId, newValue);
-
         return newValue;
+    }
+    public List<VisibilityResponse> getVisibilityList(Long userId) {
+        Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+        if (portfolio == null) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        Map<Long, Boolean> visibilityMap = portfolio.getVisibilityMap();
+        List<VisibilityResponse> responseList = new ArrayList<>();
+
+        for (long typeId = 1L; typeId <= 7L; typeId++) {
+            boolean visible = visibilityMap.getOrDefault(typeId, false);
+            responseList.add(new VisibilityResponse(typeId, visible));
+        }
+
+        return responseList;
     }
 }
