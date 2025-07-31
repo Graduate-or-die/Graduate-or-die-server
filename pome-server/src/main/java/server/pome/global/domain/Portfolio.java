@@ -1,10 +1,7 @@
 package server.pome.global.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 import server.pome.portfolio.type.TypeEnum;
 
@@ -13,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Getter
+@Getter @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

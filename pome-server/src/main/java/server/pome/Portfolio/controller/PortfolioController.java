@@ -1,6 +1,9 @@
 package server.pome.portfolio.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.pome.global.domain.BaseResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
@@ -15,19 +18,22 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    // 항목별 공개범위 설정
+    @Operation(summary = "항목별 공개범위 설정")
+    @Parameter(name = "userId", description = "회원 ID", required = true)
+    @Parameter(name = "typeId", description = "항목 ID", required = true)
     @PostMapping("/visibility/{userId}")
-    public BaseResponse<VisibilityResponse> toggleVisibility(@PathVariable Long userId,
+    public ResponseEntity<BaseResponse<VisibilityResponse>> toggleVisibility(@PathVariable Long userId,
                                                              @RequestParam("typeId") Long typeId) {
         boolean updatedState = portfolioService.toggleVisible(userId, typeId);
-        return BaseResponse.success(new VisibilityResponse(typeId, updatedState));
+        return ResponseEntity.ok(BaseResponse.success(new VisibilityResponse(typeId, updatedState)));
     }
 
-    // 공개범위 여부 리스트 조회
+    @Operation(summary = "공개범위 여부 리스트 조회")
+    @Parameter(name = "userId", description = "회원 ID", required = true)
     @GetMapping("/visibility/{userId}")
-    public BaseResponse<List<VisibilityResponse>> getVisibilityList(@PathVariable Long userId) {
+    public ResponseEntity<BaseResponse<List<VisibilityResponse>>>  getVisibilityList(@PathVariable Long userId) {
         List<VisibilityResponse> visibilityList = portfolioService.getVisibilityList(userId);
-        return BaseResponse.success(visibilityList);
+        return ResponseEntity.ok(BaseResponse.success(visibilityList));
     }
 
 }

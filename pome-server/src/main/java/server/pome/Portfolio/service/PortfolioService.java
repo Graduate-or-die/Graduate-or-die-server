@@ -1,6 +1,7 @@
 package server.pome.portfolio.service;
 
 import jakarta.transaction.Transactional;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.global.domain.Portfolio;
@@ -25,15 +26,20 @@ public class PortfolioService {
     private final UserRepository userRepository;
 
 
+    // 포트폴리오 생성
     public void createInitialPortfolio(User user) {
-        Portfolio portfolio = new Portfolio(user, TypeEnum.defaultVisibilityMap());
+        Portfolio portfolio = Portfolio.builder()
+                .user(user)
+                .visibilityMap(TypeEnum.defaultVisibilityMap())
+                .build();
         portfolioRepository.save(portfolio);
     }
 
+    // 항목별 공개범위 설정
     public boolean toggleVisible(Long userId, Long typeId) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
-        if (portfolio == null) {
-            throw new BaseException(BaseResponseStatus.INVALID_USER);
+        if (!userRepository.existsById(userId)) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
         TypeEnum.fromId(typeId);
 
@@ -54,9 +60,11 @@ public class PortfolioService {
         visibilityMap.put(typeId, newValue);
         return newValue;
     }
+
+    // 공개범위 여부 리스트 조회
     public List<VisibilityResponse> getVisibilityList(Long userId) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
-        if (portfolio == null) {
+        if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
