@@ -8,10 +8,12 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.pome.Portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.portfolio.service.PortfolioService;
+import server.pome.portfolio.type.TypeEnum;
 import server.pome.user.dto.request.CreateUserRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.request.UserLoginRequest;
@@ -28,6 +30,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PortfolioRepository portfolioRepository;
+  private final PortfolioService portfolioService;
 
   // 회원가입 (API 테스트용 임시 코드)
   public CreateUserResponse createUser(CreateUserRequest request) {
@@ -49,6 +52,7 @@ public class UserService {
     );
 
     userRepository.save(user);
+    portfolioService.createInitialPortfolio(user);
 
     return CreateUserResponse.builder()
         .userId(user.getId())

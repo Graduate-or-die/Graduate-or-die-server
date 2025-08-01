@@ -1,23 +1,21 @@
 package server.pome.global.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
+import server.pome.portfolio.type.TypeEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Getter
+@Getter @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="portfolios")
-public class Portfolio {
+public class Portfolio extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +38,10 @@ public class Portfolio {
     @Column(name = "is_visible")
     @Comment("알람 여부 매핑")
     private Map<Long, Boolean> visibilityMap = new HashMap<>();
+
+    public Portfolio(User user, Map<Long, Boolean> visibilityMap) {
+        this.user = user;
+        this.visibilityMap = visibilityMap;
+    }
+
 }
