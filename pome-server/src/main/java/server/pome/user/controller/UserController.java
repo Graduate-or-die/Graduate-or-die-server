@@ -2,6 +2,7 @@ package server.pome.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import server.pome.global.domain.BaseResponse;
 import server.pome.user.dto.request.CreateUserRequest;
@@ -70,6 +72,21 @@ public class UserController {
       @Valid @RequestBody UpdateUserRequest updateUserRequest
   ) {
     UpdateUserResponse result = userService.updateUserInfo(userId, updateUserRequest);
+    return ResponseEntity.ok(BaseResponse.success(result));
+  }
+
+  // 회원 검색
+  @Operation(summary = "메이트 검색")
+  @Parameters({
+      @Parameter(name = "userId", description = "회원 ID", required = true),
+      @Parameter(name = "name", description = "검색할 메이트 닉네임", required = true)
+  })
+  @GetMapping("search/{userId}")
+  public ResponseEntity<BaseResponse<GetUserResponse>> searchUser(
+      @PathVariable Long userId,
+      @RequestParam("name") String name
+  ) {
+    GetUserResponse result = userService.searchUser(userId, name);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
 }
