@@ -43,5 +43,5 @@ public class Mate {
   @Column(nullable = false, length = 10)
   @Comment("메이트 신청 상태(대기/수락/거절)")
   private MateRequestStatus status;
-  
+
 }

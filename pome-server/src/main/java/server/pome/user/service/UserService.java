@@ -39,9 +39,7 @@ public class UserService {
       throw new BaseException(DUPLICATE_USER);
     }
     User user = new User(
-        null,
         request.getPassword(),
-        new ArrayList<>(), // fromIds
         request.getUserName(),
         request.getNickName(),
         0, // likeCount
