@@ -28,6 +28,15 @@ public class EducationService {
     // 학력 저장
     public SaveEducationResponse saveEducation(Long userId, SaveEducationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+
+        if (portfolio == null) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        if (educationRepository.findByPortfolio(portfolio).isPresent()) {
+            throw new BaseException(BaseResponseStatus.DUPLICATE_EDUCATION);
+        }
+
         Education education = new Education(
                 null,
                 portfolio,
@@ -50,7 +59,7 @@ public class EducationService {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         Education education = educationRepository.findByPortfolio(portfolio)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.EDUCATION_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
 
         String school = request.getSchool() != null && !request.getSchool().isEmpty() ? request.getSchool() : education.getSchool();
         String major = request.getMajor() != null && !request.getMajor().isEmpty() ? request.getMajor() : education.getMajor();
