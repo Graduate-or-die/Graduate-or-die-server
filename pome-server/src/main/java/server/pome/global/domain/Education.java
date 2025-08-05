@@ -34,4 +34,11 @@ public class Education extends BaseEntity {
     @Column(name = "degree", nullable = true)
     @Comment("학위")
     private String degree;
+
+    // 학력 정보 업데이트
+    public void updateEducation(String school, String major, String degree) {
+        this.school = school;
+        this.major = major;
+        this.degree = degree;
+    }
 }
