@@ -3,6 +3,7 @@ package server.pome.education.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import server.pome.education.dto.request.SaveEducationRequest;
 import server.pome.education.dto.request.UpdateEducationRequest;
 import server.pome.education.dto.response.SaveEducationResponse;
 import server.pome.education.dto.response.UpdateEducationResponse;
@@ -25,14 +26,14 @@ public class EducationService {
     private final PortfolioRepository portfolioRepository;
 
     // 학력 저장
-    public SaveEducationResponse saveEducation(Long userId) {
+    public SaveEducationResponse saveEducation(Long userId, SaveEducationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         Education education = new Education(
                 null,
                 portfolio,
-                null,
-                null,
-                null
+                request.getSchool(),
+                request.getMajor(),
+                request.getDegree()
         );
         educationRepository.save(education);
 
@@ -45,13 +46,15 @@ public class EducationService {
     }
 
     // 학력 수정
-    public UpdateEducationResponse updateEducation(Long educationId, UpdateEducationRequest request) {
-        Education education = educationRepository.findById(educationId)
+    public UpdateEducationResponse updateEducation(Long userId, UpdateEducationRequest request) {
+        Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+
+        Education education = educationRepository.findByPortfolio(portfolio)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.EDUCATION_NOT_FOUND));
 
-        String school = Optional.ofNullable(education.getSchool()).orElse(request.getSchool());
-        String major = Optional.ofNullable(education.getMajor()).orElse(request.getMajor());
-        String degree = Optional.ofNullable(education.getDegree()).orElse(request.getDegree());
+        String school = request.getSchool() != null && !request.getSchool().isEmpty() ? request.getSchool() : education.getSchool();
+        String major = request.getMajor() != null && !request.getMajor().isEmpty() ? request.getMajor() : education.getMajor();
+        String degree = request.getDegree() != null && !request.getDegree().isEmpty() ? request.getDegree() : education.getDegree();
 
         education.updateEducation(school, major, degree);
 

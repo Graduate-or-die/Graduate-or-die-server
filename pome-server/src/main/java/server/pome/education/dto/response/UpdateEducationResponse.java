@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import server.pome.global.domain.Education;
 
 @Getter
 @Builder
@@ -21,4 +22,13 @@ public class UpdateEducationResponse {
 
     @Schema(description = "학위", example = "학사")
     private String degree;
+
+    public static UpdateEducationResponse from(Education education) {
+        return UpdateEducationResponse.builder()
+                .educationId(education.getId())
+                .school(education.getSchool())
+                .major(education.getMajor())
+                .degree(education.getDegree())
+                .build();
+    }
 }
