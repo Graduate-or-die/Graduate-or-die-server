@@ -11,7 +11,7 @@ import org.hibernate.annotations.Comment;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="education")
+@Table(name="educations")
 public class Education extends BaseEntity {
 
     @Id

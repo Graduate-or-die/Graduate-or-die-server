@@ -1,7 +1,6 @@
 package server.pome.education.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
