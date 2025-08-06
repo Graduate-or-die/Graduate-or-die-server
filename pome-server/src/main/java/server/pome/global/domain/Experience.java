@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
@@ -35,9 +35,9 @@ public class Experience extends BaseEntity {
 
     @Column(name = "experience_start_at", nullable = true)
     @Comment("근무 시작일")
-    private LocalDateTime experienceStartAt;
+    private LocalDate experienceStartAt;
 
     @Column(name = "experience_end_at", nullable = true)
     @Comment("근무 마감일")
-    private LocalDateTime experienceEndAt;
+    private LocalDate experienceEndAt;
 }
