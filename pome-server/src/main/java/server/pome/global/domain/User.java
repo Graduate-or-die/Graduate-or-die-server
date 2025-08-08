@@ -1,15 +1,8 @@
 package server.pome.global.domain;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,20 +16,9 @@ import org.hibernate.annotations.Comment;
 @Table(name = "users")
 public class User extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(nullable = false, unique = true)
-  private Long id;
-
   @Column(name = "password", nullable = false)
   @Comment("비밀번호")
   private String password;
-
-  @ElementCollection
-  @CollectionTable(name = "user_from_ids", joinColumns = @JoinColumn(name = "user_id"))
-  @Column(name = "from_id")
-  @Comment("신청자 아이디 목록")
-  private List<Integer> fromIds;
 
   @Column(name = "user_name", nullable = false)
   @Comment("유저 이름")
