@@ -8,4 +8,6 @@ import server.pome.global.domain.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
   boolean existsByNickName(String nickName);
+
+  User findByNickName(String name);
 }
