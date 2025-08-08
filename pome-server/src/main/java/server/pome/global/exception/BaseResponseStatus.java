@@ -22,7 +22,8 @@ public enum BaseResponseStatus {
   INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
 
   // education
-  DUPLICATE_EDUCATION(false, HttpStatus.BAD_REQUEST, 2006, "해당 유저의 학력이 이미 존재합니다."),
+  EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),
+  DUPLICATE_EDUCATION(false, HttpStatus.BAD_REQUEST, 2007, "해당 유저의 학력이 이미 존재합니다."),
 
   // 3000번대: 응답 오류
   RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),

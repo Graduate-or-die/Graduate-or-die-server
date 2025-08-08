@@ -13,6 +13,8 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.user.repository.UserRepository;
+import server.pome.user.service.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +23,13 @@ public class EducationService {
 
     private final EducationRepository educationRepository;
     private final PortfolioRepository portfolioRepository;
+    private final UserRepository userRepository;
 
     // 학력 저장
     public SaveEducationResponse saveEducation(Long userId, SaveEducationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
-        if (portfolio == null) {
+        if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
@@ -54,9 +57,12 @@ public class EducationService {
     // 학력 수정
     public UpdateEducationResponse updateEducation(Long userId, UpdateEducationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
 
         Education education = educationRepository.findByPortfolio(portfolio)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.EDUCATION_NOT_FOUND));
 
         String school = request.getSchool() != null && !request.getSchool().isEmpty() ? request.getSchool() : education.getSchool();
         String major = request.getMajor() != null && !request.getMajor().isEmpty() ? request.getMajor() : education.getMajor();

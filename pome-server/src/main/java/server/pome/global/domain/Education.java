@@ -13,8 +13,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Table(name="educations")
 public class Education extends BaseEntity {
-
-    @Id
+    
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
