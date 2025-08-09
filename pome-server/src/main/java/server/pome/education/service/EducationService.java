@@ -14,7 +14,6 @@ import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.user.repository.UserRepository;
-import server.pome.user.service.UserService;
 
 @Service
 @RequiredArgsConstructor

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import server.pome.global.domain.Experience;
 
 import java.time.LocalDate;
 
@@ -27,4 +28,14 @@ public class SaveExperienceResponse {
 
     @Schema(description = "근무 마감일", example = "2025-08-01")
     private LocalDate experienceEndAt;
+
+    public static SaveExperienceResponse from(Experience e) {
+        return SaveExperienceResponse.builder()
+                .experienceId(e.getId())
+                .workplace(e.getWorkplace())
+                .spot(e.getSpot())
+                .experienceStartAt(e.getExperienceStartAt())
+                .experienceEndAt(e.getExperienceEndAt())
+                .build();
+    }
 }
