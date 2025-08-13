@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.experience.dto.request.SaveExperienceRequest;
+import server.pome.experience.dto.request.UpdateExperienceRequest;
 import server.pome.experience.dto.response.SaveExperienceResponse;
+import server.pome.experience.dto.response.UpdateExperienceResponse;
 import server.pome.experience.repository.ExperienceRepository;
 import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
@@ -12,7 +14,8 @@ import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.user.repository.UserRepository;
-import server.pome.user.service.UserService;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +37,24 @@ public class ExperienceService {
         experienceRepository.save(experience);
 
         return SaveExperienceResponse.from(experience);
+    }
+
+    // 경력 수정
+    public UpdateExperienceResponse updateExperience(Long userId, Long experienceId, UpdateExperienceRequest request){
+        Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        Experience experience = experienceRepository.findByIdAndPortfolio_User_Id(experienceId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.EXPERIENCE_NOT_FOUND));
+
+        String workplace = request.getWorkplace() != null && !request.getWorkplace().isEmpty() ? request.getWorkplace() : experience.getWorkplace();
+        String spot = request.getSpot() != null && !request.getSpot().isEmpty() ? request.getSpot() : experience.getSpot();
+        LocalDate experienceStartAt = request.getExperienceStartAt() != null ? request.getExperienceStartAt() : experience.getExperienceStartAt();
+        LocalDate experienceEndAt = request.getExperienceEndAt() != null ? request.getExperienceEndAt() : experience.getExperienceEndAt();
+
+        experience.updateExperience(workplace, spot, experienceStartAt, experienceEndAt);
+        return UpdateExperienceResponse.from(experience);
     }
 }

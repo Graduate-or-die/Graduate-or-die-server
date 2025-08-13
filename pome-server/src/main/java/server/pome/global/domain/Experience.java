@@ -16,11 +16,6 @@ import java.time.LocalDate;
 @Table(name = "experiences")
 public class Experience extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
-    private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
@@ -40,4 +35,12 @@ public class Experience extends BaseEntity {
     @Column(name = "experience_end_at", nullable = true)
     @Comment("근무 마감일")
     private LocalDate experienceEndAt;
+
+    // 경력 정보 업데이트
+    public void updateExperience(String workplace, String spot, LocalDate startAt, LocalDate endAt) {
+        this.workplace = workplace;
+        this.spot = spot;
+        this.experienceStartAt = startAt;
+        this.experienceEndAt = endAt;
+    }
 }

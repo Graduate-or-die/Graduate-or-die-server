@@ -2,17 +2,15 @@ package server.pome.experience.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import server.pome.experience.dto.request.SaveExperienceRequest;
+import server.pome.experience.dto.request.UpdateExperienceRequest;
 import server.pome.experience.dto.response.SaveExperienceResponse;
+import server.pome.experience.dto.response.UpdateExperienceResponse;
 import server.pome.experience.service.ExperienceService;
 import server.pome.global.domain.BaseResponse;
 
@@ -23,11 +21,20 @@ import server.pome.global.domain.BaseResponse;
 public class ExperienceController {
     private final ExperienceService experienceService;
 
-    @Operation(summary = "학력 저장")
+    @Operation(summary = "경력 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping("/{userId}")
     public ResponseEntity<BaseResponse<SaveExperienceResponse>> saveExperience(@PathVariable Long userId, @Valid @RequestBody SaveExperienceRequest request) {
         SaveExperienceResponse result = experienceService.saveExperience(userId, request);
+        return ResponseEntity.ok(BaseResponse.success(result));
+    }
+
+    @Operation(summary = "경력 수정")
+    @Parameter(name = "userId", description = "회원 ID", required = true)
+    @Parameter(name = "blockId", description = "경력 ID", required = true)
+    @PatchMapping("/{userId}")
+    public ResponseEntity<BaseResponse<UpdateExperienceResponse>> updateExperience(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateExperienceRequest request) {
+        UpdateExperienceResponse result = experienceService.updateExperience(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

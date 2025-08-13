@@ -2,15 +2,11 @@ package server.pome.experience.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import server.pome.global.domain.Experience;
-import server.pome.global.domain.Portfolio;
 
 import java.time.LocalDate;
 
 @Getter
-public class SaveExperienceRequest {
-
+public class UpdateExperienceRequest {
     @Schema(description = "근무처", example = "네이버")
     private String workplace;
 
@@ -23,13 +19,4 @@ public class SaveExperienceRequest {
     @Schema(description = "근무 마감일", example = "2025-08-01")
     private LocalDate experienceEndAt;
 
-    public Experience toEntity(Portfolio portfolio) {
-        return new Experience(
-                portfolio,
-                this.workplace,
-                this.spot,
-                this.experienceStartAt,
-                this.experienceEndAt
-        );
-    }
 }
