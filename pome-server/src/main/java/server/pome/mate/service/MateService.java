@@ -73,16 +73,11 @@ public class MateService {
       throw new BaseException(ALREADY_REQUEST_MATE);
     }
 
-    // 대상 메이트의 신청자 리스트에 userId가 있고 매칭 활성화 되어있는 경우 메이트 매칭
-    boolean hasReverseRequest = mateRepository.existsByFromUserAndTargetUser(mateUser, user);
-    if (hasReverseRequest) {
-      return matchMate(mateId, userId);
-    }
-
     // 신규 메이트 신청
     ensureNoMate(user, mateUser);
     ensureCanMatching(user, mateUser);
 
+    // 신청 대기(PENDING) 상태로 저장
     Mate newMate = new Mate(null, mateUser, user, PENDING);
     mateRepository.save(newMate);
 
