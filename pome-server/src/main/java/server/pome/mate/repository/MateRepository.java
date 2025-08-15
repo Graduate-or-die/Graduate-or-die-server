@@ -56,6 +56,7 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
       @Param("fromStatus") MateRequestStatus fromStatus,
       @Param("toStatus") MateRequestStatus toStatus);
 
+  // 두 유저의 상태를 fromStatus -> toStatus로 동시 변경
   @Modifying
   @Query("""
   update Mate m
