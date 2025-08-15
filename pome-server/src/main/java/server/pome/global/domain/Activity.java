@@ -37,4 +37,13 @@ public class Activity extends BaseEntity {
     @Column(name = "result", nullable = true)
     @Comment("성과")
     private String result;
+
+    // 대내외활동 정보 업데이트
+    public void updateActivity(String activityName, String activityRole, LocalDate activityStartAt, LocalDate activityEndAt, String result) {
+        this.activityName = activityName;
+        this.activityRole = activityRole;
+        this.activityStartAt = activityStartAt;
+        this.activityEndAt = activityEndAt;
+        this.result = result;
+    }
 }

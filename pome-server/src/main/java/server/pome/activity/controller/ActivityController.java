@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.pome.activity.dto.request.SaveActivityRequest;
+import server.pome.activity.dto.request.UpdateActivityRequest;
 import server.pome.activity.dto.response.SaveActivityResponse;
+import server.pome.activity.dto.response.UpdateActivityResponse;
 import server.pome.activity.service.ActivityService;
-import server.pome.education.dto.request.SaveEducationRequest;
-import server.pome.education.dto.response.SaveEducationResponse;
 import server.pome.global.domain.BaseResponse;
 
 @RequiredArgsConstructor
@@ -28,6 +28,15 @@ public class ActivityController {
     public ResponseEntity<BaseResponse<SaveActivityResponse>> saveActivity(@PathVariable Long userId, @Valid @RequestBody SaveActivityRequest request) {
 
         SaveActivityResponse result = activityService.saveActivity(userId, request);
+        return ResponseEntity.ok(BaseResponse.success(result));
+    }
+
+    @Operation(summary = "대내외활동 수정")
+    @Parameter(name = "userId", description = "회원 ID", required = true)
+    @Parameter(name = "blockId", description = "대내외활동 ID", required = true)
+    @PatchMapping("/{userId}")
+    public ResponseEntity<BaseResponse<UpdateActivityResponse>> updateActivity(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateActivityRequest request) {
+        UpdateActivityResponse result = activityService.updateActivity(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }
