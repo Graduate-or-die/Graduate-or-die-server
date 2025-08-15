@@ -21,10 +21,13 @@ public enum BaseResponseStatus {
   // portfolios
   INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
 
-
   // education
   EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),
   DUPLICATE_EDUCATION(false, HttpStatus.BAD_REQUEST, 2007, "해당 유저의 학력이 이미 존재합니다."),
+
+  // experience
+  INVALID_DATE_RANGE(false, HttpStatus.BAD_REQUEST, 2008, "마감일이 시작일보다 빠릅니다"),
+  EXPERIENCE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2009, "해당 경력을 찾을 수 없습니다."),
 
   // mates
   CANNOT_MATE_SELF_REQUEST(false, HttpStatus.BAD_REQUEST, 2010, "본인에게는 메이트 신청을 할 수 없습니다."),
