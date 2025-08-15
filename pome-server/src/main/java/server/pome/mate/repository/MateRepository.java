@@ -55,4 +55,20 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
       @Param("target") User targetUser,
       @Param("fromStatus") MateRequestStatus fromStatus,
       @Param("toStatus") MateRequestStatus toStatus);
+
+  @Modifying
+  @Query("""
+  update Mate m
+     set m.status = :toStatus
+   where m.status = :fromStatus
+     and (
+          (m.fromUser.id = :aId and m.targetUser.id = :bId)
+       or (m.fromUser.id = :bId and m.targetUser.id = :aId)
+     )
+""")
+  int updateStatusEitherDirection(@Param("aId") Long aId,
+      @Param("bId") Long bId,
+      @Param("fromStatus") MateRequestStatus fromStatus,
+      @Param("toStatus") MateRequestStatus toStatus);
+
 }

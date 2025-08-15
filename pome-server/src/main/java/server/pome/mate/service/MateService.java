@@ -118,19 +118,21 @@ public class MateService {
     ensureNoMate(user, mateUser);
     ensureCanMatching(user, mateUser);
 
+    // 신청자 리스트에 user가 있는지 검사
+    boolean requested = mateRepository.existsByFromUserAndTargetUserAndStatus(mateUser, user,
+        PENDING);
+    if (!requested) {
+      throw new BaseException(PROPOSER_NOT_FOUND);
+    }
+
     // 양방향으로 매칭 상태 변경(PENDING -> ACCEPTED)
-    int mateStatus = mateRepository.updateStatusTo(mateUser, user, PENDING, ACCEPTED);
-    int userStatus = mateRepository.updateStatusTo(user, mateUser, PENDING, ACCEPTED);
+    int updated = mateRepository.updateStatusEitherDirection(userId, mateId, PENDING, ACCEPTED);
 
     // mate는 이미 user에게 요청한 상태이므로 'user -> mate' 없던 케이스만 검사 보완
-    if (userStatus == 0) {
-      boolean existsAny = mateRepository.existsByFromUserAndTargetUser(user, mateUser);
-      if (!existsAny) {
-        mateRepository.save(new Mate(null, mateUser, user, ACCEPTED));
-      } else {
-        throw new BaseException(CONFLICT_STATE);
-      }
+    if (updated == 0) {
+      throw new BaseException(CONFLICT_STATE);
     }
+
     return userId + "와 " + mateId + "가 매칭되었습니다.";
   }
 
@@ -141,11 +143,18 @@ public class MateService {
     User mateUser = pair[0];
     User user = pair[1];
 
-    // ACCEPTED -> UNMATCHED 상태 변경 -> 2건 모두 업데이트 되면 반영
-    int mateStatus = mateRepository.updateStatusTo(user, mateUser, ACCEPTED, UNMATCHED);
-    int userStatus = mateRepository.updateStatusTo(mateUser, user, ACCEPTED, UNMATCHED);
+    // 먼저 매칭 상태인지 확인
+    boolean matched = mateRepository.existsByFromUserAndTargetUserAndStatus(user, mateUser, ACCEPTED)
+        || mateRepository.existsByFromUserAndTargetUserAndStatus(mateUser, user, ACCEPTED);
 
-    if (mateStatus + userStatus != 2) {
+    if (!matched) {
+      throw new BaseException(NOT_MATCHED_MATE);
+    }
+
+    // ACCEPTED -> UNMATCHED 상태 변경 (양방향)
+    int updated = mateRepository.updateStatusEitherDirection(userId, mateId, ACCEPTED, UNMATCHED);
+
+    if (updated == 0) {
       throw new BaseException(CONFLICT_STATE);
     }
 
