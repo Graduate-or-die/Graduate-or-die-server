@@ -10,5 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ExperienceRepository extends JpaRepository<Experience, Long> {
+    // 사용자(userId)가 소유한 경력(experienceId)만 조회
     Optional<Experience> findByIdAndPortfolio_User_Id(Long id, Long userId);
 }

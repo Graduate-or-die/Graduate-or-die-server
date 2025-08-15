@@ -33,6 +33,12 @@ public class ExperienceService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
+        if (request.getExperienceStartAt() != null && request.getExperienceEndAt() != null) {
+            if (request.getExperienceEndAt().isBefore(request.getExperienceStartAt())) {
+                throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
+            }
+        }
+
         Experience experience = request.toEntity(portfolio);
         experienceRepository.save(experience);
 
@@ -48,6 +54,12 @@ public class ExperienceService {
 
         Experience experience = experienceRepository.findByIdAndPortfolio_User_Id(experienceId, userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.EXPERIENCE_NOT_FOUND));
+
+        if (request.getExperienceStartAt() != null && request.getExperienceEndAt() != null) {
+            if (request.getExperienceEndAt().isBefore(request.getExperienceStartAt())) {
+                throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
+            }
+        }
 
         String workplace = request.getWorkplace() != null && !request.getWorkplace().isEmpty() ? request.getWorkplace() : experience.getWorkplace();
         String spot = request.getSpot() != null && !request.getSpot().isEmpty() ? request.getSpot() : experience.getSpot();

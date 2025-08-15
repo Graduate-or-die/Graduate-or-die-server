@@ -29,13 +29,13 @@ public class UpdateExperienceResponse {
     @Schema(description = "근무 마감일", example = "2025-08-01")
     private LocalDate experienceEndAt;
 
-    public static UpdateExperienceResponse from(Experience experience) {
+    public static UpdateExperienceResponse from(Experience e) {
         return UpdateExperienceResponse.builder()
-                .experienceId(experience.getId())
-                .workplace(experience.getWorkplace())
-                .spot(experience.getSpot())
-                .experienceStartAt(experience.getExperienceStartAt())
-                .experienceEndAt(experience.getExperienceEndAt())
+                .experienceId(e.getId())
+                .workplace(e.getWorkplace())
+                .spot(e.getSpot())
+                .experienceStartAt(e.getExperienceStartAt())
+                .experienceEndAt(e.getExperienceEndAt())
                 .build();
     }
 }

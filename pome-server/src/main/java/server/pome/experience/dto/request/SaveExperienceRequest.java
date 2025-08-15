@@ -9,6 +9,7 @@ import server.pome.global.domain.Portfolio;
 import java.time.LocalDate;
 
 @Getter
+@NoArgsConstructor
 public class SaveExperienceRequest {
 
     @Schema(description = "근무처", example = "네이버")
@@ -24,12 +25,12 @@ public class SaveExperienceRequest {
     private LocalDate experienceEndAt;
 
     public Experience toEntity(Portfolio portfolio) {
-        return new Experience(
-                portfolio,
-                this.workplace,
-                this.spot,
-                this.experienceStartAt,
-                this.experienceEndAt
-        );
+        return Experience.builder()
+                .portfolio(portfolio)
+                .workplace(workplace)
+                .spot(spot)
+                .experienceStartAt(experienceStartAt)
+                .experienceEndAt(experienceEndAt)
+                .build();
     }
 }
