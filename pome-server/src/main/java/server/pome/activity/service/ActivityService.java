@@ -31,6 +31,12 @@ public class ActivityService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
+        if (request.getActivityStartAt() != null && request.getActivityEndAt() != null) {
+            if (request.getActivityStartAt().isBefore(request.getActivityEndAt())) {
+                throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
+            }
+        }
+
         Activity activity = request.toEntity(portfolio);
         activityRepository.save(activity);
 

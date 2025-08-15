@@ -28,13 +28,13 @@ public class SaveActivityRequest {
     private String result;
 
     public Activity toEntity(Portfolio portfolio) {
-        return new Activity(
-                portfolio,
-                this.activityName,
-                this.activityRole,
-                this.activityStartAt,
-                this.activityEndAt,
-                this.result
-        );
+        return Activity.builder()
+                .portfolio(portfolio)
+                .activityName(activityName)
+                .activityRole(activityRole)
+                .activityStartAt(activityStartAt)
+                .activityEndAt(activityEndAt)
+                .result(result)
+                .build();
     }
 }
