@@ -33,17 +33,6 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
   boolean existsByFromUserAndTargetUserAndStatus(User fromUser, User targetUser,
       MateRequestStatus status);
 
-  // targetUser의 신청자 중 fromUser의 상태를 status로 변경
-  @Modifying(clearAutomatically = true, flushAutomatically = true)
-  @Query("""
-  UPDATE Mate m
-  SET m.status = :status
-  WHERE m.fromUser = :from AND m.targetUser = :target
-""")
-  int updateStatus(@Param("from") User fromUser,
-      @Param("target") User targetUser,
-      @Param("status") MateRequestStatus status);
-
   // targetUser에게 mate를 신청한 fromUser의 상태(fromStatus)를 특정 상태(toStatus)로 변경
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
