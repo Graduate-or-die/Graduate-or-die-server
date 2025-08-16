@@ -34,7 +34,12 @@ public enum BaseResponseStatus {
 
   // mates
   CANNOT_MATE_SELF_REQUEST(false, HttpStatus.BAD_REQUEST, 2010, "본인에게는 메이트 신청을 할 수 없습니다."),
-
+  ALREADY_HAVE_MATE(false, HttpStatus.BAD_REQUEST, 2011, "해당 유저는 이미 메이트가 있습니다."),
+  ALREADY_REQUEST_MATE(false, HttpStatus.BAD_REQUEST, 2012, "해당 유저에게 이미 메이트를 신청했습니다."),
+  PROPOSER_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2013, "신청자 리스트에 메이트가 존재하지 않습니다."),
+  NOT_MATCHED_MATE(false, HttpStatus.BAD_REQUEST, 2014, "매칭된 메이트가 아닙니다."),
+  CONFLICT_STATE(false, HttpStatus.BAD_REQUEST, 2015, "상태가 불일치하여 해제 실패하였습니다."),
+  MATCHING_DISABLED(false, HttpStatus.BAD_REQUEST, 2016, "매칭 비활성화 상태입니다."),
 
   // 3000번대: 응답 오류
   RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
