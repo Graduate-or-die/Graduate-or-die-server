@@ -40,5 +40,14 @@ public class Award extends BaseEntity {
     @Column(name = "award_file", nullable = true)
     @Comment("첨부")
     private List<String> awardFile = new ArrayList<>();
+
+    // 수상경력 정보 업데이트
+    public void updateAward(String awardName, String awardOrganization, LocalDate awardDate, String awardGrade, List<String> awardFile) {
+        this.awardName = awardName;
+        this.awardOrganization = awardOrganization;
+        this.awardDate = awardDate;
+        this.awardGrade = awardGrade;
+        this.awardFile = awardFile;
+    }
 }
 

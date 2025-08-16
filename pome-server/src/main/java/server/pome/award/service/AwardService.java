@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.award.dto.request.SaveAwardRequest;
+import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveAwardResponse;
+import server.pome.award.dto.response.UpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
@@ -12,6 +14,9 @@ import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.user.repository.UserRepository;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,4 +44,23 @@ public class AwardService {
         return SaveAwardResponse.from(award);
     }
 
+    // 수상경력 수정
+    public UpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request) {
+        Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        Award award = awardRepository.findByIdAndPortfolio_User_Id(awardId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.AWARD_NOT_FOUND));
+
+        String awardName = request.getAwardName() != null &&  !request.getAwardName().isEmpty() ? request.getAwardName() : award.getAwardName();
+        String awardOrganization = request.getAwardOrganization() != null && !request.getAwardOrganization().isEmpty() ? request.getAwardOrganization() : award.getAwardOrganization();
+        LocalDate awardDate = request.getAwardDate() != null ? request.getAwardDate() : award.getAwardDate();
+        String awardGrade = request.getAwardGrade() != null && !request.getAwardGrade().isEmpty() ? request.getAwardGrade() : award.getAwardGrade();
+        List<String> awardFile = request.getAwardFile() != null && !request.getAwardFile().isEmpty() ? request.getAwardFile() : award.getAwardFile();
+
+        award.updateAward(awardName, awardOrganization, awardDate, awardGrade, awardFile);
+        return UpdateAwardResponse.from(award);
+    }
 }

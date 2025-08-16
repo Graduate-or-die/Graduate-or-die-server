@@ -32,9 +32,11 @@ public enum BaseResponseStatus {
   // activity
   ACTIVITY_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2020, "해당 활동을 찾을 수 없습니다."),
 
+  // award
+  AWARD_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2025, "해당 수상 경력을 찾을 수 없습니다."),
+
   // mates
   CANNOT_MATE_SELF_REQUEST(false, HttpStatus.BAD_REQUEST, 2010, "본인에게는 메이트 신청을 할 수 없습니다."),
-
 
   // 3000번대: 응답 오류
   RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
