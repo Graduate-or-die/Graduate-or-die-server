@@ -57,4 +57,14 @@ public class User extends BaseEntity {
     this.introduction = introduction;
     this.job = job;
   }
+
+  // 좋아요 수 증가
+  public void addLike() {
+    this.likeCount += 1;
+  }
+
+  // 좋아요 수 감소
+  public void disLike() {
+    this.likeCount -= 1;
+  }
 }
