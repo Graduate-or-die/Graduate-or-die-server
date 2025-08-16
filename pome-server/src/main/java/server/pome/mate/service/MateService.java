@@ -6,6 +6,7 @@ import static server.pome.global.enums.MateRequestStatus.REJECTED;
 import static server.pome.global.enums.MateRequestStatus.UNMATCHED;
 import static server.pome.global.exception.BaseResponseStatus.ALREADY_HAVE_MATE;
 import static server.pome.global.exception.BaseResponseStatus.ALREADY_REQUEST_MATE;
+import static server.pome.global.exception.BaseResponseStatus.CANNOT_MATE_SELF_REQUEST;
 import static server.pome.global.exception.BaseResponseStatus.CONFLICT_STATE;
 import static server.pome.global.exception.BaseResponseStatus.MATCHING_DISABLED;
 import static server.pome.global.exception.BaseResponseStatus.NOT_MATCHED_MATE;
@@ -59,9 +60,13 @@ public class MateService {
   // 메이트 신청
   @Transactional
   public String requestMate(Long mateId, Long userId) {
+    // 본인에게 메이트 API 호출 금지
+    ensureNoSelfMate(mateId, userId);
+
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0]; // 신청 받은 유저
     User user = pair[1]; // 신청 보낸 유저
+
 
     // 이미 신청 상태인 경우
     boolean alreadyRequest = mateRepository
@@ -84,9 +89,13 @@ public class MateService {
   // 메이트 거절
   @Transactional
   public String rejectMate(Long mateId, Long userId) {
+    // 본인에게 메이트 API 호출 금지
+    ensureNoSelfMate(mateId, userId);
+
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0];
     User user = pair[1];
+
 
     // 메이트의 신청자 리스트에 mateUser가 없는 경우
     boolean isPending = mateRepository.existsByFromUserAndTargetUserAndStatus(mateUser, user,
@@ -96,6 +105,7 @@ public class MateService {
     }
 
     int updateMate = mateRepository.updateStatusTo(mateUser, user, PENDING, REJECTED);
+
     // 업데이트가 반영되지 않으면 예외 처리
     if (updateMate == 0) {
       throw new BaseException(PROPOSER_NOT_FOUND);
@@ -107,6 +117,9 @@ public class MateService {
   // 메이트 매칭
   @Transactional
   public String matchMate(Long mateId, Long userId) {
+    // 본인에게 메이트 API 호출 금지
+    ensureNoSelfMate(mateId, userId);
+
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0];
     User user = pair[1];
@@ -136,9 +149,13 @@ public class MateService {
   // 메이트 해제
   @Transactional
   public String unmatchMate(Long mateId, Long userId) {
+    // 본인에게 메이트 API 호출 금지
+    ensureNoSelfMate(mateId, userId);
+
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0];
     User user = pair[1];
+
 
     // 먼저 매칭 상태인지 확인
     boolean matched = mateRepository.existsByFromUserAndTargetUserAndStatus(user, mateUser, ACCEPTED)
@@ -191,6 +208,12 @@ public class MateService {
   private void ensureCanMatching(User a, User b) {
     if (!a.getMatching() || !b.getMatching()) {
       throw new BaseException(MATCHING_DISABLED);
+    }
+  }
+
+  private void ensureNoSelfMate(Long aId, Long bId) {
+    if (aId.equals(bId)) {
+      throw new BaseException(CANNOT_MATE_SELF_REQUEST);
     }
   }
 }
