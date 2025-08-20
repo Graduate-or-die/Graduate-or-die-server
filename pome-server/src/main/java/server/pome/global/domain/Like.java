@@ -7,7 +7,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -30,10 +29,6 @@ import org.hibernate.annotations.CreationTimestamp;
     name = "likes",
     uniqueConstraints = { // {from_user, target_user} 쌍을 유일하게 강제하여 중복 좋아요 방지
         @UniqueConstraint(name = "ux_likes_from_target", columnNames = {"from_user", "target_user"})
-    },
-    indexes = { // 비유니크 인덱스 생성 -> 조회 및 검색 최적화
-        @Index(name = "ix_likes_target", columnList = "target_user"),
-        @Index(name = "ix_likes_from", columnList = "from_user")
     }
 )
 public class Like {
