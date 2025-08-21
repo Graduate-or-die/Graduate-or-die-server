@@ -32,6 +32,9 @@ public enum BaseResponseStatus {
   // activity
   ACTIVITY_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2020, "해당 활동을 찾을 수 없습니다."),
 
+  // award
+  AWARD_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2025, "해당 수상 경력을 찾을 수 없습니다."),
+
   // mate
   CANNOT_MATE_SELF_REQUEST(false, HttpStatus.BAD_REQUEST, 2010, "본인에게는 메이트 신청을 할 수 없습니다."),
   ALREADY_HAVE_MATE(false, HttpStatus.BAD_REQUEST, 2011, "해당 유저는 이미 메이트가 있습니다."),
