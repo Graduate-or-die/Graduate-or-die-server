@@ -8,6 +8,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.pome.like.dto.response.LikeResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
@@ -116,6 +117,4 @@ public class UserService {
     return userRepository.findById(id)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
   }
-
-
 }
