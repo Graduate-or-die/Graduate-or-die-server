@@ -2,15 +2,11 @@ package server.pome.like.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class LikeResponse {
 
   @Schema(description = "유저 ID", example = "1", requiredMode = RequiredMode.REQUIRED)
