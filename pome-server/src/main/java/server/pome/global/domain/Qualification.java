@@ -43,5 +43,5 @@ public class Qualification extends BaseEntity{
     @ElementCollection // 추후 첨부 파일 관련 테이블 생성 예정  @CollectionTable
     @Column(name = "qulification_file", nullable = true)
     @Comment("첨부")
-    private List<String> qulificationFile = new ArrayList<>();
+    private List<String> qualificationFile = new ArrayList<>();
 }

@@ -28,7 +28,7 @@ public class SaveQualificationRequest {
     private int score;
 
     @Schema(description = "첨부", example = "qulificationimg/url")
-    private List<String> qulificationFile = new ArrayList<>();
+    private List<String> qualificationFile = new ArrayList<>();
 
     public Qualification toEntity(Portfolio portfolio) {
         return Qualification.builder()
@@ -38,7 +38,7 @@ public class SaveQualificationRequest {
                 .qualificationStartDate(qualificationStartDate)
                 .qualificationEndDate(qualificationEndDate)
                 .score(score)
-                .qulificationFile(qulificationFile)
+                .qualificationFile(qualificationFile)
                 .build();
     }
 

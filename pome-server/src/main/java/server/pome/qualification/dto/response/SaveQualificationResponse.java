@@ -35,10 +35,10 @@ public class SaveQualificationResponse {
     private int score;
 
     @Schema(description = "첨부", example = "qulificationimg/url")
-    private List<String> qulificationFile = new ArrayList<>();
+    private List<String> qualificationFile = new ArrayList<>();
 
     public static SaveQualificationResponse from(Qualification qualification) {
-        List<String> files = qualification.getQulificationFile();
+        List<String> files = qualification.getQualificationFile();
         return SaveQualificationResponse.builder()
                 .qualificationid(qualification.getId())
                 .qualificationName(qualification.getQualificationName())
@@ -47,7 +47,7 @@ public class SaveQualificationResponse {
                 .qualificationEndDate(qualification.getQualificationEndDate())
                 .score(qualification.getScore())
                 // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
-                .qulificationFile(files == null ? Collections.emptyList() : new ArrayList<>(files))
+                .qualificationFile(files == null ? Collections.emptyList() : new ArrayList<>(files))
                 .build();
     }
 }
