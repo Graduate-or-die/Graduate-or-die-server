@@ -31,6 +31,9 @@ public class SaveQualificationResponse {
     @Schema(description = "만료일자", example = "2027-01-01")
     private LocalDate qualificationEndDate;
 
+    @Schema(description = "만료일 여부", example = "true")
+    private boolean hasQualificationEndDate;
+
     @Schema(description = "등급/점수", example = "1")
     private int score;
 
@@ -45,6 +48,7 @@ public class SaveQualificationResponse {
                 .qualificationOrganization(qualification.getQualificationOrganization())
                 .qualificationStartDate(qualification.getQualificationStartDate())
                 .qualificationEndDate(qualification.getQualificationEndDate())
+                .hasQualificationEndDate(qualification.isHasQualificationEndDate())
                 .score(qualification.getScore())
                 // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
                 .qualificationFile(files == null ? Collections.emptyList() : new ArrayList<>(files))

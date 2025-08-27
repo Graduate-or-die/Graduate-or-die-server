@@ -24,6 +24,9 @@ public class SaveQualificationRequest {
     @Schema(description = "만료일자", example = "2027-01-01")
     private LocalDate qualificationEndDate;
 
+    @Schema(description = "만료일 여부", example = "true")
+    private boolean hasQualificationEndDate;
+
     @Schema(description = "등급/점수", example = "1")
     private int score;
 
@@ -37,6 +40,7 @@ public class SaveQualificationRequest {
                 .qualificationOrganization(qualificationOrganization)
                 .qualificationStartDate(qualificationStartDate)
                 .qualificationEndDate(qualificationEndDate)
+                .hasQualificationEndDate(hasQualificationEndDate)
                 .score(score)
                 .qualificationFile(qualificationFile)
                 .build();
