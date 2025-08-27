@@ -18,7 +18,7 @@ import server.pome.user.repository.UserRepository;
 @Transactional
 public class QualificationService {
 
-    private final QualificationRepository qulificationRepository;
+    private final QualificationRepository qualificationRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
 
@@ -30,10 +30,20 @@ public class QualificationService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
+        if (request.getQualificationStartDate() == null && request.getQualificationEndDate() != null) {
+            throw new BaseException(BaseResponseStatus.END_DATE_WITHOUT_START_DATE);
+        }
+
+        if (request.getQualificationStartDate() != null && request.getQualificationEndDate() != null) {
+            if (request.getQualificationEndDate().isBefore(request.getQualificationStartDate())) {
+                throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
+            }
+        }
+
         // 일단 임시 요청으로 들어온 URL를 save
         // TODO: S3가 붙으면 request에서의 qualificationFile이 아닌 S3의 URL로 교체 예정
         Qualification qualification = request.toEntity(portfolio);
-        qulificationRepository.save(qualification);
+        qualificationRepository.save(qualification);
 
         return SaveQualificationResponse.from(qualification);
     }
