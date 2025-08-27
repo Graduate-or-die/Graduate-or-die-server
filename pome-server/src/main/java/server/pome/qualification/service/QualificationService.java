@@ -9,9 +9,14 @@ import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.qualification.dto.request.SaveQualificationRequest;
+import server.pome.qualification.dto.request.UpdateQualificationRequest;
 import server.pome.qualification.dto.response.SaveQualificationResponse;
+import server.pome.qualification.dto.response.UpdateQualificationResponse;
 import server.pome.qualification.repository.QualificationRepository;
 import server.pome.user.repository.UserRepository;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +51,38 @@ public class QualificationService {
         qualificationRepository.save(qualification);
 
         return SaveQualificationResponse.from(qualification);
+    }
+
+    // 자격증 수정
+    public UpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request) {
+        Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
+
+        if (!userRepository.existsById(userId)) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        if (request.getQualificationStartDate() == null && request.getQualificationEndDate() != null) {
+            throw new BaseException(BaseResponseStatus.END_DATE_WITHOUT_START_DATE);
+        }
+
+        if (request.getQualificationStartDate() != null && request.getQualificationEndDate() != null) {
+            if (request.getQualificationEndDate().isBefore(request.getQualificationStartDate())) {
+                throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
+            }
+        }
+
+        Qualification qualification = qualificationRepository.findByIdAndPortfolio_User_Id(qualificationId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.QUALIFICATION_NOT_FOUND));
+
+        String qualificationName = request.getQualificationName() != null &&  !request.getQualificationName().isEmpty() ? request.getQualificationName() : qualification.getQualificationName();
+        String qualificationOrganization = request.getQualificationOrganization() != null && !request.getQualificationOrganization().isEmpty() ? request.getQualificationOrganization() : qualification.getQualificationOrganization();
+        LocalDate qualificationStartDate = request.getQualificationStartDate() != null ? request.getQualificationStartDate() : qualification.getQualificationStartDate();
+        LocalDate qualificationEndDate = request.getQualificationEndDate() != null ? request.getQualificationEndDate() : qualification.getQualificationEndDate();
+        boolean hasQualificationEndDate = request.isHasQualificationEndDate();
+        int score = request.getScore();
+        List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
+
+        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartDate, qualificationEndDate, hasQualificationEndDate, score, qualificationFile);
+        return UpdateQualificationResponse.from(qualification);
     }
 }

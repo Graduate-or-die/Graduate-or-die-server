@@ -74,5 +74,15 @@ public class Qualification extends BaseEntity{
         this.qualificationEndDate = null;
     }
 
+    public void updateQualification(String qualificationName, String qualificationOrganization,  LocalDate qualificationStartDate, LocalDate qualificationEndDate, boolean hasQualificationEndDate, int score, List<String> qualificationFile) {
+        this.qualificationName = qualificationName;
+        this.qualificationOrganization = qualificationOrganization;
+        this.qualificationStartDate = qualificationStartDate;
+        this.qualificationEndDate = qualificationEndDate;
+        this.hasQualificationEndDate = hasQualificationEndDate;
+        this.score = score;
+        this.qualificationFile = qualificationFile;
+    }
+
 }
 
