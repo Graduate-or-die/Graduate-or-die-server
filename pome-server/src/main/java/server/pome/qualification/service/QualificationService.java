@@ -35,12 +35,12 @@ public class QualificationService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
-        if (request.getQualificationStartDate() == null && request.getQualificationEndDate() != null) {
+        if (request.getQualificationStartAt() == null && request.getQualificationEndAt() != null) {
             throw new BaseException(BaseResponseStatus.END_DATE_WITHOUT_START_DATE);
         }
 
-        if (request.getQualificationStartDate() != null && request.getQualificationEndDate() != null) {
-            if (request.getQualificationEndDate().isBefore(request.getQualificationStartDate())) {
+        if (request.getQualificationStartAt() != null && request.getQualificationEndAt() != null) {
+            if (request.getQualificationEndAt().isBefore(request.getQualificationStartAt())) {
                 throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
             }
         }
@@ -61,12 +61,12 @@ public class QualificationService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
-        if (request.getQualificationStartDate() == null && request.getQualificationEndDate() != null) {
+        if (request.getQualificationStartAt() == null && request.getQualificationEndAt() != null) {
             throw new BaseException(BaseResponseStatus.END_DATE_WITHOUT_START_DATE);
         }
 
-        if (request.getQualificationStartDate() != null && request.getQualificationEndDate() != null) {
-            if (request.getQualificationEndDate().isBefore(request.getQualificationStartDate())) {
+        if (request.getQualificationStartAt() != null && request.getQualificationEndAt() != null) {
+            if (request.getQualificationEndAt().isBefore(request.getQualificationStartAt())) {
                 throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
             }
         }
@@ -76,9 +76,9 @@ public class QualificationService {
 
         String qualificationName = request.getQualificationName() != null &&  !request.getQualificationName().isEmpty() ? request.getQualificationName() : qualification.getQualificationName();
         String qualificationOrganization = request.getQualificationOrganization() != null && !request.getQualificationOrganization().isEmpty() ? request.getQualificationOrganization() : qualification.getQualificationOrganization();
-        LocalDate qualificationStartDate = request.getQualificationStartDate() != null ? request.getQualificationStartDate() : qualification.getQualificationStartDate();
-        LocalDate qualificationEndDate = request.getQualificationEndDate() != null ? request.getQualificationEndDate() : qualification.getQualificationEndDate();
-        boolean hasQualificationEndDate = request.isHasQualificationEndDate();
+        LocalDate qualificationStartDate = request.getQualificationStartAt() != null ? request.getQualificationStartAt() : qualification.getQualificationStartAt();
+        LocalDate qualificationEndDate = request.getQualificationEndAt() != null ? request.getQualificationEndAt() : qualification.getQualificationEndAt();
+        boolean hasQualificationEndDate = request.isHasQualificationEndAt();
         int score = request.getScore();
         List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
 

@@ -26,13 +26,13 @@ public class SaveQualificationResponse {
     private String qualificationOrganization;
 
     @Schema(description = "취득일자", example = "2024-01-01")
-    private LocalDate qualificationStartDate;
+    private LocalDate qualificationStartAt;
 
     @Schema(description = "만료일자", example = "2027-01-01")
-    private LocalDate qualificationEndDate;
+    private LocalDate qualificationEndAt;
 
     @Schema(description = "만료일 여부", example = "true")
-    private boolean hasQualificationEndDate;
+    private boolean hasQualificationEndAt;
 
     @Schema(description = "등급/점수", example = "1")
     private int score;
@@ -46,9 +46,9 @@ public class SaveQualificationResponse {
                 .qualificationId(qualification.getId())
                 .qualificationName(qualification.getQualificationName())
                 .qualificationOrganization(qualification.getQualificationOrganization())
-                .qualificationStartDate(qualification.getQualificationStartDate())
-                .qualificationEndDate(qualification.getQualificationEndDate())
-                .hasQualificationEndDate(qualification.isHasQualificationEndDate())
+                .qualificationStartAt(qualification.getQualificationStartAt())
+                .qualificationEndAt(qualification.getQualificationEndAt())
+                .hasQualificationEndAt(qualification.isHasQualificationEndAt())
                 .score(qualification.getScore())
                 // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
                 .qualificationFile(files == null ? Collections.emptyList() : new ArrayList<>(files))

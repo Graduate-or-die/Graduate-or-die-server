@@ -17,13 +17,13 @@ public class UpdateQualificationRequest {
     private String qualificationOrganization;
 
     @Schema(description = "취득일자", example = "2024-01-01")
-    private LocalDate qualificationStartDate;
+    private LocalDate qualificationStartAt;
 
     @Schema(description = "만료일자", example = "2027-01-01")
-    private LocalDate qualificationEndDate;
+    private LocalDate qualificationEndAt;
 
     @Schema(description = "만료일 여부", example = "true")
-    private boolean hasQualificationEndDate;
+    private boolean hasQualificationEndAt;
 
     @Schema(description = "등급/점수", example = "1")
     private int score;

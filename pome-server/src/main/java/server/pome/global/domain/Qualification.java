@@ -22,25 +22,25 @@ public class Qualification extends BaseEntity{
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-    @Column(name = "qualification name", nullable = true)
+    @Column(name = "qualification_name", nullable = true)
     @Comment("자격증명")
     private String qualificationName;
 
-    @Column(name = "qualification organization", nullable = true)
+    @Column(name = "qualification_organization", nullable = true)
     @Comment("발급기관")
     private String qualificationOrganization;
 
-    @Column(name = "qualification start_date", nullable = true)
+    @Column(name = "qualification_start_at", nullable = true)
     @Comment("취득일자")
-    private LocalDate qualificationStartDate;
+    private LocalDate qualificationStartAt;
 
-    @Column(name = "qualification end_date", nullable = true)
+    @Column(name = "qualification_end_at", nullable = true)
     @Comment("만료일자")
-    private LocalDate qualificationEndDate;
+    private LocalDate qualificationEndAt;
 
-    @Column(name = "has_qualification end_date", nullable = false)
+    @Column(name = "has_qualification_end_at", nullable = false)
     @Comment("만료일 여부")
-    private boolean hasQualificationEndDate = true;
+    private boolean hasQualificationEndAt = true;
 
     @Column(name = "score", nullable = true)
     @Comment("등급/점수")
@@ -55,31 +55,27 @@ public class Qualification extends BaseEntity{
     @PrePersist
     @PreUpdate
     private void syncExpirationFlag() {
-        if (!hasQualificationEndDate) {
-            qualificationEndDate = null;
-        } else {
-            if (qualificationEndDate == null) {
-                throw new BaseException(BaseResponseStatus.DATE_NOT_EXIST);
-            }
+        if (!hasQualificationEndAt) {
+            qualificationEndAt = null;
         }
     }
 
     public void setExpiration(LocalDate endDate) {
-        this.hasQualificationEndDate = true;
-        this.qualificationEndDate = qualificationEndDate;
+        this.hasQualificationEndAt = true;
+        this.qualificationEndAt = qualificationEndAt;
     }
 
     public void setNoExpiration() {
-        this.hasQualificationEndDate = false;
-        this.qualificationEndDate = null;
+        this.hasQualificationEndAt = false;
+        this.qualificationEndAt = null;
     }
 
     public void updateQualification(String qualificationName, String qualificationOrganization,  LocalDate qualificationStartDate, LocalDate qualificationEndDate, boolean hasQualificationEndDate, int score, List<String> qualificationFile) {
         this.qualificationName = qualificationName;
         this.qualificationOrganization = qualificationOrganization;
-        this.qualificationStartDate = qualificationStartDate;
-        this.qualificationEndDate = qualificationEndDate;
-        this.hasQualificationEndDate = hasQualificationEndDate;
+        this.qualificationStartAt = qualificationStartAt;
+        this.qualificationEndAt = qualificationEndAt;
+        this.hasQualificationEndAt = hasQualificationEndAt;
         this.score = score;
         this.qualificationFile = qualificationFile;
     }

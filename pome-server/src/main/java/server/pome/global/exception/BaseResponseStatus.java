@@ -36,7 +36,7 @@ public enum BaseResponseStatus {
   AWARD_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2025, "해당 수상 경력을 찾을 수 없습니다."),
 
   // qualification
-  DATE_NOT_EXIST(false, HttpStatus.NOT_FOUND, 2030, "날짜 입력이 필요합니다"),
+  // DATE_NOT_EXIST(false, HttpStatus.NOT_FOUND, 2030, "날짜 입력이 필요합니다"),
   END_DATE_WITHOUT_START_DATE(false, HttpStatus.BAD_REQUEST, 2035, "마감일을 입력하기 전 시작일이 필요합니다"),
   QUALIFICATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2040, "해당 자격증을 찾을 수 없습니다."),
 
