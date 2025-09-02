@@ -1,22 +1,24 @@
 package server.pome.chat.service;
 
-import static server.pome.global.exception.BaseResponseStatus.CHATROOM_NOT_FOUND;
+import static server.pome.global.exception.BaseResponseStatus.CHAT_FIELD_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.pome.chat.dto.request.CreateChatRequest;
 import server.pome.chat.dto.response.CreateChatResponse;
+import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.chat.repository.ChatMessageRepository;
-import server.pome.chat.repository.ChatRoomRepository;
+import server.pome.global.domain.ChatField;
 import server.pome.global.domain.ChatMessage;
-import server.pome.global.domain.ChatRoom;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.mate.service.MateService;
 import server.pome.user.repository.UserRepository;
 
 @Service
@@ -24,19 +26,28 @@ import server.pome.user.repository.UserRepository;
 public class ChatMessageService {
 
   private final ChatMessageRepository chatMessageRepository;
-  private final ChatRoomRepository chatRoomRepository;
+  private final ChatFieldRepository chatFieldRepository;
   private final UserRepository userRepository;
-  private final ChatRoomReadService chatRoomReadService;
+  private final ChatFieldReadService chatFieldReadService;
+
+  private final ChatFieldService chatFieldService;
+  private final MateService mateService;
 
   // 채팅 생성 (전송)
   @Transactional
-  public CreateChatResponse createChat(Long roomId, Long senderId,
+  public CreateChatResponse createChat(Long mateId, Long senderId,
       CreateChatRequest createChatRequest) {
+
     // 채팅방 조회
-    ChatRoom room = findRoomById(roomId);
+    ChatField field = chatFieldService.getOrCreate(
+        mateId, createChatRequest.getPortfolioType(),
+        createChatRequest.getBlockId(),
+        createChatRequest.getFieldKey());
+
+    Long fieldId = field.getId();
 
     // 참가한 유저인지 검증 및 조회
-    if (!room.isParticipant(senderId)) {
+    if (!isParticipants(field, senderId)) {
       throw new BaseException(USER_NOT_PARTICIPANT);
     }
 
@@ -50,31 +61,33 @@ public class ChatMessageService {
     }
 
     // 채팅 내용 검증
-    if (createChatRequest.getContent() == null || createChatRequest.getContent().isBlank()) {
+    String content = createChatRequest.getContent();
+    if (content == null || content.isBlank()) {
       throw new BaseException(INVALID_CHAT_FORM);
     }
+    content = content.strip();
 
     // 메시지 생성, 저장
-    User senderRef = userRepository.getReferenceById(senderId);
-    ChatMessage message = new ChatMessage(room, senderRef, createChatRequest.getPortfolioType(),
-        createChatRequest.getBlockId(), createChatRequest.getField(),
-        createChatRequest.getContent());
+    ChatMessage message = new ChatMessage(field, sender, content);
     chatMessageRepository.save(message);
 
     // 발송자의 읽음 포인터를 새 메시지까지 전진
-    chatRoomReadService.markReadUpTo(roomId, senderId, message.getId());
+    chatFieldReadService.markReadUpTo(mateId, senderId, message.getId(), createChatRequest);
 
-    return CreateChatResponse.from(message.getId(), roomId, senderId,
+    return CreateChatResponse.from(message.getId(), field.getFieldKey(), senderId,
         createChatRequest.getContent());
   }
 
   /** 헬퍼 메서드 */
-  private ChatRoom findRoomById(Long roomId) {
-    // 채팅방 조회
-    ChatRoom room = chatRoomRepository.findById(roomId)
-        .orElseThrow(() -> new BaseException(CHATROOM_NOT_FOUND));
-    return room;
+  // 조회한 채팅방에 권한이 있는 유저인지 확인(메이트 또는 유저 검증)
+  private boolean isParticipants(ChatField field, Long userId) {
+    // 포트폴리오 소유자라면 채팅방 권한 있음
+    Long ownerId = field.getOwner().getId();
+    if (Objects.equals(ownerId, userId)) {
+      return true;
+    }
+    Long mateId = mateService.getMateId(ownerId);
+    return mateService.isAcceptedMates(mateId, ownerId);
   }
-
 
 }

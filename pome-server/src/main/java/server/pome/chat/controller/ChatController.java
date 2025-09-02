@@ -27,16 +27,16 @@ public class ChatController {
 
   @Operation(summary = "채팅 생성")
   @Parameters({
-      @Parameter(name = "roomId", description = "채팅방 ID", required = true),
-      @Parameter(name = "userId", description = "회원 ID", required = true)
+      @Parameter(name = "mateId", description = "조회 당한 메이트의 ID", required = true),
+      @Parameter(name = "userId", description = "조회한 회원 ID", required = true)
   })
-  @PostMapping("/{roomId}/{userId}")
+  @PostMapping("/{mateId}/{userId}")
   public ResponseEntity<BaseResponse<CreateChatResponse>> createChat(
-      @PathVariable Long roomId,
+      @PathVariable Long mateId,
       @PathVariable Long userId,
       @Valid @RequestBody CreateChatRequest createChatRequest
   ) {
-    CreateChatResponse result = chatMessageService.createChat(roomId, userId, createChatRequest);
+    CreateChatResponse result = chatMessageService.createChat(mateId, userId, createChatRequest);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
 }

@@ -1,6 +1,7 @@
 package server.pome.mate.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,11 +22,10 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
 
   // user가 매칭 완료(ACCEPTED)인 Mate 가지고 있는지 여부
   @Query("""
-        SELECT CASE WHEN EXISTS (
-          SELECT 1 FROM Mate m
-          WHERE m.status = server.pome.global.enums.MateRequestStatus.ACCEPTED
-            AND (m.fromUser = :user OR m.targetUser = :user)
-        ) THEN true ELSE false END
+        SELECT (count(m) > 0)
+          FROM Mate m
+         WHERE m.status = server.pome.global.enums.MateRequestStatus.ACCEPTED
+           AND (m.fromUser = :user OR m.targetUser = :user)
       """)
   boolean existsAcceptedByUser(@Param("user") User user);
 
@@ -37,8 +37,10 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
         UPDATE Mate m
-        SET m.status = :toStatus
-        WHERE m.fromUser = :from AND m.targetUser = :target AND m.status = :fromStatus
+           SET m.status = :toStatus
+         WHERE m.fromUser = :from
+           AND m.targetUser = :target
+           AND m.status = :fromStatus
       """)
   int updateStatusTo(@Param("from") User fromUser,
       @Param("target") User targetUser,
@@ -46,19 +48,44 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
       @Param("toStatus") MateRequestStatus toStatus);
 
   // 두 유저의 상태를 fromStatus -> toStatus로 동시 변경
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
-  update Mate m
-     set m.status = :toStatus
-   where m.status = :fromStatus
-     and (
-          (m.fromUser.id = :aId and m.targetUser.id = :bId)
-       or (m.fromUser.id = :bId and m.targetUser.id = :aId)
-     )
-""")
+        UPDATE Mate m
+           SET m.status = :toStatus
+         WHERE m.status = :fromStatus
+           AND (
+                (m.fromUser.id = :aId AND m.targetUser.id = :bId)
+             OR (m.fromUser.id = :bId AND m.targetUser.id = :aId)
+           )
+      """)
   int updateStatusEitherDirection(@Param("aId") Long aId,
       @Param("bId") Long bId,
       @Param("fromStatus") MateRequestStatus fromStatus,
       @Param("toStatus") MateRequestStatus toStatus);
+
+  // 유저의 메이트 ID 반환
+  @Query("""
+    SELECT CASE WHEN m.fromUser.id = :userId THEN m.targetUser.id ELSE m.fromUser.id END
+      FROM Mate m
+     WHERE m.status = :status
+       AND (m.fromUser.id = :userId OR m.targetUser.id = :userId)
+  """)
+  Optional<Long> findMateIdByUserAndStatus(@Param("userId") Long userId,
+      @Param("status") MateRequestStatus status);
+
+  // 두 유저가 ACCEPTED 상태의 메이트인지 여부
+  @Query("""
+    SELECT COUNT(m) > 0
+      FROM Mate m
+     WHERE m.status = :status
+       AND (
+             (m.fromUser.id = :u1 AND m.targetUser.id = :u2)
+          OR (m.fromUser.id = :u2 AND m.targetUser.id = :u1)
+           )
+  """)
+  boolean isAcceptedMates(@Param("u1") Long u1,
+      @Param("u2") Long u2,
+      @Param("status") MateRequestStatus status);
+
 
 }

@@ -14,7 +14,7 @@ public class CreateChatRequest {
   private Long blockId;
 
   @Schema(description = "필드명", example = "역할")
-  private String field;
+  private String fieldKey;
 
   @Schema(description = "채팅 내용", example = "무슨 역할인가요")
   private String content;
