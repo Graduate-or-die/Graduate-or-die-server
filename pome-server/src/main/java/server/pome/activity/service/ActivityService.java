@@ -36,6 +36,10 @@ public class ActivityService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
+        if (request.getActivityStartAt() == null && request.getActivityEndAt() != null) {
+            throw new BaseException(BaseResponseStatus.END_DATE_WITHOUT_START_DATE);
+        }
+
         if (request.getActivityStartAt() != null && request.getActivityEndAt() != null) {
             if (request.getActivityEndAt().isBefore(request.getActivityStartAt())) {
                 throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);
