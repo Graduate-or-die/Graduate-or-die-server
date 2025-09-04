@@ -56,6 +56,9 @@ public class Qualification extends BaseEntity{
     @PreUpdate
     private void syncExpirationFlag() {
         if (!hasQualificationEndAt) {
+            if (qualificationEndAt != null) {
+                throw new BaseException(BaseResponseStatus.END_DATE_NOT_ALLOWED);
+            }
             qualificationEndAt = null;
         }
     }
