@@ -25,7 +25,7 @@ public class UpdateAwardResponse {
     private String awardOrganization;
 
     @Schema(description = "수상일자", example = "2025-09-01")
-    private LocalDate awardDate;
+    private LocalDate awardAt;
 
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;
@@ -38,7 +38,7 @@ public class UpdateAwardResponse {
                 .awardId(award.getId())
                 .awardName(award.getAwardName())
                 .awardOrganization(award.getAwardOrganization())
-                .awardDate(award.getAwardDate())
+                .awardAt(award.getAwardAt())
                 .awardGrade(award.getAwardGrade())
                 .awardFile(award.getAwardFile())
                 .build();

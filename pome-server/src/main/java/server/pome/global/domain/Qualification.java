@@ -63,7 +63,7 @@ public class Qualification extends BaseEntity{
         }
     }
 
-    public void setExpiration(LocalDate endDate) {
+    public void setExpiration(LocalDate qualificationEndAt) {
         this.hasQualificationEndAt = true;
         this.qualificationEndAt = qualificationEndAt;
     }
@@ -73,7 +73,7 @@ public class Qualification extends BaseEntity{
         this.qualificationEndAt = null;
     }
 
-    public void updateQualification(String qualificationName, String qualificationOrganization,  LocalDate qualificationStartDate, LocalDate qualificationEndDate, boolean hasQualificationEndDate, int score, List<String> qualificationFile) {
+    public void updateQualification(String qualificationName, String qualificationOrganization,  LocalDate qualificationStartAt, LocalDate qualificationEndAt, boolean hasQualificationEndAt, int score, List<String> qualificationFile) {
         this.qualificationName = qualificationName;
         this.qualificationOrganization = qualificationOrganization;
         this.qualificationStartAt = qualificationStartAt;

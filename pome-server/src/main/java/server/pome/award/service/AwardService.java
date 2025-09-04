@@ -56,11 +56,11 @@ public class AwardService {
 
         String awardName = request.getAwardName() != null &&  !request.getAwardName().isEmpty() ? request.getAwardName() : award.getAwardName();
         String awardOrganization = request.getAwardOrganization() != null && !request.getAwardOrganization().isEmpty() ? request.getAwardOrganization() : award.getAwardOrganization();
-        LocalDate awardDate = request.getAwardDate() != null ? request.getAwardDate() : award.getAwardDate();
+        LocalDate awardAt = request.getAwardAt() != null ? request.getAwardAt() : award.getAwardAt();
         String awardGrade = request.getAwardGrade() != null && !request.getAwardGrade().isEmpty() ? request.getAwardGrade() : award.getAwardGrade();
         List<String> awardFile = request.getAwardFile() != null && !request.getAwardFile().isEmpty() ? request.getAwardFile() : award.getAwardFile();
 
-        award.updateAward(awardName, awardOrganization, awardDate, awardGrade, awardFile);
+        award.updateAward(awardName, awardOrganization, awardAt, awardGrade, awardFile);
         return UpdateAwardResponse.from(award);
     }
 }

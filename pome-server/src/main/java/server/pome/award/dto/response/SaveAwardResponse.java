@@ -26,7 +26,7 @@ public class SaveAwardResponse {
     private String awardOrganization;
 
     @Schema(description = "수상일자", example = "2025-09-01")
-    private LocalDate awardDate;
+    private LocalDate awardAt;
 
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;
@@ -40,7 +40,7 @@ public class SaveAwardResponse {
                 .awardId(award.getId())
                 .awardName(award.getAwardName())
                 .awardOrganization(award.getAwardOrganization())
-                .awardDate(award.getAwardDate())
+                .awardAt(award.getAwardAt())
                 .awardGrade(award.getAwardGrade())
                 // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
                 .awardFile(files == null ? Collections.emptyList() : new ArrayList<>(files))
