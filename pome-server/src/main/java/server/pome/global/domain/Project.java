@@ -28,7 +28,7 @@ public class Project extends BaseEntity {
 
     @Column(name = "project_end_at", nullable = true)
     @Comment("마감일")
-    private LocalDate projectEndtAt;
+    private LocalDate projectEndAt;
 
     @Column(name = "project_role", nullable = true)
     @Comment("사용 기술 스택 및 역할")
