@@ -17,7 +17,7 @@ public class UpdateAwardRequest {
     private String awardOrganization;
 
     @Schema(description = "수상일자", example = "2025-09-01")
-    private LocalDate awardDate;
+    private LocalDate awardAt;
 
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;

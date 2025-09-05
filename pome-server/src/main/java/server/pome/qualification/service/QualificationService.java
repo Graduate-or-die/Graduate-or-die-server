@@ -76,13 +76,13 @@ public class QualificationService {
 
         String qualificationName = request.getQualificationName() != null &&  !request.getQualificationName().isEmpty() ? request.getQualificationName() : qualification.getQualificationName();
         String qualificationOrganization = request.getQualificationOrganization() != null && !request.getQualificationOrganization().isEmpty() ? request.getQualificationOrganization() : qualification.getQualificationOrganization();
-        LocalDate qualificationStartDate = request.getQualificationStartAt() != null ? request.getQualificationStartAt() : qualification.getQualificationStartAt();
-        LocalDate qualificationEndDate = request.getQualificationEndAt() != null ? request.getQualificationEndAt() : qualification.getQualificationEndAt();
-        boolean hasQualificationEndDate = request.isHasQualificationEndAt();
+        LocalDate qualificationStartAt = request.getQualificationStartAt() != null ? request.getQualificationStartAt() : qualification.getQualificationStartAt();
+        LocalDate qualificationEndAt = request.getQualificationEndAt() != null ? request.getQualificationEndAt() : qualification.getQualificationEndAt();
+        boolean hasQualificationEndAt = request.isHasQualificationEndAt();
         int score = request.getScore();
         List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
 
-        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartDate, qualificationEndDate, hasQualificationEndDate, score, qualificationFile);
+        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score, qualificationFile);
         return UpdateQualificationResponse.from(qualification);
     }
 }
