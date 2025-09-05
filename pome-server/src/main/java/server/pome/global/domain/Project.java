@@ -42,4 +42,13 @@ public class Project extends BaseEntity {
     @Comment("프로젝트 성과")
     private String projectAward;
 
+    // 프로젝트 정보 업데이스
+    public void UpdateProject(String projectName, LocalDate projectStartAt, LocalDate projectEndAt, String projectRole, String projectDescription, String projectAward) {
+        this.projectName = projectName;
+        this.projectStartAt = projectStartAt;
+        this.projectEndAt = projectEndAt;
+        this.projectRole = projectRole;
+        this.projectDescription = projectDescription;
+        this.projectAward = projectAward;
+    }
 }
