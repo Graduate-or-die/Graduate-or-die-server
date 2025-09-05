@@ -33,6 +33,10 @@ public class ExperienceService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
+        if (request.getExperienceStartAt() == null && request.getExperienceEndAt() != null) {
+            throw new BaseException(BaseResponseStatus.END_DATE_WITHOUT_START_DATE);
+        }
+
         if (request.getExperienceStartAt() != null && request.getExperienceEndAt() != null) {
             if (request.getExperienceEndAt().isBefore(request.getExperienceStartAt())) {
                 throw new BaseException(BaseResponseStatus.INVALID_DATE_RANGE);

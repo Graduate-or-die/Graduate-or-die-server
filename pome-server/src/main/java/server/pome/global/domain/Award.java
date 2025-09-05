@@ -28,9 +28,9 @@ public class Award extends BaseEntity {
     @Comment("주최기관")
     private String awardOrganization;
 
-    @Column(name = "award_date", nullable = true)
+    @Column(name = "award_At", nullable = true)
     @Comment("수상일자")
-    private LocalDate awardDate;
+    private LocalDate awardAt;
 
     @Column(name = "award_grade", nullable = true)
     @Comment("시상등급")
@@ -42,10 +42,10 @@ public class Award extends BaseEntity {
     private List<String> awardFile = new ArrayList<>();
 
     // 수상경력 정보 업데이트
-    public void updateAward(String awardName, String awardOrganization, LocalDate awardDate, String awardGrade, List<String> awardFile) {
+    public void updateAward(String awardName, String awardOrganization, LocalDate awardAt, String awardGrade, List<String> awardFile) {
         this.awardName = awardName;
         this.awardOrganization = awardOrganization;
-        this.awardDate = awardDate;
+        this.awardAt = awardAt;
         this.awardGrade = awardGrade;
         this.awardFile = awardFile;
     }
