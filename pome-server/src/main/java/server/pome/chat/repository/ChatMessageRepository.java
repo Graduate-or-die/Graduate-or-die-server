@@ -1,5 +1,6 @@
 package server.pome.chat.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -16,18 +17,22 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
   // 방의 가장 최신 메시지 1개 조회
   Optional<ChatMessage> findTopByField_IdOrderByIdDesc(Long fieldId);
 
-  // 미읽음 메시지 개수 조회
-  // 마지막 읽은 메시지 id보다 큰 메시지 중 내가 보낸 메시지 제외하고 집계
+  // fieldIds 중 미읽음 메시지가 존재하는 fieldId만 반환
   @Query("""
-    SELECT COUNT(m)
-      FROM ChatMessage m
-     WHERE m.field.id = :fieldId
-       AND m.id > COALESCE(:lastReadMessageId, 0)
-       AND m.sender.id <> :excludeSenderId
-       AND m.deletedAt IS NULL
-  """)
-  long countUnread(@Param("fieldId") Long fieldId,
-      @Param("lastReadMessageId") Long lastReadMessageId,
-      @Param("excludeSenderId") Long excludeSenderId);
+        SELECT DISTINCT m.field.id
+        FROM ChatMessage m
+        WHERE m.field.id IN :fieldIds
+        AND m.deletedAt IS NULL
+        AND m.sender.id <> :userId
+        AND m.id > coalesce(
+          (SELECT r.lastReadMessageId
+            FROM ChatFieldRead r
+            WHERE r.field = m.field
+            AND r.user.id = :userId
+          ), 0
+        )
+      """)
+  List<Long> findUnreadFieldIds(@Param("fieldIds") Collection<Long> fieldIds,
+      @Param("userId") Long userId);
 
 }

@@ -3,6 +3,8 @@ package server.pome.chat.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import server.pome.chat.dto.request.CreateChatRequest;
+import server.pome.chat.dto.request.UnreadRequest;
 import server.pome.chat.dto.response.CreateChatResponse;
+import server.pome.chat.dto.response.UnreadResponse;
 import server.pome.chat.service.ChatFieldReadService;
 import server.pome.global.domain.BaseResponse;
 
@@ -26,16 +30,16 @@ public class ChatFieldReadController {
 
   @Operation(summary = "최신 메시지까지 읽음 처리 (필드 화면 나갈 때 호출)")
   @Parameters({
-      @Parameter(name = "fieldId", description = "채팅방 ID", required = true),
+      @Parameter(name = "mateId", description = "포트폴리오 소유자 ID", required = true),
       @Parameter(name = "userId", description = "회원 ID", required = true)
   })
-  @PostMapping("/read/{fieldId}/{userId}")
+  @PostMapping("/read/{mateId}/{userId}")
   public ResponseEntity<Void> readUpToLatest(
-      @PathVariable Long fieldId,
+      @PathVariable Long mateId,
       @PathVariable Long userId,
       @RequestBody CreateChatRequest request
   ) {
-    chatFieldReadService.markReadUpToLatest(fieldId, userId, request);
+    chatFieldReadService.markReadUpToLatest(mateId, userId, request);
     return ResponseEntity.noContent().build();
   }
 
@@ -56,19 +60,20 @@ public class ChatFieldReadController {
     return ResponseEntity.noContent().build();
   }
 
-  @Operation(summary = "필드별 읽지 않은 메시지 개수 조회")
+  @Operation(summary = "필드별 읽지 않은 메시지 존재 여부 조회")
   @Parameters({
       @Parameter(name = "mateId", description = "포트폴리오 소유자 ID", required = true),
       @Parameter(name = "userId", description = "회원 ID", required = true)
   })
-  @GetMapping("/unread/{mateId}/{userId}")
-  public ResponseEntity<Map<String, Long>> unreadCount(
+  @PostMapping("/unread/{mateId}/{userId}")
+  public ResponseEntity<BaseResponse<List<UnreadResponse>>> getUnreadList(
       @PathVariable Long mateId,
       @PathVariable Long userId,
-      @RequestBody CreateChatRequest request
+      @RequestBody UnreadRequest request
   ) {
-    long count = chatFieldReadService.countUnread(mateId, userId, request);
-    return ResponseEntity.ok(Map.of("unread", count));
+    List<UnreadResponse> result = chatFieldReadService.GetUnreadList(mateId, userId, request);
+    return ResponseEntity.ok(BaseResponse.success(result));
+
   }
 
 

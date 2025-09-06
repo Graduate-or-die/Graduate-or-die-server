@@ -217,12 +217,6 @@ public class MateService {
     }
   }
 
-  // 유저의 메이트 ID 조회
-  public Long getMateId(Long userId) {
-    return mateRepository.findMateIdByUserAndStatus(userId, ACCEPTED)
-        .orElse(null);
-  }
-
   // 메이트 여부 검증
   public boolean isAcceptedMates(Long u1, Long u2) {
     return mateRepository.isAcceptedMates(u1, u2, ACCEPTED);

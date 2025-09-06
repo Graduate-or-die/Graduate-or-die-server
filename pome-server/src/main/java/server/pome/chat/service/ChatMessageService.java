@@ -1,6 +1,5 @@
 package server.pome.chat.service;
 
-import static server.pome.global.exception.BaseResponseStatus.CHAT_FIELD_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.pome.chat.dto.request.CreateChatRequest;
 import server.pome.chat.dto.response.CreateChatResponse;
-import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.chat.repository.ChatMessageRepository;
 import server.pome.global.domain.ChatField;
 import server.pome.global.domain.ChatMessage;
@@ -26,10 +24,8 @@ import server.pome.user.repository.UserRepository;
 public class ChatMessageService {
 
   private final ChatMessageRepository chatMessageRepository;
-  private final ChatFieldRepository chatFieldRepository;
   private final UserRepository userRepository;
   private final ChatFieldReadService chatFieldReadService;
-
   private final ChatFieldService chatFieldService;
   private final MateService mateService;
 
@@ -43,8 +39,6 @@ public class ChatMessageService {
         mateId, createChatRequest.getPortfolioType(),
         createChatRequest.getBlockId(),
         createChatRequest.getFieldKey());
-
-    Long fieldId = field.getId();
 
     // 참가한 유저인지 검증 및 조회
     if (!isParticipants(field, senderId)) {
@@ -67,6 +61,8 @@ public class ChatMessageService {
     }
     content = content.strip();
 
+
+
     // 메시지 생성, 저장
     ChatMessage message = new ChatMessage(field, sender, content);
     chatMessageRepository.save(message);
@@ -75,7 +71,7 @@ public class ChatMessageService {
     chatFieldReadService.markReadUpTo(mateId, senderId, message.getId(), createChatRequest);
 
     return CreateChatResponse.from(message.getId(), field.getFieldKey(), senderId,
-        createChatRequest.getContent());
+        content);
   }
 
   /** 헬퍼 메서드 */
@@ -86,8 +82,8 @@ public class ChatMessageService {
     if (Objects.equals(ownerId, userId)) {
       return true;
     }
-    Long mateId = mateService.getMateId(ownerId);
-    return mateService.isAcceptedMates(mateId, ownerId);
+    // 포트폴리오 소유자와 유저가 메이트이면 권한 있음
+    return mateService.isAcceptedMates(userId, ownerId);
   }
 
 }
