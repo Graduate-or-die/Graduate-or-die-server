@@ -17,7 +17,7 @@ public class UpdateProjectRequest {
     @Schema(description = "마감일", example = "2025-12-01")
     private LocalDate projectEndAt;
 
-    @Schema(description = "사용 기술 스택 및 역할", example = "백엔드")
+    @Schema(description = "프로젝트 역할", example = "백엔드")
     private String projectRole;
 
     @Schema(description = "프로젝트 설명", example = "졸업하기 위한 앱 서비스")
