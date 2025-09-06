@@ -24,6 +24,7 @@ public class ChatFieldService {
   // 생성 가능한 최대 블록 수
   private static int MAX_BLOCK_ID = 50;
 
+  // 채팅방 생성 또는 조회
   @Transactional
   public ChatField getOrCreate(Long ownerId, TypeEnum portfolioType, Long blockId,
       String fieldKey) {
@@ -41,9 +42,12 @@ public class ChatFieldService {
       throw new BaseException(INVALID_CHAT_FORM);
     }
 
+    // 포트폴리오 소유자 ID - 항목 - 블록ID - 필드명으로 field 생성 또는 조회
     return chatFieldRepository.findByOwner_IdAndPortfolioTypeAndBlockIdAndFieldKey(ownerId,
             portfolioType, blockId, fieldKey)
         .orElseGet(() -> {
+
+          // 조회 실패 시 생성
           User ownerRef = userRepository.getReferenceById(ownerId);
           return chatFieldRepository.save(
               new ChatField(ownerRef, portfolioType, blockId, fieldKey));

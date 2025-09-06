@@ -1,9 +1,11 @@
 package server.pome.chat.service.impl;
 
 import static java.time.LocalDateTime.now;
+import static server.pome.global.exception.BaseResponseStatus.CHAT_FIELD_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.CHAT_READ_ERROR;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
+import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,20 +18,21 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import server.pome.chat.dto.request.CreateChatRequest;
+import server.pome.chat.dto.request.ReadRequest;
 import server.pome.chat.dto.request.UnreadRequest;
-import server.pome.chat.dto.response.CreateChatResponse;
 import server.pome.chat.dto.response.UnreadResponse;
 import server.pome.chat.repository.ChatFieldReadRepository;
 import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.chat.repository.ChatMessageRepository;
 import server.pome.chat.service.ChatFieldReadService;
 import server.pome.chat.service.ChatFieldService;
+import server.pome.chat.service.ChatMessageService;
 import server.pome.global.domain.ChatField;
 import server.pome.global.domain.ChatFieldRead;
 import server.pome.global.domain.ChatMessage;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.mate.service.MateService;
 import server.pome.portfolio.type.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
@@ -42,15 +45,16 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   private final ChatFieldRepository chatFieldRepository;
   private final UserRepository userRepository;
   private final ChatFieldService chatFieldService;
+  private final MateService mateService;
 
   // 최신까지 읽음
   @Transactional
   @Override
-  public void markReadUpToLatest(Long mateId, Long userId, CreateChatRequest request) {
+  public void markReadUpToLatest(Long mateId, Long userId, ReadRequest request) {
     // request 유효성 검사
     validCreateChatRequest(request);
 
-    Long fieldId = getFieldId(mateId, request);
+    Long fieldId = getFieldIdByReadRequest(mateId, request);
 
     // 가장 최신 메시지 Id 조회 (없으면 0 반환)
     Long latestId = chatMessageRepository.findTopByField_IdOrderByIdDesc(fieldId)
@@ -70,11 +74,11 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   // 특정 메시지까지 읽음
   @Transactional
   @Override
-  public void markReadUpTo(Long mateId, Long userId, Long messageId, CreateChatRequest request) {
+  public void markReadUpTo(Long mateId, Long userId, Long messageId, ReadRequest request) {
     // request 유효성 검사
     validCreateChatRequest(request);
 
-    Long fieldId = getFieldId(mateId, request);
+    Long fieldId = getFieldIdByReadRequest(mateId, request);
 
     if (messageId == null || messageId <= 0L) {
       getReadPointer(fieldId, userId);
@@ -163,7 +167,7 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   }
 
   // 항목-블록-필드명으로 fieldId 조회
-  private Long getFieldId(Long userId, CreateChatRequest request) {
+  private Long getFieldIdByReadRequest(Long userId, ReadRequest request) {
     return chatFieldService.getOrCreate(
         userId, request.getPortfolioType(),
         request.getBlockId(),
@@ -172,7 +176,7 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
 
 
   // Request 타입별 유효성 검사
-  private void validCreateChatRequest(CreateChatRequest request) {
+  private void validCreateChatRequest(ReadRequest request) {
     if (request == null) {
       throw new BaseException(INVALID_CHAT_FORM);
     }
@@ -193,4 +197,5 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
       throw new BaseException(INVALID_TYPE_ENUM);
     }
   }
+
 }

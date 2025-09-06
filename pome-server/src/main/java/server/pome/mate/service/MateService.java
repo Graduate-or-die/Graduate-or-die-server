@@ -221,6 +221,4 @@ public class MateService {
   public boolean isAcceptedMates(Long u1, Long u2) {
     return mateRepository.isAcceptedMates(u1, u2, ACCEPTED);
   }
-
-
 }

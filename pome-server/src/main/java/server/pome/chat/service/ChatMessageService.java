@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.pome.chat.dto.request.CreateChatRequest;
+import server.pome.chat.dto.request.ReadRequest;
 import server.pome.chat.dto.response.CreateChatResponse;
 import server.pome.chat.repository.ChatMessageRepository;
 import server.pome.global.domain.ChatField;
@@ -34,17 +35,6 @@ public class ChatMessageService {
   public CreateChatResponse createChat(Long mateId, Long senderId,
       CreateChatRequest createChatRequest) {
 
-    // 채팅방 조회
-    ChatField field = chatFieldService.getOrCreate(
-        mateId, createChatRequest.getPortfolioType(),
-        createChatRequest.getBlockId(),
-        createChatRequest.getFieldKey());
-
-    // 참가한 유저인지 검증 및 조회
-    if (!isParticipants(field, senderId)) {
-      throw new BaseException(USER_NOT_PARTICIPANT);
-    }
-
     // 유저 조회
     User sender = userRepository.findById(senderId)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
@@ -61,14 +51,23 @@ public class ChatMessageService {
     }
     content = content.strip();
 
+    // 채팅방 조회
+    ChatField field = chatFieldService.getOrCreate(
+        mateId, createChatRequest.getPortfolioType(),
+        createChatRequest.getBlockId(),
+        createChatRequest.getFieldKey());
 
+    // 참가한 유저인지 검증 및 조회
+    isParticipants(field, senderId);
 
     // 메시지 생성, 저장
     ChatMessage message = new ChatMessage(field, sender, content);
     chatMessageRepository.save(message);
 
     // 발송자의 읽음 포인터를 새 메시지까지 전진
-    chatFieldReadService.markReadUpTo(mateId, senderId, message.getId(), createChatRequest);
+    ReadRequest readRequest = new ReadRequest(createChatRequest.getPortfolioType(),
+        createChatRequest.getBlockId(), createChatRequest.getFieldKey());
+    chatFieldReadService.markReadUpTo(mateId, senderId, message.getId(), readRequest);
 
     return CreateChatResponse.from(message.getId(), field.getFieldKey(), senderId,
         content);
@@ -76,14 +75,11 @@ public class ChatMessageService {
 
   /** 헬퍼 메서드 */
   // 조회한 채팅방에 권한이 있는 유저인지 확인(메이트 또는 유저 검증)
-  private boolean isParticipants(ChatField field, Long userId) {
-    // 포트폴리오 소유자라면 채팅방 권한 있음
+  private void isParticipants(ChatField field, Long userId) {
+    // 포트폴리오 소유자, 소유자의 메이트가 아니라면 권한 없음
     Long ownerId = field.getOwner().getId();
-    if (Objects.equals(ownerId, userId)) {
-      return true;
+    if (!Objects.equals(ownerId, userId) && !(mateService.isAcceptedMates(userId, ownerId))) {
+      throw new BaseException(USER_NOT_PARTICIPANT);
     }
-    // 포트폴리오 소유자와 유저가 메이트이면 권한 있음
-    return mateService.isAcceptedMates(userId, ownerId);
   }
-
 }

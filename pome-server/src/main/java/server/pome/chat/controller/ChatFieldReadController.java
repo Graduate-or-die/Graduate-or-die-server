@@ -3,20 +3,16 @@ package server.pome.chat.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import server.pome.chat.dto.request.CreateChatRequest;
+import server.pome.chat.dto.request.ReadRequest;
 import server.pome.chat.dto.request.UnreadRequest;
-import server.pome.chat.dto.response.CreateChatResponse;
 import server.pome.chat.dto.response.UnreadResponse;
 import server.pome.chat.service.ChatFieldReadService;
 import server.pome.global.domain.BaseResponse;
@@ -37,7 +33,7 @@ public class ChatFieldReadController {
   public ResponseEntity<Void> readUpToLatest(
       @PathVariable Long mateId,
       @PathVariable Long userId,
-      @RequestBody CreateChatRequest request
+      @RequestBody ReadRequest request
   ) {
     chatFieldReadService.markReadUpToLatest(mateId, userId, request);
     return ResponseEntity.noContent().build();
@@ -54,7 +50,7 @@ public class ChatFieldReadController {
       @PathVariable Long mateId,
       @PathVariable Long messageId,
       @PathVariable Long userId,
-      @RequestBody CreateChatRequest request
+      @RequestBody ReadRequest request
   ) {
     chatFieldReadService.markReadUpTo(mateId, userId, messageId, request);
     return ResponseEntity.noContent().build();
