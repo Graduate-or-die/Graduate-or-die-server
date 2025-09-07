@@ -1,9 +1,16 @@
 package server.pome.global.exception;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,6 +19,7 @@ import server.pome.global.domain.BaseResponse;
 import server.pome.portfolio.type.TypeEnum;
 
 @RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -46,16 +54,42 @@ public class GlobalExceptionHandler {
         .body(BaseResponse.error(BaseResponseStatus.SERVER_ERROR));
   }
 
-  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<BaseResponse<?>> handleTypeMisMatch(MethodArgumentTypeMismatchException e) {
-    if (e.getRequiredType() == TypeEnum.class) {
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(BaseResponse.error(BaseResponseStatus.INVALID_TYPE_ENUM));
+  // Request에서 ENUM과 바인딩 실패한 경우
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<BaseResponse<?>> handleTypeMisMatch(HttpMessageNotReadableException e) {
+    Throwable root = e.getMostSpecificCause();
+
+    if (root instanceof InvalidFormatException invalidFormatException) {
+      Class<?> raw = extractRawTargetClass(invalidFormatException);
+
+      // TYPENUM 매칭 실패
+      if (raw != null && raw.isEnum() && raw == TypeEnum.class) {
+        return ResponseEntity
+            .badRequest()
+            .body(BaseResponse.error(BaseResponseStatus.INVALID_TYPE_ENUM));
+      }
     }
 
     return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
+        .badRequest()
         .body(BaseResponse.error(BaseResponseStatus.INVALID_CHAT_FORM));
+  }
+
+  /**
+   * 헬퍼 메서드
+   */
+  private static Class<?> extractRawTargetClass(InvalidFormatException invalidFormatException) {
+    try {
+      Object target = invalidFormatException.getTargetType();
+      if (target instanceof JavaType jt) {
+        return jt.getRawClass();
+      }
+      if (target instanceof Class<?> c) {
+        return c;
+      }
+    } catch (Throwable ignore) { }
+
+    return null;
+
   }
 }
