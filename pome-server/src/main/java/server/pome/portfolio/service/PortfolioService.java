@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
@@ -24,6 +25,7 @@ public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final ChatFieldRepository chatFieldRepository;
 
 
     // 포트폴리오 생성

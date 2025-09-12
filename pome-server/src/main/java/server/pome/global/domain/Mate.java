@@ -41,7 +41,7 @@ public class Mate {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 10)
-  @Comment("메이트 신청 상태(대기/수락/거절)")
+  @Comment("메이트 신청 상태(대기/수락/거절/해제)")
   private MateRequestStatus status;
 
 }

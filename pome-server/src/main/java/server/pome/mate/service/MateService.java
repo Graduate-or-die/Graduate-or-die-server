@@ -216,4 +216,9 @@ public class MateService {
       throw new BaseException(CANNOT_MATE_SELF_REQUEST);
     }
   }
+
+  // 메이트 여부 검증
+  public boolean isAcceptedMates(Long u1, Long u2) {
+    return mateRepository.isAcceptedMates(u1, u2, ACCEPTED);
+  }
 }
