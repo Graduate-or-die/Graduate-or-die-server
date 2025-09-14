@@ -15,7 +15,7 @@ public class UpdateEtcResponse {
     private Long etcId;
 
     @Schema(description = "신체사항", example = "이상없음")
-    private String physicalDetails;
+    private String physicalDetail;
 
     @Schema(description = "국적", example = "대한민국")
     private String nationality;
@@ -29,7 +29,7 @@ public class UpdateEtcResponse {
     public static UpdateEtcResponse from(Etc etc) {
         return UpdateEtcResponse.builder()
                 .etcId(etc.getId())
-                .physicalDetails(etc.getPhysicalDetails())
+                .physicalDetail(etc.getPhysicalDetail())
                 .nationality(etc.getNationality())
                 .link(etc.getLink())
                 .memo(etc.getMemo())

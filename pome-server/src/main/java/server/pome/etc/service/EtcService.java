@@ -52,12 +52,12 @@ public class EtcService {
         Etc etc = etcRepository.findByPortfolio(portfolio)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.ETC_NOT_FOUND));
 
-        String physicalDetails = request.getPhysicalDetails() != null && !request.getPhysicalDetails().isEmpty() ? request.getPhysicalDetails() : etc.getPhysicalDetails();
+        String physicalDetail = request.getPhysicalDetail() != null && !request.getPhysicalDetail().isEmpty() ? request.getPhysicalDetail() : etc.getPhysicalDetail();
         String nationality = request.getNationality() != null && !request.getNationality().isEmpty() ? request.getNationality() : etc.getNationality();
         String link = request.getLink() != null && !request.getLink().isEmpty() ? request.getLink() : etc.getLink();
         String memo = request.getMemo() != null && !request.getMemo().isEmpty() ? request.getMemo() : etc.getMemo();
 
-        etc.updateEtc(physicalDetails, nationality, link, memo);
+        etc.updateEtc(physicalDetail, nationality, link, memo);
         return UpdateEtcResponse.from(etc);
     }
 }

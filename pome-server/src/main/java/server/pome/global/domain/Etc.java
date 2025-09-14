@@ -16,9 +16,9 @@ public class Etc extends BaseEntity {
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-    @Column(name = "physical_details", nullable = true)
+    @Column(name = "physical_detail", nullable = true)
     @Comment("신체사항")
-    private String physicalDetails;
+    private String physicalDetail;
 
     @Column(name = "nationality", nullable = true)
     @Comment("국적")
@@ -33,8 +33,8 @@ public class Etc extends BaseEntity {
     private String memo;
 
     // 기타 정보 업데이트
-    public void updateEtc(String physicalDetails, String nationality, String link, String memo) {
-        this.physicalDetails = physicalDetails;
+    public void updateEtc(String physicalDetail, String nationality, String link, String memo) {
+        this.physicalDetail = physicalDetail;
         this.nationality = nationality;
         this.link = link;
         this.memo = memo;

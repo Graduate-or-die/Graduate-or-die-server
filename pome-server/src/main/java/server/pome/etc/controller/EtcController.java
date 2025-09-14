@@ -31,7 +31,7 @@ public class EtcController {
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
-    @Operation(summary = "학력 저장")
+    @Operation(summary = "기타 수정")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PatchMapping("/{userId}")
     public ResponseEntity<BaseResponse<UpdateEtcResponse>> updateEtc(@PathVariable Long userId, @Valid @RequestBody UpdateEtcRequest request) {

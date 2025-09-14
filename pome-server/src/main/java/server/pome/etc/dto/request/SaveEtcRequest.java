@@ -9,7 +9,7 @@ import server.pome.global.domain.Portfolio;
 public class SaveEtcRequest {
 
     @Schema(description = "신체사항", example = "이상없음")
-    private String physicalDetails;
+    private String physicalDetail;
 
     @Schema(description = "국적", example = "대한민국")
     private String nationality;
@@ -23,7 +23,7 @@ public class SaveEtcRequest {
     public Etc toEntity(Portfolio portfolio) {
         return Etc.builder()
                 .portfolio(portfolio)
-                .physicalDetails(physicalDetails)
+                .physicalDetail(physicalDetail)
                 .nationality(nationality)
                 .link(link)
                 .memo(memo)

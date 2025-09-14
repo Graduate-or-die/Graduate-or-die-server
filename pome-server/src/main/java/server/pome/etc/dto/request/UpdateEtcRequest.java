@@ -7,7 +7,7 @@ import lombok.Getter;
 public class UpdateEtcRequest {
 
     @Schema(description = "신체사항", example = "이상없음")
-    private String physicalDetails;
+    private String physicalDetail;
 
     @Schema(description = "국적", example = "대한민국")
     private String nationality;
