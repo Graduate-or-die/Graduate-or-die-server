@@ -35,4 +35,5 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
   List<Long> findUnreadFieldIds(@Param("fieldIds") Collection<Long> fieldIds,
       @Param("userId") Long userId);
 
+  Page<ChatMessage> findByFieldIdOrderByIdAsc(Long fieldId, Pageable pageable);
 }
