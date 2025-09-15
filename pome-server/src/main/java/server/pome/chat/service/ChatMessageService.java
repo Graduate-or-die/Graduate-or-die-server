@@ -1,5 +1,7 @@
 package server.pome.chat.service;
 
+import static server.pome.global.exception.BaseResponseStatus.CHAT_DELETE_DISABLED;
+import static server.pome.global.exception.BaseResponseStatus.CHAT_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
@@ -107,6 +109,35 @@ public class ChatMessageService {
         )).toList();
 
     return responses;
+  }
+
+  // 특정 채팅 삭제
+  public void deleteChat(Long mateId, Long messageId, Long userId, ReadRequest readRequest) {
+    // 유저 조회
+    User sender = userRepository.findById(userId)
+        .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
+
+    // 채팅방 조회
+    ChatField field = chatFieldService.getOrCreate(mateId, readRequest.getPortfolioType(),
+        readRequest.getBlockId(), readRequest.getFieldKey());
+
+    // 메시지 조회
+    ChatMessage message = chatMessageRepository.findById(messageId)
+        .orElseThrow(() -> new BaseException(CHAT_NOT_FOUND));
+
+    // 본인의 메시지만 삭제 가능
+    if (!message.getSender().getId().equals(userId)) {
+      throw new BaseException(CHAT_DELETE_DISABLED);
+    }
+
+    // 조회한 필드 내 메시지가 맞는지 검증
+    if (!message.getField().getId().equals(field.getId())) {
+      throw new BaseException(CHAT_NOT_FOUND);
+    }
+
+    // 메시지 삭제
+    chatMessageRepository.delete(message);
+
   }
 
   /** 헬퍼 메서드 */

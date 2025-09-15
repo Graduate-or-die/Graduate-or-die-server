@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import server.pome.global.domain.ChatField;
 import server.pome.global.domain.ChatMessage;
 
 @Repository
@@ -36,4 +37,5 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
       @Param("userId") Long userId);
 
   Page<ChatMessage> findByFieldIdOrderByIdAsc(Long fieldId, Pageable pageable);
+
 }
