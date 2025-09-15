@@ -112,6 +112,7 @@ public class ChatMessageService {
   }
 
   // 특정 채팅 삭제
+  @Transactional
   public void deleteChat(Long mateId, Long messageId, Long userId, ReadRequest readRequest) {
     // 유저 조회
     User sender = userRepository.findById(userId)

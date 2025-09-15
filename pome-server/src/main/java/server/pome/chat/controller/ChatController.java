@@ -79,6 +79,6 @@ public class ChatController {
       @Valid @RequestBody ReadRequest readRequest
   ) {
     chatMessageService.deleteChat(mateId, messageId, userId, readRequest);
-    return ResponseEntity.ok(BaseResponse.success(mateId + ": 삭제 완료"));
+    return ResponseEntity.ok(BaseResponse.success(messageId + ": 삭제 완료"));
   }
 }
