@@ -41,8 +41,14 @@ public enum BaseResponseStatus {
   END_DATE_WITHOUT_START_DATE(false, HttpStatus.BAD_REQUEST, 2035, "마감일을 입력하기 전 시작일이 필요합니다"),
   QUALIFICATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2040, "해당 자격증을 찾을 수 없습니다."),
 
+  // etc
+  ETC_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2070, "해당 유저의 기타 사항을 찾을 수 없습니다."),
+  DUPLICATE_ETC(false, HttpStatus.BAD_REQUEST, 2071, "해당 유저의 기타 사항이 이미 존재합니다."),
+  
+
   // project
   PROJECT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2060, "해당 프로젝트를 찾을 수 없습니다."),
+
 
   // mate
   CANNOT_MATE_SELF_REQUEST(false, HttpStatus.BAD_REQUEST, 2010, "본인에게는 메이트 신청을 할 수 없습니다."),
