@@ -1,6 +1,6 @@
 package server.pome.chat.service;
 
-import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
+import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.global.domain.ChatField;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.type.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
@@ -35,11 +34,11 @@ public class ChatFieldService {
     }
 
     if (blockId == null || blockId > MAX_BLOCK_ID) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
 
     if (fieldKey == null || fieldKey.isBlank()) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
 
     // 포트폴리오 소유자 ID - 항목 - 블록ID - 필드명으로 field 생성 또는 조회

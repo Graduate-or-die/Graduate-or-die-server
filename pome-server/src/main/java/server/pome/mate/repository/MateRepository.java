@@ -70,7 +70,7 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
      WHERE m.status = :status
        AND (m.fromUser.id = :userId OR m.targetUser.id = :userId)
   """)
-  Optional<Long> findMateIdByUserAndStatus(@Param("userId") Long userId,
+  Optional<Long> findMateIdByUserIdAndStatus(@Param("userId") Long userId,
       @Param("status") MateRequestStatus status);
 
   // 두 유저가 ACCEPTED 상태의 메이트인지 여부

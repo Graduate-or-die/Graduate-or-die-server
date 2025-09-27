@@ -19,7 +19,7 @@ import org.hibernate.annotations.Comment;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "messages")
-public class Message {
+public class Message extends BaseEntity {
 
   @Comment("채팅방")
   @ManyToOne(fetch = LAZY)

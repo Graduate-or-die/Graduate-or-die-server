@@ -2,7 +2,7 @@ package server.pome.chat.service;
 
 import static server.pome.global.exception.BaseResponseStatus.CHAT_DELETE_DISABLED;
 import static server.pome.global.exception.BaseResponseStatus.CHAT_NOT_FOUND;
-import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
+import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
 
@@ -41,7 +41,7 @@ public class ChatMessageService {
       CreateChatRequest createChatRequest) {
 
     if (createChatRequest == null) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
 
     // 유저 조회
@@ -51,7 +51,7 @@ public class ChatMessageService {
     // 채팅 내용 검증
     String content = createChatRequest.getContent();
     if (content == null || content.isBlank()) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
     content = content.strip();
 
@@ -83,7 +83,7 @@ public class ChatMessageService {
       ReadRequest readRequest, Pageable pageable) {
 
     if (readRequest == null) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
 
     // 유저 조회
