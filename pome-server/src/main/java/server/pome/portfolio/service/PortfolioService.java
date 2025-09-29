@@ -14,8 +14,10 @@ import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.portfolio.type.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.stream.LongStream;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,9 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final ChatFieldRepository chatFieldRepository;
+
+    private static final long START_TYPE = 1L;
+    private static final long END_TYPE   = 7L;
 
 
     // 포트폴리오 생성
@@ -77,19 +82,19 @@ public class PortfolioService {
 
         // 공개범위 리스트
         Map<Long, Boolean> visibilityMap = portfolio.getVisibilityMap();
-        List<VisibilityResponse> visibility = new ArrayList<>(7);
-        for (long typeId = 1L; typeId <= 7L; typeId++) {
+        List<VisibilityResponse> visibility = new ArrayList<>((int) END_TYPE);
+        for (long typeId = START_TYPE; typeId <= END_TYPE; typeId++) {
             boolean isVisible = visibilityMap.getOrDefault(typeId, false);
             visibility.add(new VisibilityResponse(typeId, isVisible));
         }
 
         List<Long> targets = (typeIds == null || typeIds.isEmpty())
-                ? java.util.stream.LongStream.rangeClosed(1, 7).boxed().toList()
+                ? LongStream.rangeClosed(START_TYPE, END_TYPE).boxed().toList()
                 : typeIds;
 
         // 미리보기
         int req = (limit == null ? 3 : limit);
-        Map<String, PreviewResponse.PreviewBucket> previews = new java.util.LinkedHashMap<>();
+        Map<String, PreviewResponse.PreviewBucket> previews = new LinkedHashMap<>();
 
         for (Long typeId : targets) {
             int n = capForType(typeId, req);
@@ -98,11 +103,10 @@ public class PortfolioService {
                 continue;
             }
 
-            // 상위 N + total 조회
+            // 상위 n개
             List<Object[]> rows = portfolioRepository.findPreviewTopN(portfolio.getId(), typeId, n);
-            long total = portfolioRepository.countVisibleByType(portfolio.getId(), typeId);
 
-            java.util.List<PreviewResponse.PreviewItem> items = new java.util.ArrayList<>(rows.size());
+            List<PreviewResponse.PreviewItem> items = new ArrayList<>(rows.size());
             for (Object[] r : rows) {
                 items.add(PreviewResponse.PreviewItem.builder()
                         .id((Long) r[0])
@@ -114,9 +118,6 @@ public class PortfolioService {
             previews.put(typeId.toString(),
                     PreviewResponse.PreviewBucket.builder()
                             .items(items)
-                            .count(items.size())
-                            .hasMore(total > items.size())
-                            .total(total)
                             .build());
         }
 

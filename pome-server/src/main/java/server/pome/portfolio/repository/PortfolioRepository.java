@@ -17,7 +17,7 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long>, Por
 }
 interface PortfolioPreviewRepositoryCustom {
   List<Object[]> findPreviewTopN(Long portfolioId, long typeId, int n); // [id, title, awardGrade]
-  long countVisibleByType(Long portfolioId, long typeId);
+
 }
 
 // 커스텀 구현 (JPQL에서 visible 조건 제거)
@@ -76,7 +76,6 @@ class PortfolioRepositoryImpl implements PortfolioPreviewRepositoryCustom {
             .getResultList();
   }
 
-  @Override
   public long countVisibleByType(Long portfolioId, long typeId) {
     String jpql = switch ((int) typeId) {
       case 1 -> "SELECT COUNT(e) FROM Education e WHERE e.portfolio.id = :pid";

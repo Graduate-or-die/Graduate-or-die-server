@@ -24,16 +24,11 @@ public class PreviewResponse {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class PreviewBucket {
         private List<PreviewItem> items;
-        private int count;
-        private boolean hasMore;
-        private long total;
+
 
         public static PreviewBucket empty() {
             return PreviewBucket.builder()
                     .items(List.of())
-                    .count(0)
-                    .hasMore(false)
-                    .total(0)
                     .build();
         }
     }

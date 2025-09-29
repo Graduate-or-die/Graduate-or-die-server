@@ -31,6 +31,7 @@ public class PortfolioController {
 
     @Operation(summary = "공개범위 여부 리스트 조회")
     @Parameter(name = "userId", description = "회원 ID", required = true)
+    @Parameter(name = "limit", description = "미리보기 개수 (최대 3개)", required = false)
     @GetMapping("/visibility/{userId}")
     public ResponseEntity<BaseResponse<PreviewResponse>> getVisibilityAndPreview(
             @PathVariable Long userId,
