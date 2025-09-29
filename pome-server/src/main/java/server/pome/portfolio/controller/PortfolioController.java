@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.pome.global.domain.BaseResponse;
+import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.service.PortfolioService;
 
@@ -31,9 +32,13 @@ public class PortfolioController {
     @Operation(summary = "공개범위 여부 리스트 조회")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @GetMapping("/visibility/{userId}")
-    public ResponseEntity<BaseResponse<List<VisibilityResponse>>>  getVisibilityList(@PathVariable Long userId) {
-        List<VisibilityResponse> visibilityList = portfolioService.getVisibilityList(userId);
-        return ResponseEntity.ok(BaseResponse.success(visibilityList));
+    public ResponseEntity<BaseResponse<PreviewResponse>> getVisibilityAndPreview(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) List<Long> typeIds
+    ) {
+        PreviewResponse response = portfolioService.getVisibilityAndPreview(userId, limit, typeIds);
+        return ResponseEntity.ok(BaseResponse.success(response));
     }
 
 }
