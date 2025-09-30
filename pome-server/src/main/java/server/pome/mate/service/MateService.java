@@ -23,6 +23,7 @@ import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
 import server.pome.mate.dto.response.GetMateRequestResponse;
 import server.pome.mate.repository.MateRepository;
+import server.pome.message.service.MessageRoomService;
 import server.pome.user.repository.UserRepository;
 
 
@@ -32,6 +33,7 @@ public class MateService {
 
   private final UserRepository userRepository;
   private final MateRepository mateRepository;
+  private final MessageRoomService messageRoomService;
 
   // 메이트 신청자 리스트 조회
   @Transactional(readOnly = true)
@@ -143,6 +145,9 @@ public class MateService {
       throw new BaseException(CONFLICT_STATE);
     }
 
+    // 채팅방 생성
+    messageRoomService.getOrCreateMessageRoom(userId, mateId);
+
     return userId + "와 " + mateId + "가 매칭되었습니다.";
   }
 
@@ -171,6 +176,8 @@ public class MateService {
     if (updated == 0) {
       throw new BaseException(CONFLICT_STATE);
     }
+
+    // TODO: 채팅방, 코멘트, 채팅, 메시지 삭제
 
     return userId + "와 " + mateId + "의 매칭을 해제했습니다.";
   }

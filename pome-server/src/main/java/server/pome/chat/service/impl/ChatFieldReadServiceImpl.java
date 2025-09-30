@@ -1,17 +1,14 @@
 package server.pome.chat.service.impl;
 
 import static java.time.LocalDateTime.now;
-import static server.pome.global.exception.BaseResponseStatus.CHAT_FIELD_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.CHAT_READ_ERROR;
-import static server.pome.global.exception.BaseResponseStatus.INVALID_CHAT_FORM;
+import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
-import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,7 +23,6 @@ import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.chat.repository.ChatMessageRepository;
 import server.pome.chat.service.ChatFieldReadService;
 import server.pome.chat.service.ChatFieldService;
-import server.pome.chat.service.ChatMessageService;
 import server.pome.global.domain.ChatField;
 import server.pome.global.domain.ChatFieldRead;
 import server.pome.global.domain.ChatMessage;
@@ -82,7 +78,7 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
 
     if (messageId == null || messageId <= 0L) {
       getReadPointer(fieldId, userId);
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
 
     markReadUpToFieldId(fieldId, userId, messageId);
@@ -178,20 +174,20 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   // Request 타입별 유효성 검사
   private void validCreateChatRequest(ReadRequest request) {
     if (request == null) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
     if (request.getPortfolioType() == null) {
       throw new BaseException(INVALID_TYPE_ENUM);
     }
     if (request.getBlockId() == null || request.getFieldKey() == null || request.getFieldKey()
         .isBlank()) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
   }
 
   private void validUnreadRequest(UnreadRequest request) {
     if (request == null) {
-      throw new BaseException(INVALID_CHAT_FORM);
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
     if (request.getPortfolioType() == null) {
       throw new BaseException(INVALID_TYPE_ENUM);

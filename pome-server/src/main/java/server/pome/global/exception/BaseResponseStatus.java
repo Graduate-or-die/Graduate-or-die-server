@@ -44,18 +44,15 @@ public enum BaseResponseStatus {
   // etc
   ETC_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2070, "해당 유저의 기타 사항을 찾을 수 없습니다."),
   DUPLICATE_ETC(false, HttpStatus.BAD_REQUEST, 2071, "해당 유저의 기타 사항이 이미 존재합니다."),
-  
 
   // project
   PROJECT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2060, "해당 프로젝트를 찾을 수 없습니다."),
-
 
   // mate
   CANNOT_MATE_SELF_REQUEST(false, HttpStatus.BAD_REQUEST, 2010, "본인에게는 메이트 신청을 할 수 없습니다."),
   ALREADY_HAVE_MATE(false, HttpStatus.BAD_REQUEST, 2011, "해당 유저는 이미 메이트가 있습니다."),
   ALREADY_REQUEST_MATE(false, HttpStatus.BAD_REQUEST, 2012, "해당 유저에게 이미 메이트를 신청했습니다."),
   PROPOSER_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2013, "신청자 리스트에 메이트가 존재하지 않습니다."),
-  NOT_MATCHED_MATE(false, HttpStatus.BAD_REQUEST, 2014, "매칭된 메이트가 아닙니다."),
   CONFLICT_STATE(false, HttpStatus.BAD_REQUEST, 2015, "상태가 불일치하여 해제 실패하였습니다."),
   MATCHING_DISABLED(false, HttpStatus.BAD_REQUEST, 2016, "매칭 비활성화 상태입니다."),
 
@@ -66,18 +63,25 @@ public enum BaseResponseStatus {
 
   // chat
   CHAT_FIELD_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2040, "존재하지 않는 채팅방입니다."),
-  USER_NOT_PARTICIPANT(false, HttpStatus.BAD_REQUEST, 2041, "채팅방의 참가자 권한이 없는 유저입니다."),
-  INVALID_CHAT_FORM(false, HttpStatus.BAD_REQUEST, 2042, "유효하지 않은 채팅 양식입니다."),
   CHAT_READ_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 2043, "메시지 읽음 처리 중 오류가 발생했습니다."),
   CHAT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2044, "존재하지 않는 메시지입니다."),
   CHAT_DELETE_DISABLED(false, HttpStatus.BAD_REQUEST, 2045, "다른 유저의 메시지를 삭제할 수 없습니다."),
+
+  // message
+  USER_CANNOT_SAME(false, HttpStatus.BAD_REQUEST, 2060, "채팅방의 두 참여자가 동일할 수 없습니다"),
+
+  // chat && message 공용
+  INVALID_REQUEST_FORM(false, HttpStatus.BAD_REQUEST, 2042, "유효하지 않은 채팅 양식입니다."),
+  USER_NOT_PARTICIPANT(false, HttpStatus.BAD_REQUEST, 2041, "채팅방의 참가자 권한이 없는 유저입니다."),
+  NOT_MATCHED_MATE(false, HttpStatus.BAD_REQUEST, 2014, "매칭된 메이트가 아닙니다."),
 
   // 3000번대: 응답 오류
   RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
 
   // 4000번대: 서버/DB 오류
   DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4000, "데이터베이스 연결에 실패하였습니다."),
-  SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4001, "서버와의 연결에 실패하였습니다.");
+  SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4001, "서버와의 연결에 실패하였습니다."),
+  ;
   private final boolean isSuccess;
   private final HttpStatus httpStatus;
   private final int code;

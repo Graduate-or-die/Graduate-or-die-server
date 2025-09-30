@@ -2,9 +2,6 @@ package server.pome.global.exception;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -14,7 +11,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import server.pome.global.domain.BaseResponse;
 import server.pome.portfolio.type.TypeEnum;
 
@@ -72,7 +68,7 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity
         .badRequest()
-        .body(BaseResponse.error(BaseResponseStatus.INVALID_CHAT_FORM));
+        .body(BaseResponse.error(BaseResponseStatus.INVALID_REQUEST_FORM));
   }
 
   /**
