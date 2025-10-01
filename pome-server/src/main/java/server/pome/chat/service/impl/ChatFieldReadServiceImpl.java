@@ -29,7 +29,7 @@ import server.pome.global.domain.ChatMessage;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
 import server.pome.mate.service.MateService;
-import server.pome.portfolio.type.TypeEnum;
+import server.pome.global.enums.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
 @Service

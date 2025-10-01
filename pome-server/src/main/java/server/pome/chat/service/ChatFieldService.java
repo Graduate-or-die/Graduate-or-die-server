@@ -10,7 +10,7 @@ import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.global.domain.ChatField;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
-import server.pome.portfolio.type.TypeEnum;
+import server.pome.global.enums.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
 @Service

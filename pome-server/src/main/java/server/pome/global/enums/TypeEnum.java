@@ -1,4 +1,4 @@
-package server.pome.portfolio.type;
+package server.pome.global.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
