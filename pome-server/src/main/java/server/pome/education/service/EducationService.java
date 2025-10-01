@@ -36,21 +36,11 @@ public class EducationService {
             throw new BaseException(BaseResponseStatus.DUPLICATE_EDUCATION);
         }
 
-        Education education = new Education(
-                null,
-                portfolio,
-                request.getSchool(),
-                request.getMajor(),
-                request.getDegree()
-        );
+        Education education = request.toEntity(portfolio);
         educationRepository.save(education);
 
-        return SaveEducationResponse.builder()
-                .educationId(education.getId())
-                .school(education.getSchool())
-                .major(education.getMajor())
-                .degree(education.getDegree())
-                .build();
+        return SaveEducationResponse.from(education);
+
     }
 
     // 학력 수정
