@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Builder
 @AllArgsConstructor
-public class SaveExperienceResponse {
+public class SaveUpdateExperienceResponse {
 
     @Schema(description = "경력 ID", example = "1")
     private Long experienceId;
@@ -29,8 +29,8 @@ public class SaveExperienceResponse {
     @Schema(description = "근무 마감일", example = "2025-08-01")
     private LocalDate experienceEndAt;
 
-    public static SaveExperienceResponse from(Experience e) {
-        return SaveExperienceResponse.builder()
+    public static SaveUpdateExperienceResponse from(Experience e) {
+        return SaveUpdateExperienceResponse.builder()
                 .experienceId(e.getId())
                 .workplace(e.getWorkplace())
                 .spot(e.getSpot())

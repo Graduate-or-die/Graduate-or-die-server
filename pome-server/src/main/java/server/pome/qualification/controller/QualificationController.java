@@ -9,11 +9,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import server.pome.global.domain.BaseResponse;
-import server.pome.global.domain.Qualification;
 import server.pome.qualification.dto.request.SaveQualificationRequest;
 import server.pome.qualification.dto.request.UpdateQualificationRequest;
-import server.pome.qualification.dto.response.SaveQualificationResponse;
-import server.pome.qualification.dto.response.UpdateQualificationResponse;
+import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
 import server.pome.qualification.service.QualificationService;
 
 @RequiredArgsConstructor
@@ -27,9 +25,9 @@ public class QualificationController {
     @Operation(summary = "자격증 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveQualificationResponse>> saveQualification(@PathVariable Long userId, @Valid @RequestBody SaveQualificationRequest request) {
+    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(@PathVariable Long userId, @Valid @RequestBody SaveQualificationRequest request) {
 
-        SaveQualificationResponse result = qualificationService.saveQualification(userId, request);
+        SaveUpdateQualificationResponse result = qualificationService.saveQualification(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
@@ -37,9 +35,9 @@ public class QualificationController {
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "자격증 ID", required = true)
     @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<UpdateQualificationResponse>> updateQualification(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateQualificationRequest request) {
+    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> updateQualification(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateQualificationRequest request) {
 
-        UpdateQualificationResponse result = qualificationService.updateQualification(userId, blockId, request);
+        SaveUpdateQualificationResponse result = qualificationService.updateQualification(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

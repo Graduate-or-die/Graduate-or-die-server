@@ -10,8 +10,7 @@ import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.qualification.dto.request.SaveQualificationRequest;
 import server.pome.qualification.dto.request.UpdateQualificationRequest;
-import server.pome.qualification.dto.response.SaveQualificationResponse;
-import server.pome.qualification.dto.response.UpdateQualificationResponse;
+import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
 import server.pome.qualification.repository.QualificationRepository;
 import server.pome.user.repository.UserRepository;
 
@@ -28,7 +27,7 @@ public class QualificationService {
     private final UserRepository userRepository;
 
     // 자격증 저장
-    public SaveQualificationResponse saveQualification(Long userId, SaveQualificationRequest request) {
+    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -50,11 +49,11 @@ public class QualificationService {
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
 
-        return SaveQualificationResponse.from(qualification);
+        return SaveUpdateQualificationResponse.from(qualification);
     }
 
     // 자격증 수정
-    public UpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request) {
+    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -83,6 +82,6 @@ public class QualificationService {
         List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
 
         qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score, qualificationFile);
-        return UpdateQualificationResponse.from(qualification);
+        return SaveUpdateQualificationResponse.from(qualification);
     }
 }

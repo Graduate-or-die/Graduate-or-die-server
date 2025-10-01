@@ -9,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
-import server.pome.award.dto.response.SaveAwardResponse;
-import server.pome.award.dto.response.UpdateAwardResponse;
+import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.service.AwardService;
 import server.pome.global.domain.BaseResponse;
 
@@ -25,9 +24,9 @@ public class AwardController {
     @Operation(summary = "수상경력 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveAwardResponse>> saveAward(@PathVariable Long userId, @Valid @RequestBody SaveAwardRequest request) {
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(@PathVariable Long userId, @Valid @RequestBody SaveAwardRequest request) {
 
-        SaveAwardResponse result = awardService.saveAward(userId, request);
+        SaveUpdateAwardResponse result = awardService.saveAward(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
@@ -35,8 +34,8 @@ public class AwardController {
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "수상경력 ID", required = true)
     @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<UpdateAwardResponse>> updateAward(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateAwardRequest request) {
-        UpdateAwardResponse result = awardService.updateAward(userId, blockId, request);
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateAwardRequest request) {
+        SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

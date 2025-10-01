@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
-import server.pome.award.dto.response.SaveAwardResponse;
-import server.pome.award.dto.response.UpdateAwardResponse;
+import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
@@ -28,7 +27,7 @@ public class AwardService {
     private final UserRepository userRepository;
 
     // 수상경력 저장
-    public SaveAwardResponse saveAward(Long userId, SaveAwardRequest request) {
+    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request) {
 
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
@@ -41,11 +40,11 @@ public class AwardService {
         Award award = request.toEntity(portfolio);
         awardRepository.save(award);
 
-        return SaveAwardResponse.from(award);
+        return SaveUpdateAwardResponse.from(award);
     }
 
     // 수상경력 수정
-    public UpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request) {
+    public SaveUpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -61,6 +60,6 @@ public class AwardService {
         List<String> awardFile = request.getAwardFile() != null && !request.getAwardFile().isEmpty() ? request.getAwardFile() : award.getAwardFile();
 
         award.updateAward(awardName, awardOrganization, awardAt, awardGrade, awardFile);
-        return UpdateAwardResponse.from(award);
+        return SaveUpdateAwardResponse.from(award);
     }
 }

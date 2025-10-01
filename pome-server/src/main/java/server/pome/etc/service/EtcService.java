@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.etc.dto.request.SaveEtcRequest;
 import server.pome.etc.dto.request.UpdateEtcRequest;
-import server.pome.etc.dto.response.SaveEtcResponse;
-import server.pome.etc.dto.response.UpdateEtcResponse;
+import server.pome.etc.dto.response.SaveUpdateEtcResponse;
 import server.pome.etc.repository.EtcRepository;
 import server.pome.global.domain.Etc;
 import server.pome.global.domain.Portfolio;
@@ -25,7 +24,7 @@ public class EtcService {
     private final UserRepository userRepository;
 
     // 기타 저장
-    public SaveEtcResponse saveEtc(Long userId, SaveEtcRequest request) {
+    public SaveUpdateEtcResponse saveEtc(Long userId, SaveEtcRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -39,11 +38,11 @@ public class EtcService {
         Etc etc = request.toEntity(portfolio);
         etcRepository.save(etc);
 
-        return SaveEtcResponse.from(etc);
+        return SaveUpdateEtcResponse.from(etc);
     }
 
     // 기타 수정
-    public UpdateEtcResponse updateEtcResponse(Long userId, UpdateEtcRequest request) {
+    public SaveUpdateEtcResponse updateEtcResponse(Long userId, UpdateEtcRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -58,6 +57,6 @@ public class EtcService {
         String memo = request.getMemo() != null && !request.getMemo().isEmpty() ? request.getMemo() : etc.getMemo();
 
         etc.updateEtc(physicalDetail, nationality, link, memo);
-        return UpdateEtcResponse.from(etc);
+        return SaveUpdateEtcResponse.from(etc);
     }
 }

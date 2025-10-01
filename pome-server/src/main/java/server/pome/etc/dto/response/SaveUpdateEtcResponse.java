@@ -9,7 +9,7 @@ import server.pome.global.domain.Etc;
 @Getter
 @Builder
 @AllArgsConstructor
-public class SaveEtcResponse {
+public class SaveUpdateEtcResponse {
 
     @Schema(description = "기타 ID", example = "1")
     private Long etcId;
@@ -26,8 +26,8 @@ public class SaveEtcResponse {
     @Schema(description = "메모", example = "호주워홀경험있음")
     private String memo;
 
-    public static SaveEtcResponse from(Etc etc) {
-        return SaveEtcResponse.builder()
+    public static SaveUpdateEtcResponse from(Etc etc) {
+        return SaveUpdateEtcResponse.builder()
                 .etcId(etc.getId())
                 .physicalDetail(etc.getPhysicalDetail())
                 .nationality(etc.getNationality())

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UpdateProjectResponse {
+public class SaveUpdateProjectResponse {
 
     @Schema(description = "프로젝트 ID", example = "1")
     private Long projectId;
@@ -34,8 +34,8 @@ public class UpdateProjectResponse {
     @Schema(description = "프로젝트 성과", example = "졸업가능상태")
     private String projectAward;
 
-    public static UpdateProjectResponse from(Project project) {
-        return UpdateProjectResponse.builder()
+    public static SaveUpdateProjectResponse from(Project project) {
+        return SaveUpdateProjectResponse.builder()
                 .projectId(project.getId())
                 .projectName(project.getProjectName())
                 .projectStartAt(project.getProjectStartAt())

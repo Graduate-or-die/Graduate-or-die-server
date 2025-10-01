@@ -9,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import server.pome.experience.dto.request.SaveExperienceRequest;
 import server.pome.experience.dto.request.UpdateExperienceRequest;
-import server.pome.experience.dto.response.SaveExperienceResponse;
-import server.pome.experience.dto.response.UpdateExperienceResponse;
+import server.pome.experience.dto.response.SaveUpdateExperienceResponse;
 import server.pome.experience.service.ExperienceService;
 import server.pome.global.domain.BaseResponse;
 
@@ -24,8 +23,8 @@ public class ExperienceController {
     @Operation(summary = "경력 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveExperienceResponse>> saveExperience(@PathVariable Long userId, @Valid @RequestBody SaveExperienceRequest request) {
-        SaveExperienceResponse result = experienceService.saveExperience(userId, request);
+    public ResponseEntity<BaseResponse<SaveUpdateExperienceResponse>> saveExperience(@PathVariable Long userId, @Valid @RequestBody SaveExperienceRequest request) {
+        SaveUpdateExperienceResponse result = experienceService.saveExperience(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
@@ -33,8 +32,8 @@ public class ExperienceController {
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "경력 ID", required = true)
     @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<UpdateExperienceResponse>> updateExperience(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateExperienceRequest request) {
-        UpdateExperienceResponse result = experienceService.updateExperience(userId, blockId, request);
+    public ResponseEntity<BaseResponse<SaveUpdateExperienceResponse>> updateExperience(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateExperienceRequest request) {
+        SaveUpdateExperienceResponse result = experienceService.updateExperience(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

@@ -8,12 +8,13 @@ import server.pome.global.domain.Qualification;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class UpdateQualificationResponse {
+public class SaveUpdateQualificationResponse {
 
     @Schema(description = "자격증 ID", example = "1")
     private Long qualificationId;
@@ -39,8 +40,9 @@ public class UpdateQualificationResponse {
     @Schema(description = "첨부", example = "qulificationimg/url")
     private List<String> qualificationFile = new ArrayList<>();
 
-    public static UpdateQualificationResponse from(Qualification qualification) {
-        return UpdateQualificationResponse.builder()
+    public static SaveUpdateQualificationResponse from(Qualification qualification) {
+        List<String> files = qualification.getQualificationFile();
+        return SaveUpdateQualificationResponse.builder()
                 .qualificationId(qualification.getId())
                 .qualificationName(qualification.getQualificationName())
                 .qualificationOrganization(qualification.getQualificationOrganization())
@@ -48,7 +50,8 @@ public class UpdateQualificationResponse {
                 .qualificationEndAt(qualification.getQualificationEndAt())
                 .hasQualificationEndAt(qualification.isHasQualificationEndAt())
                 .score(qualification.getScore())
-                .qualificationFile(qualification.getQualificationFile())
+                // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
+                .qualificationFile(files == null ? Collections.emptyList() : new ArrayList<>(files))
                 .build();
     }
 }

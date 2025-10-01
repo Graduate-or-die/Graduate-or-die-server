@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.education.dto.request.SaveEducationRequest;
 import server.pome.education.dto.request.UpdateEducationRequest;
-import server.pome.education.dto.response.SaveEducationResponse;
-import server.pome.education.dto.response.UpdateEducationResponse;
+import server.pome.education.dto.response.SaveUpdateEducationResponse;
 import server.pome.global.domain.Education;
 import server.pome.education.repository.EducationRepository;
 import server.pome.global.domain.Portfolio;
@@ -25,7 +24,7 @@ public class EducationService {
     private final UserRepository userRepository;
 
     // 학력 저장
-    public SaveEducationResponse saveEducation(Long userId, SaveEducationRequest request) {
+    public SaveUpdateEducationResponse saveEducation(Long userId, SaveEducationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -39,12 +38,12 @@ public class EducationService {
         Education education = request.toEntity(portfolio);
         educationRepository.save(education);
 
-        return SaveEducationResponse.from(education);
+        return SaveUpdateEducationResponse.from(education);
 
     }
 
     // 학력 수정
-    public UpdateEducationResponse updateEducation(Long userId, UpdateEducationRequest request) {
+    public SaveUpdateEducationResponse updateEducation(Long userId, UpdateEducationRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -59,7 +58,7 @@ public class EducationService {
 
         education.updateEducation(school, major, degree);
 
-        return UpdateEducationResponse.from(education);
+        return SaveUpdateEducationResponse.from(education);
     }
 
 }
