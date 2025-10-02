@@ -11,10 +11,6 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Table(name="educations")
 public class Education extends BaseEntity {
-    
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
-    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
