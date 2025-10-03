@@ -10,8 +10,7 @@ import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.project.dto.request.SaveProjectRequest;
 import server.pome.project.dto.request.UpdateProjectRequest;
-import server.pome.project.dto.response.SaveProjectResponse;
-import server.pome.project.dto.response.UpdateProjectResponse;
+import server.pome.project.dto.response.SaveUpdateProjectResponse;
 import server.pome.project.repository.ProjectRepository;
 import server.pome.user.repository.UserRepository;
 
@@ -27,7 +26,7 @@ public class ProjectService {
     private final UserRepository userRepository;
 
     // 프로젝트 저장
-    public SaveProjectResponse saveProject(Long userId, SaveProjectRequest request) {
+    public SaveUpdateProjectResponse saveProject(Long userId, SaveProjectRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -46,11 +45,11 @@ public class ProjectService {
         Project project = request.toEntity(portfolio);
         projectRepository.save(project);
 
-        return SaveProjectResponse.from(project);
+        return SaveUpdateProjectResponse.from(project);
     }
 
     // 프로젝트 수정
-    public UpdateProjectResponse updateProject(Long userId, Long projectId, UpdateProjectRequest request) {
+    public SaveUpdateProjectResponse updateProject(Long userId, Long projectId, UpdateProjectRequest request) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -73,7 +72,7 @@ public class ProjectService {
         String projectAward = request.getProjectAward() != null &&  !request.getProjectAward().isEmpty() ? request.getProjectAward() : project.getProjectAward();
 
         project.UpdateProject(projectName, projectStartAt, projectEndAt, projectRole, projectDescription, projectAward);
-        return UpdateProjectResponse.from(project);
+        return SaveUpdateProjectResponse.from(project);
 
 
 

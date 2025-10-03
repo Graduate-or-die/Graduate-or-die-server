@@ -3,7 +3,7 @@ package server.pome.chat.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import server.pome.portfolio.type.TypeEnum;
+import server.pome.global.enums.TypeEnum;
 
 @Getter
 @Builder

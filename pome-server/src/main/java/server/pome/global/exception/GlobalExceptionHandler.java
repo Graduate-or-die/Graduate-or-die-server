@@ -12,7 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import server.pome.global.domain.BaseResponse;
-import server.pome.portfolio.type.TypeEnum;
+import server.pome.global.enums.TypeEnum;
 
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)

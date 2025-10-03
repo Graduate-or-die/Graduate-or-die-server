@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import server.pome.activity.dto.request.SaveActivityRequest;
 import server.pome.global.domain.Activity;
 
 import java.time.LocalDate;
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Builder
 @AllArgsConstructor
-public class SaveActivityResponse {
+public class SaveUpdateActivityResponse {
 
     @Schema(description = "대내와활동 ID", example = "1")
     private Long activityId;
@@ -32,8 +31,8 @@ public class SaveActivityResponse {
     @Schema(description = "성과", example = "우수상")
     private String result;
 
-    public static SaveActivityResponse from(Activity activity) {
-        return SaveActivityResponse.builder()
+    public static SaveUpdateActivityResponse from(Activity activity) {
+        return SaveUpdateActivityResponse.builder()
                 .activityId(activity.getId())
                 .activityName(activity.getActivityName())
                 .activityRole(activity.getActivityRole())

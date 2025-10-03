@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class SaveAwardResponse {
+public class SaveUpdateAwardResponse {
 
     @Schema(description = "수상경력 ID", example = "1")
     private Long awardId;
@@ -34,9 +34,9 @@ public class SaveAwardResponse {
     @Schema(description = "첨부", example = "awardimg/url")
     private List<String> awardFile = new ArrayList<>();
 
-    public static SaveAwardResponse from(Award award) {
+    public static SaveUpdateAwardResponse from(Award award) {
         List<String> files = award.getAwardFile();
-        return SaveAwardResponse.builder()
+        return SaveUpdateAwardResponse.builder()
                 .awardId(award.getId())
                 .awardName(award.getAwardName())
                 .awardOrganization(award.getAwardOrganization())

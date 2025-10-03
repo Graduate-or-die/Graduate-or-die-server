@@ -9,8 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.pome.etc.dto.request.SaveEtcRequest;
 import server.pome.etc.dto.request.UpdateEtcRequest;
-import server.pome.etc.dto.response.SaveEtcResponse;
-import server.pome.etc.dto.response.UpdateEtcResponse;
+import server.pome.etc.dto.response.SaveUpdateEtcResponse;
 import server.pome.etc.service.EtcService;
 import server.pome.global.domain.BaseResponse;
 
@@ -25,18 +24,18 @@ public class EtcController {
     @Operation(summary = "기타 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveEtcResponse>> saveEtc(@PathVariable Long userId, @Valid @RequestBody SaveEtcRequest request) {
+    public ResponseEntity<BaseResponse<SaveUpdateEtcResponse>> saveEtc(@PathVariable Long userId, @Valid @RequestBody SaveEtcRequest request) {
 
-        SaveEtcResponse result = etcService.saveEtc(userId, request);
+        SaveUpdateEtcResponse result = etcService.saveEtc(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     @Operation(summary = "기타 수정")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<UpdateEtcResponse>> updateEtc(@PathVariable Long userId, @Valid @RequestBody UpdateEtcRequest request) {
+    public ResponseEntity<BaseResponse<SaveUpdateEtcResponse>> updateEtc(@PathVariable Long userId, @Valid @RequestBody UpdateEtcRequest request) {
 
-        UpdateEtcResponse result = etcService.updateEtcResponse(userId, request);
+        SaveUpdateEtcResponse result = etcService.updateEtcResponse(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

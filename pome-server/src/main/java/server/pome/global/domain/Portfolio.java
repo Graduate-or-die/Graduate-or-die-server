@@ -3,7 +3,6 @@ package server.pome.global.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import server.pome.portfolio.type.TypeEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -11,7 +11,7 @@ import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
-import server.pome.portfolio.type.TypeEnum;
+import server.pome.global.enums.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
 import java.util.LinkedHashMap;
