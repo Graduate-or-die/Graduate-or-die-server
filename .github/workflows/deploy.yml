@@ -1,19 +1,15 @@
-name: Deploy to EC2 on main
+name: Deploy to EC2 via SSH
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: {}
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
-    env:
-      EC2_HOST: ${{ secrets.EC2_HOST }}
-      EC2_USER: ${{ secrets.EC2_USER }}
-      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-      EC2_PATH: ${{ secrets.EC2_PATH || '/opt/app' }}
-      HEALTH_URL: ${{ secrets.HEALTH_URL || 'http://127.0.0.1:8080/health/check' }}
 
     steps:
       - name: Checkout
@@ -23,56 +19,74 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
-      # Gradle 기준
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build (Gradle)
+      - name: Build with Gradle (pome-server module)
+        working-directory: pome-server
         run: |
-          chmod +x gradlew || true
+          set -euo pipefail
+          chmod +x ./gradlew
           ./gradlew clean bootJar -x test
 
       - name: Find built jar
         id: jar
         run: |
-          # Gradle 부트Jar 기본 위치 예시
-          JAR_PATH=$(find build/libs -maxdepth 1 -type f -name "*.jar" | head -n 1)
+          set -euo pipefail
+          JAR_PATH=$(find pome-server/build/libs -maxdepth 1 -type f -name "*.jar" | head -n 1)
           if [ -z "$JAR_PATH" ]; then
-            # Maven 기본 위치 예시
-            JAR_PATH=$(find target -maxdepth 1 -type f -name "*.jar" | head -n 1)
+            echo "No jar found under pome-server/build/libs"; exit 1
           fi
-          if [ -z "$JAR_PATH" ]; then
-            echo "No jar found"; exit 1
-          fi
-          echo "jar=$JAR_PATH" >> $GITHUB_OUTPUT
+          echo "jar=$JAR_PATH" >> "$GITHUB_OUTPUT"
           echo "Found JAR: $JAR_PATH"
 
+      # --- 배포는 push 일 때만 실행 (PR은 빌드만) ---
+      - name: Stop if not push (skip deploy on PR)
+        if: github.event_name != 'push'
+        run: echo "PR run → build only. Deploy is skipped."
+
       - name: Write SSH key
+        if: github.event_name == 'push'
         run: |
-          echo "$EC2_SSH_KEY" > key.pem
+          set -euo pipefail
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Add EC2 to known_hosts
+      - name: Add EC2 host to known_hosts
+        if: github.event_name == 'push'
         run: |
+          set -euo pipefail
           mkdir -p ~/.ssh
-          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Copy JAR to EC2
+        if: github.event_name == 'push'
         run: |
-          scp -i key.pem "${{ steps.jar.outputs.jar }}" "$EC2_USER@$EC2_HOST:/home/$EC2_USER/app-new.jar"
+          set -euo pipefail
+          scp -i key.pem "${{ steps.jar.outputs.jar }}" "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app-new.jar"
 
-      - name: Run deploy script on EC2
+      - name: Deploy on EC2
+        if: github.event_name == 'push'
         run: |
-          ssh -i key.pem "$EC2_USER@$EC2_HOST" "\
-            /opt/app/deploy.sh /home/$EC2_USER/app-new.jar && \
-            rm -f /home/$EC2_USER/app-new.jar \
+          set -euo pipefail
+          ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
+            /opt/app/deploy.sh /home/${{ secrets.EC2_USER }}/app-new.jar && \
+            rm -f /home/${{ secrets.EC2_USER }}/app-new.jar \
+          "
+
+      - name: Post-check (remote health check)
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
+            curl -fsS http://127.0.0.1:8080/health/check >/dev/null \
           "
