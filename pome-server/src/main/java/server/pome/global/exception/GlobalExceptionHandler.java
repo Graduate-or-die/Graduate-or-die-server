@@ -2,6 +2,10 @@ package server.pome.global.exception;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -43,8 +47,17 @@ public class GlobalExceptionHandler {
 
   // 처리되지 않음 모든 예외에 대한 기본 처리
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<BaseResponse<?>> handleUnhandledException(Exception e) {
-    log.error("[UnhandledException] ", e);
+  public ResponseEntity<BaseResponse<?>> handleUnhandledException(Exception e, HttpServletRequest req) {
+    final String uri = req.getRequestURI();
+
+    // 안전장치: 혹시라도 Advice 스코프가 넓어졌을 때 /actuator/** 는 기본 처리로 넘김
+    if (uri.startsWith("/actuator")) {
+      // HandlerExceptionResolver 로 위임 (무한루프 방지 위해 직접 바디 생성 X)
+      throw new RuntimeException(e);
+    }
+
+    log.error("[UnhandledException] path={}, msg={}", uri, e.getMessage(), e);
+
     return ResponseEntity
         .status(BaseResponseStatus.SERVER_ERROR.getHttpStatus())
         .body(BaseResponse.error(BaseResponseStatus.SERVER_ERROR));
@@ -70,6 +83,7 @@ public class GlobalExceptionHandler {
         .badRequest()
         .body(BaseResponse.error(BaseResponseStatus.INVALID_REQUEST_FORM));
   }
+
 
   /**
    * 헬퍼 메서드
