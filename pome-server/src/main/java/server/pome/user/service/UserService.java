@@ -5,9 +5,17 @@ import static server.pome.global.exception.BaseResponseStatus.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import server.pome.like.dto.response.LikeResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
@@ -17,10 +25,7 @@ import server.pome.portfolio.service.PortfolioService;
 import server.pome.user.dto.request.CreateUserRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.request.UserLoginRequest;
-import server.pome.user.dto.response.CreateUserResponse;
-import server.pome.user.dto.response.GetUserResponse;
-import server.pome.user.dto.response.UpdateUserResponse;
-import server.pome.user.dto.response.UserLoginResponse;
+import server.pome.user.dto.response.*;
 import server.pome.user.repository.UserRepository;
 
 @Transactional
@@ -59,10 +64,111 @@ public class UserService {
         .build();
   }
 
+  private final WebClient kakaoWebClient; // HttpClientConfig에서 @Bean 등록된 WebClient 주입
+
+  @Value("${kakao.oauth.client-id}")
+  private String kakaoClientId;
+
+  @Value("${kakao.oauth.redirect-uri}")
+  private String kakaoRedirectUri;
+
+  @Value("${kakao.oauth.client-secret:}")
+  private String kakaoClientSecret;
+
   // 로그인
-  public UserLoginResponse login(UserLoginRequest request) {
-    // TODO: 소셜 로그인 구현
-    return null;
+  public UserLoginResponse loginWithKakaoCode(String code) {
+    if (code == null || code.isBlank()) {
+      throw new BaseException(REQUEST_ERROR);
+    }
+
+    // 1) 인가코드로 카카오 토큰 교환
+    KakaoTokenResponse token = exchangeCodeForToken(code);
+
+    // 2) access_token으로 카카오 유저 정보 조회
+    KakaoUserResponse kakaoUser = fetchKakaoUser(token.getAccessToken());
+
+    // 3) DB 매핑 (임시: kakaoId/email 필드가 없다고 가정 → nickname 기반 생성/조회)
+    User user = findOrCreateUserFromKakao(kakaoUser);
+
+    // 4)JWT 발급 및 응답 커미션
+    // TODO: 팀의 JwtProvider 규격에 맞춰 실제 토큰 발급/반환
+
+    // 임시 로직 (JWT 미발급 상태에서 최소 정보만 반환)
+    return UserLoginResponse.builder()
+            .userId(user.getId())
+            .userName(user.getUserName())
+            .nickName(user.getNickName())
+            // .accessToken("TEMP_ACCESS_" + user.getId())
+            // .refreshToken("TEMP_REFRESH_" + user.getId())
+            .build();
+  }
+
+  private KakaoTokenResponse exchangeCodeForToken(String code) {
+    MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+    form.add("grant_type", "authorization_code");
+    form.add("client_id", kakaoClientId);
+    form.add("redirect_uri", kakaoRedirectUri);
+    form.add("code", code);
+    if (kakaoClientSecret != null && !kakaoClientSecret.isBlank()) {
+      form.add("client_secret", kakaoClientSecret);
+    }
+
+    return kakaoWebClient.post()
+            .uri("/oauth/token")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .body(BodyInserters.fromFormData(form))
+            .retrieve()
+            .bodyToMono(KakaoTokenResponse.class)
+            .block();
+  }
+
+  private KakaoUserResponse fetchKakaoUser(String accessToken) {
+    return kakaoWebClient.mutate()
+            .baseUrl("https://kapi.kakao.com") // 사용자 정보는 kapi 서버
+            .build()
+            .get()
+            .uri("/v2/user/me")
+            .headers(h -> h.setBearerAuth(accessToken))
+            .retrieve()
+            .bodyToMono(KakaoUserResponse.class)
+            .block();
+  }
+
+  // DB 매핑 (임시 버전)
+
+  private User findOrCreateUserFromKakao(KakaoUserResponse kakaoUser) {
+    String preferNickname = kakaoUser.getProperties() != null
+            ? kakaoUser.getProperties().getNickname()
+            : "kakao_user";
+
+    // 1) 우선 닉네임으로 존재하면 그 유저 사용 (임시)
+    User found = userRepository.findByNickName(preferNickname);
+    if (found != null) {
+      return found;
+    }
+
+    // 2) 없으면 신규 생성 (임시 값 채움)
+    String uniqueNick = preferNickname;
+    if (userRepository.existsByNickName(preferNickname)) {
+      uniqueNick = preferNickname + "-kakao-" + UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    User user = new User(
+            null,                       // password 없음
+            preferNickname,             // userName 임시로 닉네임 사용 (필요 시 profile.nickname / account_name 분리)
+            uniqueNick,                 // nickName
+            0,                          // likeCount
+            true,                       // matching
+            null,                       // introduction
+            null,                       // job
+            null                        // profileImage
+    );
+
+    userRepository.save(user);
+    // 신규면 포트폴리오 초기화
+    portfolioService.createInitialPortfolio(user);
+
+    return user;
   }
 
   // 회원 정보 조회

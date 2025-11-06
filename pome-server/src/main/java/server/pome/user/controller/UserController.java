@@ -20,6 +20,7 @@ import server.pome.global.domain.BaseResponse;
 import server.pome.like.dto.response.LikeResponse;
 import server.pome.like.service.LikeService;
 import server.pome.user.dto.request.CreateUserRequest;
+import server.pome.user.dto.request.KakaoLoginRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.request.UserLoginRequest;
 import server.pome.user.dto.response.CreateUserResponse;
@@ -37,22 +38,36 @@ public class UserController {
   private final UserService userService;
   private final LikeService likeService;
 
-  // 조회, 수정 API 테스트용 임시 회원가입 API
-  @Operation(summary = "회원가입")
-  @PostMapping("/signup")
-  public ResponseEntity<BaseResponse<CreateUserResponse>> createUser(
-      @Valid @RequestBody CreateUserRequest request) {
-    CreateUserResponse response = userService.createUser(request);
-    return ResponseEntity.ok(BaseResponse.success(response));
-  }
+//  // 조회, 수정 API 테스트용 임시 회원가입 API
+//  @Operation(summary = "회원가입")
+//  @PostMapping("/signup")
+//  public ResponseEntity<BaseResponse<CreateUserResponse>> createUser(
+//          @Valid @RequestBody CreateUserRequest request) {
+//    CreateUserResponse response = userService.createUser(request);
+//    return ResponseEntity.ok(BaseResponse.success(response));
+//  }
+//
+//  // 임시 로그인
+//  @Operation(summary = "로그인")
+//  @PostMapping("/login")
+//  public ResponseEntity<BaseResponse<UserLoginResponse>> login(
+//          @Valid @RequestBody UserLoginRequest userLoginRequest
+//  ) {
+//    UserLoginResponse result = userService.login(userLoginRequest);
+//    return ResponseEntity.ok(BaseResponse.success(result));
+//  }
 
-  // 로그인
-  @Operation(summary = "로그인")
+  // 카카오 로그인 (인가코드 → JWT)
+  @Operation(summary = "카카오 로그인")
   @PostMapping("/login")
-  public ResponseEntity<BaseResponse<UserLoginResponse>> login(
-      @Valid @RequestBody UserLoginRequest userLoginRequest
+  public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLogin(
+          @Valid @RequestBody KakaoLoginRequest request
   ) {
-    UserLoginResponse result = userService.login(userLoginRequest);
+    // Todo 1. code → 카카오 토큰 교환
+    // Todo 2. access_token → 카카오 유저정보 조회
+    // Todo 3. DB 매핑
+    // Todo 4. 서비스 JWT 발급 후 반환
+    UserLoginResponse result = userService.loginWithKakaoCode(request.getCode());
     return ResponseEntity.ok(BaseResponse.success(result));
   }
 
