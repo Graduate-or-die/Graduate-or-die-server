@@ -11,22 +11,22 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class CorsConfig {
 
   @Bean
-  CorsConfigurationSource corsConfigurationSource() {
+  public CorsConfigurationSource corsConfigurationSource() {
     var c = new CorsConfiguration();
-
     c.setAllowedOrigins(List.of(
-        "http://localhost:8080",
-        "http://alb-spring-722955680.ap-northeast-2.elb.amazonaws.com",
         "http://localhost:3000",
-        "http://localhost:5173"));
-    c.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
+        "http://localhost:5173",
+        "http://alb-spring-722955680.ap-northeast-2.elb.amazonaws.com"
+    ));
+    c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
     c.setAllowedHeaders(List.of("*"));
-    c.setExposedHeaders(List.of("Location", "Content-Disposition"));
+    c.setExposedHeaders(List.of("Location","Content-Disposition"));
+    c.setAllowCredentials(true);
     c.setMaxAge(3600L);
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    var source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", c);
     return source;
   }
-
 }
+

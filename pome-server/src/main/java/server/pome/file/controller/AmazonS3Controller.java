@@ -1,4 +1,4 @@
-package server.pome.s3.controller;
+package server.pome.file.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import server.pome.global.domain.BaseResponse;
-import server.pome.s3.service.AwsS3Service;
+import server.pome.file.service.AwsS3Service;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/file")
+@RequestMapping("/files")
 public class AmazonS3Controller {
 
   private final AwsS3Service awsS3Service;

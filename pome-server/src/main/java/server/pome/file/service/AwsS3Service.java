@@ -1,4 +1,4 @@
-package server.pome.s3.service;
+package server.pome.file.service;
 
 import static server.pome.global.exception.BaseResponseStatus.S3_ERROR;
 
@@ -15,9 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException.BadRequest;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 
