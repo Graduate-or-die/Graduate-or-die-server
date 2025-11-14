@@ -3,6 +3,7 @@ package server.pome.chat.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import server.pome.global.domain.BaseResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/fields")
+@Tag(name = "ChatRead", description = "채팅 읽음용 API")
 public class ChatFieldReadController {
 
   private final ChatFieldReadService chatFieldReadService;
