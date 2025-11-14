@@ -87,6 +87,7 @@ public enum BaseResponseStatus {
   // 4000번대: 서버/DB 오류
   DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4000, "데이터베이스 연결에 실패하였습니다."),
   SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4001, "서버와의 연결에 실패하였습니다."),
+  S3_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4002, "파일 업로드에 실패하였습니다"),
   ;
   private final boolean isSuccess;
   private final HttpStatus httpStatus;
