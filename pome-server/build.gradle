@@ -35,8 +35,14 @@ dependencies {
 	// Swagger UI
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 	implementation 'mysql:mysql-connector-java:8.0.33'
+
 	// Webflux (비동기 통신)
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// security
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+
 }
 
 tasks.named('test') {
