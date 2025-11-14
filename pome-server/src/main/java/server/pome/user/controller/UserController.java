@@ -38,25 +38,6 @@ public class UserController {
   private final UserService userService;
   private final LikeService likeService;
 
-//  // 조회, 수정 API 테스트용 임시 회원가입 API
-//  @Operation(summary = "회원가입")
-//  @PostMapping("/signup")
-//  public ResponseEntity<BaseResponse<CreateUserResponse>> createUser(
-//          @Valid @RequestBody CreateUserRequest request) {
-//    CreateUserResponse response = userService.createUser(request);
-//    return ResponseEntity.ok(BaseResponse.success(response));
-//  }
-//
-//  // 임시 로그인
-//  @Operation(summary = "로그인")
-//  @PostMapping("/login")
-//  public ResponseEntity<BaseResponse<UserLoginResponse>> login(
-//          @Valid @RequestBody UserLoginRequest userLoginRequest
-//  ) {
-//    UserLoginResponse result = userService.login(userLoginRequest);
-//    return ResponseEntity.ok(BaseResponse.success(result));
-//  }
-
   // 카카오 로그인 (인가코드 → JWT)
   @Operation(summary = "카카오 로그인")
   @PostMapping("/login")

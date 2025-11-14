@@ -20,5 +20,5 @@ kakao:
   oauth:
     client-id: ${KAKAO_REST_API_KEY}
     client-secret: ${KAKAO_CLIENT_SECRET:}
-    redirect-uri: http://localhost:8080/user/login
+    redirect-uri: http://localhost:8080/users/login
     token-uri: https://kauth.kakao.com/oauth/token
