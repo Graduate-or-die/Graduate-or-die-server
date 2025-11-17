@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
 
 import static server.pome.global.exception.BaseResponseStatus.CANNOT_MATE_SELF_REQUEST;
 import static server.pome.global.exception.BaseResponseStatus.OAUTH_ALREADY_LINKED;
@@ -78,11 +79,18 @@ public class User extends BaseEntity {
     this.likeCount -= 1;
   }
 
-  public void linkKakao(Long kakaoId, String email) {
-    if (this.kakaoId != null) {
-      throw new BaseException(OAUTH_ALREADY_LINKED);
+  public User linkKakao(Long kakaoId, String email) {
+    // 이미 kakaoId가 연동되어 있으면 그대로 사용
+    if (this.kakaoId != null && !this.kakaoId.equals(kakaoId)) {
+      // 다른 카카오 계정이 이미 연동된 상황
+      throw new BaseException(BaseResponseStatus.OAUTH_UNAUTHORIZED);
     }
-    this.kakaoId = kakaoId;
-    this.email = email;
+    if (this.kakaoId == null) {
+      this.kakaoId = kakaoId;
+    }
+    if ((this.email == null || this.email.isBlank()) && email != null && !email.isBlank()) {
+      this.email = email;
+    }
+    return this;
   }
 }

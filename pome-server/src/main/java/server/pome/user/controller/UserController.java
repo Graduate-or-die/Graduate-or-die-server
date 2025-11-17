@@ -23,6 +23,7 @@ import server.pome.user.dto.request.CreateUserRequest;
 import server.pome.user.dto.request.KakaoLoginRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.request.UserLoginRequest;
+import server.pome.user.dto.response.KakaoTokenResponse;
 import server.pome.user.dto.response.CreateUserResponse;
 import server.pome.user.dto.response.GetUserResponse;
 import server.pome.user.dto.response.UpdateUserResponse;
@@ -117,4 +118,5 @@ public class UserController {
     LikeResponse result = likeService.unlike(mateId, userId);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
+
 }

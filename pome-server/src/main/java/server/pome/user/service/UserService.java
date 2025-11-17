@@ -59,13 +59,8 @@ public class UserService {
     // 2) access_token으로 카카오 유저 정보 조회
     KakaoUserResponse kakaoUser = fetchKakaoUser(token.getAccessToken());
 
-    // 이메일 유무 관계 없이 처리
-    String email = (kakaoUser.getKakaoAccount() != null)
-            ? kakaoUser.getKakaoAccount().getEmail()
-            : null;
-
     // 3) DB 매핑
-    User user = findOrCreateUserFromKakao(kakaoUser, email);
+    User user = findOrCreateUserFromKakao(kakaoUser);
 
     // 4)JWT 발급 및 응답 커미션
     // TODO: 팀의 JwtProvider 규격에 맞춰 실제 토큰 발급/반환
@@ -113,24 +108,27 @@ public class UserService {
 
   // DB 매핑 (임시 버전)
 
-  private User findOrCreateUserFromKakao(KakaoUserResponse kakaoUser, String email) {
+  private User findOrCreateUserFromKakao(KakaoUserResponse kakaoUser) {
     Long kakaoId = kakaoUser.getId();
+    String email = (kakaoUser.getKakaoAccount() != null)
+            ? kakaoUser.getKakaoAccount().getEmail()
+            : null;
     String nickname = (kakaoUser.getProperties() != null)
             ? kakaoUser.getProperties().getNickname()
             : "kakao_user";
 
     // email 우선
     if (email != null && !email.isBlank()) {
-      Optional<User> userOpt = userRepository.findByEmail(email);
-      if (userOpt.isPresent()) {
-        return userOpt.get();
+      Optional<User> byEmail = userRepository.findByEmail(email);
+      if (byEmail.isPresent()) {
+        return byEmail.get().linkKakao(kakaoId, email);
       }
     }
 
     // email 없으면 ID
-    Optional<User> userOpt2 = userRepository.findByKakaoId(kakaoId);
-    if (userOpt2.isPresent()) {
-      return userOpt2.get();
+    Optional<User> byKakaoId = userRepository.findByKakaoId(kakaoId);
+    if (byKakaoId.isPresent()) {
+      return byKakaoId.get().linkKakao(kakaoId, email);
     }
 
     // 둘 다 없으면 신규 생성 (임시 값 채움)
@@ -139,7 +137,7 @@ public class UserService {
       uniqueNick = nickname + "-kakao-" + UUID.randomUUID().toString().substring(0, 6);
     }
 
-    User user = User.builder()
+    User newUser = User.builder()
             .userName(nickname)
             .nickName(uniqueNick)
             .likeCount(0)
@@ -148,12 +146,10 @@ public class UserService {
             .email(email) // null 허용
             .build();
 
-    user.linkKakao(kakaoUser.getId(), email);
-    userRepository.save(user);
-    // 신규면 포트폴리오 초기화
-    portfolioService.createInitialPortfolio(user);
+    userRepository.save(newUser);
+    portfolioService.createInitialPortfolio(newUser);
 
-    return user;
+    return newUser;
   }
 
   // 회원 정보 조회
@@ -208,4 +204,5 @@ public class UserService {
     return userRepository.findById(id)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
   }
+
 }
