@@ -17,6 +17,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import server.pome.global.jwt.JwtTokenProvider;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
@@ -36,6 +37,7 @@ public class UserService {
   private final PortfolioRepository portfolioRepository;
   private final PortfolioService portfolioService;
   private final WebClient kakaoWebClient; // HttpClientConfig에서 @Bean 등록된 WebClient 주입
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Value("${kakao.oauth.client-id}")
   private String kakaoClientId;
@@ -62,16 +64,16 @@ public class UserService {
     // 3) DB 매핑
     User user = findOrCreateUserFromKakao(kakaoUser);
 
-    // 4)JWT 발급 및 응답 커미션
-    // TODO: 팀의 JwtProvider 규격에 맞춰 실제 토큰 발급/반환
+    // 4)JWT 발급
+    String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
+    String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
 
-    // 임시 로직 (JWT 미발급 상태에서 최소 정보만 반환)
     return UserLoginResponse.builder()
             .userId(user.getId())
             .userName(user.getUserName())
             .nickName(user.getNickName())
-            // .accessToken("TEMP_ACCESS_" + user.getId())
-            // .refreshToken("TEMP_REFRESH_" + user.getId())
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
             .build();
   }
 

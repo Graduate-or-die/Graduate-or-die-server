@@ -15,7 +15,6 @@ public class UserLoginResponse {
     private String userName;
     private String nickName;
 
-    // JWT 발급 시 아래 두 필드 활성화
-    // private String accessToken;
-    // private String refreshToken;
+    private String accessToken;
+    private String refreshToken;
 }
