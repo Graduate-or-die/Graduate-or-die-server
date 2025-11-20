@@ -3,6 +3,11 @@ package server.pome.global.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -12,31 +17,37 @@ import org.hibernate.annotations.Comment;
 @Table(name="etcs")
 public class Etc extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-    @Column(name = "physical_detail", nullable = true)
-    @Comment("신체사항")
-    private String physicalDetail;
-
-    @Column(name = "nationality", nullable = true)
-    @Comment("국적")
-    private String nationality;
-
+    @ElementCollection
     @Column(name = "link", nullable = true)
     @Comment("링크")
-    private String link;
+    private List<String> link = new ArrayList<>();
 
     @Column(name = "memo", nullable = true)
     @Comment("메모")
     private String memo;
 
+    // 기타 링크 4개 제한
+    public void addLink(String link) {
+        if (this.link.size() >= 4) {
+            throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
+        }
+        this.link.add(link);
+    }
+
     // 기타 정보 업데이트
-    public void updateEtc(String physicalDetail, String nationality, String link, String memo) {
-        this.physicalDetail = physicalDetail;
-        this.nationality = nationality;
-        this.link = link;
+    public void updateEtc(List<String> link, String memo) {
+        if (link != null && link.size() > 4) {
+            throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
+        }
+
+        this.link.clear();
+        if (link != null) {
+            this.link.addAll(link);
+        }
         this.memo = memo;
     }
 }

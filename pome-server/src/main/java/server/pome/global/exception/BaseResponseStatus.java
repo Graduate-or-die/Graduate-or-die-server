@@ -42,6 +42,7 @@ public enum BaseResponseStatus {
   // etc
   ETC_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2070, "해당 유저의 기타 사항을 찾을 수 없습니다."),
   DUPLICATE_ETC(false, HttpStatus.BAD_REQUEST, 2071, "해당 유저의 기타 사항이 이미 존재합니다."),
+  ETC_LINK_LIMIT_EXCEEDED(false, HttpStatus.BAD_REQUEST,2072, "링크는 최대 4개까지만 등록할 수 있습니다."),
 
   // project
   PROJECT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2060, "해당 프로젝트를 찾을 수 없습니다."),
