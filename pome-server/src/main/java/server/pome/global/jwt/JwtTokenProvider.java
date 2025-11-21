@@ -17,7 +17,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String secret = "5c1ecc65746183f206b63c0b22971c924b9cc7019f1f370040ebb3f5d2c4a96020c70f8faac37c77bd007b327b5386c6b630a0ebae207d88d730343e0f71d098";
 
     @Value("${jwt.access-token-validity-in-seconds}")
     private long accessTokenValidityInSeconds;
@@ -48,7 +48,7 @@ public class JwtTokenProvider {
                 .setSubject(String.valueOf(userId))  // 토큰 안에 userId 넣기
                 .setIssuedAt(now)
                 .setExpiration(expiry)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 }
