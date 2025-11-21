@@ -47,7 +47,7 @@ public class User extends BaseEntity {
   @Comment("희망 직무")
   private String job;
 
-  @Column(name = "profile_image", length = 2048)
+  @Column(name = "profile_image_url", length = 2048)
   @Comment("프로필 사진")
   private String profileImage;
 
