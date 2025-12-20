@@ -51,10 +51,6 @@ public class UserController {
   public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLogin(
           @Valid @RequestBody KakaoLoginRequest request
   ) {
-    // Todo 1. code → 카카오 토큰 교환
-    // Todo 2. access_token → 카카오 유저정보 조회
-    // Todo 3. DB 매핑
-    // Todo 4. 서비스 JWT 발급 후 반환
     UserLoginResponse result = userService.loginWithKakaoCode(request.getCode());
     return ResponseEntity.ok(BaseResponse.success(result));
   }

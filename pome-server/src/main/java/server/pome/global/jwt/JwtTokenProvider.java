@@ -1,10 +1,10 @@
 package server.pome.global.jwt;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +12,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
-    private String secret = "5c1ecc65746183f206b63c0b22971c924b9cc7019f1f370040ebb3f5d2c4a96020c70f8faac37c77bd007b327b5386c6b630a0ebae207d88d730343e0f71d098";
+    private String secret;
 
     @Value("${jwt.access-token-validity-in-seconds}")
     private long accessTokenValidityInSeconds;
@@ -50,5 +51,35 @@ public class JwtTokenProvider {
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
+    }
+    // 토큰 유효성 검사
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token); // 여기서 검증됨
+            return true;
+        } catch (ExpiredJwtException e) {
+            log.warn("[JWT] 만료된 토큰");
+        } catch (UnsupportedJwtException e) {
+            log.warn("[JWT] 지원하지 않는 토큰");
+        } catch (MalformedJwtException e) {
+            log.warn("[JWT] 형식이 깨진 토큰");
+        } catch (SecurityException | IllegalArgumentException e) {
+            log.warn("[JWT] 올바르지 않은 토큰");
+        }
+        return false;
+    }
+
+    // 토큰에서 userId 추출
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return Long.parseLong(claims.getSubject());
     }
 }
