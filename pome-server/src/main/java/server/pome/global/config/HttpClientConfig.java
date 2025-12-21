@@ -1,4 +1,4 @@
-package server.pome.user.auth;
+package server.pome.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

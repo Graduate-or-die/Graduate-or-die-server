@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import server.pome.like.service.LikeService;
 import server.pome.user.dto.request.KakaoLoginRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.response.GetUserResponse;
+import server.pome.jwt.dto.response.LoginTokensResponse;
 import server.pome.user.dto.response.UpdateUserResponse;
 import server.pome.user.dto.response.UserLoginResponse;
 import server.pome.user.service.UserService;
@@ -41,8 +44,25 @@ public class UserController {
   public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLoginCallback(
           @RequestParam("code") String code
   ) {
-    UserLoginResponse result = userService.loginWithKakaoCode(code);
-    return ResponseEntity.ok(BaseResponse.success(result));
+    LoginTokensResponse tokens = userService.loginWithKakaoCode(code);
+
+    ResponseCookie responseCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/")
+            .build();
+
+    UserLoginResponse body = UserLoginResponse.builder()
+            .userId(tokens.getUserId())
+            .userName(tokens.getUserName())
+            .nickName(tokens.getNickName())
+            .accessToken(tokens.getAccessToken())
+            .build();
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+            .body(BaseResponse.success(body));
   }
 
   // 카카오 로그인
@@ -51,10 +71,26 @@ public class UserController {
   public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLogin(
           @Valid @RequestBody KakaoLoginRequest request
   ) {
-    UserLoginResponse result = userService.loginWithKakaoCode(request.getCode());
-    return ResponseEntity.ok(BaseResponse.success(result));
-  }
+    LoginTokensResponse tokens = userService.loginWithKakaoCode(request.getCode());
 
+    ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/")
+            .build();
+
+    UserLoginResponse body = UserLoginResponse.builder()
+            .userId(tokens.getUserId())
+            .userName(tokens.getUserName())
+            .nickName(tokens.getNickName())
+            .accessToken(tokens.getAccessToken())
+            .build();
+
+    return ResponseEntity.ok()
+            .header(org.springframework.http.HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .body(BaseResponse.success(body));
+  }
 
   // 회원 정보 조회
   @Operation(summary = "회원 정보 조회")

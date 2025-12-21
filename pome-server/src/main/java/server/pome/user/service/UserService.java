@@ -17,7 +17,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import server.pome.global.jwt.JwtTokenProvider;
+import server.pome.jwt.dto.response.LoginTokensResponse;
+import server.pome.jwt.provider.JwtTokenProvider;
+import server.pome.jwt.service.RefreshTokenService;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
@@ -38,6 +40,7 @@ public class UserService {
   private final PortfolioService portfolioService;
   private final WebClient kakaoWebClient; // HttpClientConfig에서 @Bean 등록된 WebClient 주입
   private final JwtTokenProvider jwtTokenProvider;
+  private final RefreshTokenService refreshTokenService;
 
   @Value("${kakao.oauth.client-id}")
   private String kakaoClientId;
@@ -49,7 +52,7 @@ public class UserService {
   private String kakaoClientSecret;
 
   // 로그인
-  public UserLoginResponse loginWithKakaoCode(String code) {
+  public LoginTokensResponse loginWithKakaoCode(String code) {
     if (code == null || code.isBlank()) {
       log.warn("[LOGIN] Blank authorization code");
       throw new BaseException(REQUEST_ERROR);
@@ -68,7 +71,14 @@ public class UserService {
     String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
     String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
 
-    return UserLoginResponse.builder()
+    // refresh 만료시각 계산 (DB 저장)
+    java.time.LocalDateTime refreshExpireAt =
+            java.time.LocalDateTime.now().plusSeconds(jwtTokenProvider.getRefreshTokenValidityInSeconds());
+
+    // DB 저장
+    refreshTokenService.save(user, refreshToken, refreshExpireAt);
+
+    return LoginTokensResponse.builder()
             .userId(user.getId())
             .userName(user.getUserName())
             .nickName(user.getNickName())

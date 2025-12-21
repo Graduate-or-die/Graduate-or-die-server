@@ -1,4 +1,4 @@
-package server.pome.user.auth;
+package server.pome.jwt.auth;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import server.pome.global.domain.User;
-import server.pome.global.jwt.JwtTokenProvider;
+import server.pome.jwt.provider.JwtTokenProvider;
 import server.pome.user.repository.UserRepository;
 
 @Slf4j

@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import server.pome.user.auth.JwtAuthenticationFilter;
+import server.pome.jwt.auth.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {

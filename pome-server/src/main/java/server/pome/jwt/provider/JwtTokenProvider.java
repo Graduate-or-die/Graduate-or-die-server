@@ -1,4 +1,4 @@
-package server.pome.global.jwt;
+package server.pome.jwt.provider;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -39,6 +40,14 @@ public class JwtTokenProvider {
 
     public String generateRefreshToken(Long userId) {
         return buildToken(userId, refreshTokenValidityInSeconds);
+    }
+
+    public long getAccessTokenValidityInSeconds() {
+        return accessTokenValidityInSeconds;
+    }
+
+    public long getRefreshTokenValidityInSeconds() {
+        return refreshTokenValidityInSeconds;
     }
 
     private String buildToken(Long userId, long validityInSeconds) {
@@ -81,5 +90,9 @@ public class JwtTokenProvider {
                 .getBody();
 
         return Long.parseLong(claims.getSubject());
+    }
+
+    public LocalDateTime calcRefreshExpireAt() {
+        return LocalDateTime.now().plusSeconds(refreshTokenValidityInSeconds);
     }
 }
