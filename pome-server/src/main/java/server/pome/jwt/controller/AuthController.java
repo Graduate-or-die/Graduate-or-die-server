@@ -33,7 +33,7 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", result.getRefreshToken())
                 .httpOnly(true)
-                .secure(true)
+                .secure(true) 
                 .sameSite("None")
                 .path("/")
                 .build();
