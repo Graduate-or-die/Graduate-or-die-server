@@ -19,9 +19,6 @@ public class SaveEtcRequest {
     private String memo;
 
     public Etc toEntity(Portfolio portfolio) {
-        if (link != null && link.size() > 4) {
-            throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
-        }
         return Etc.builder()
                 .portfolio(portfolio)
                 .link(link)

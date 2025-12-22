@@ -37,6 +37,11 @@ public class EtcService {
             throw new BaseException(BaseResponseStatus.DUPLICATE_ETC);
         }
 
+        List<String> link = request.getLink();
+        if (link != null && link.size() > 4) {
+            throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
+        }
+
         Etc etc = request.toEntity(portfolio);
         etcRepository.save(etc);
 
