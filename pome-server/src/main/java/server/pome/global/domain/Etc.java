@@ -40,14 +40,16 @@ public class Etc extends BaseEntity {
 
     // 기타 정보 업데이트
     public void updateEtc(List<String> link, String memo) {
-        if (link != null && link.size() > 4) {
-            throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
-        }
-
         this.link.clear();
+
         if (link != null) {
+            if (link.size() > 4) {
+                throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
+            }
             this.link.addAll(link);
         }
+
         this.memo = memo;
     }
 }
+
