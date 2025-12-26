@@ -14,6 +14,8 @@ import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.user.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,6 +37,11 @@ public class EtcService {
             throw new BaseException(BaseResponseStatus.DUPLICATE_ETC);
         }
 
+        List<String> link = request.getLink();
+        if (link != null && link.size() > 4) {
+            throw new BaseException(BaseResponseStatus.ETC_LINK_LIMIT_EXCEEDED);
+        }
+
         Etc etc = request.toEntity(portfolio);
         etcRepository.save(etc);
 
@@ -51,12 +58,10 @@ public class EtcService {
         Etc etc = etcRepository.findByPortfolio(portfolio)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.ETC_NOT_FOUND));
 
-        String physicalDetail = request.getPhysicalDetail() != null && !request.getPhysicalDetail().isEmpty() ? request.getPhysicalDetail() : etc.getPhysicalDetail();
-        String nationality = request.getNationality() != null && !request.getNationality().isEmpty() ? request.getNationality() : etc.getNationality();
-        String link = request.getLink() != null && !request.getLink().isEmpty() ? request.getLink() : etc.getLink();
+        List<String> link = request.getLink() != null && !request.getLink().isEmpty() ? request.getLink() : etc.getLink();
         String memo = request.getMemo() != null && !request.getMemo().isEmpty() ? request.getMemo() : etc.getMemo();
 
-        etc.updateEtc(physicalDetail, nationality, link, memo);
+        etc.updateEtc(link, memo);
         return SaveUpdateEtcResponse.from(etc);
     }
 }
