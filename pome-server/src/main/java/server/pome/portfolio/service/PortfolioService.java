@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.chat.repository.ChatFieldRepository;
+import server.pome.etc.repository.EtcRepository;
+import server.pome.global.domain.Etc;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
@@ -29,6 +31,7 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final ChatFieldRepository chatFieldRepository;
+    private final EtcRepository etcRepository;
 
     private static final long START_TYPE = 1L;
     private static final long END_TYPE   = 7L;
@@ -103,6 +106,36 @@ public class PortfolioService {
                 continue;
             }
 
+            if (typeId == 7L) {
+                Etc etc = etcRepository.findByPortfolio(portfolio).orElse(null);
+
+                if (etc == null || etc.getLink() == null || etc.getLink().isEmpty()) {
+                    previews.put(typeId.toString(), PreviewResponse.PreviewBucket.empty());
+                    continue;
+                }
+
+                List<String> links = etc.getLink();
+
+                int toIndex = Math.min(n, links.size());
+                List<String> previewLinks = links.subList(0, toIndex);
+
+                List<PreviewResponse.PreviewItem> items = new ArrayList<>(previewLinks.size());
+
+                for (String link : previewLinks) {
+                    items.add(PreviewResponse.PreviewItem.builder()
+                            .id(etc.getId())
+                            .title(link)
+                            .awardGrade(null)
+                            .build());
+                }
+
+                previews.put(typeId.toString(),
+                        PreviewResponse.PreviewBucket.builder()
+                                .items(items)
+                                .build());
+                continue;
+            }
+
             // 상위 n개
             List<Object[]> rows = portfolioRepository.findPreviewTopN(portfolio.getId(), typeId, n);
 
@@ -132,7 +165,6 @@ public class PortfolioService {
         return switch (typeId.intValue()) {
             case 1 -> Math.min(1, requested);
             case 2 -> Math.min(2, requested);
-            case 7 -> 0;
             default -> Math.min(3, requested);
         };
     }

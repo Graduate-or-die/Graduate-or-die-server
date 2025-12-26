@@ -4,18 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import server.pome.global.domain.Etc;
 import server.pome.global.domain.Portfolio;
+import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
+
+import java.util.List;
 
 @Getter
 public class SaveEtcRequest {
 
-    @Schema(description = "신체사항", example = "이상없음")
-    private String physicalDetail;
-
-    @Schema(description = "국적", example = "대한민국")
-    private String nationality;
-
     @Schema(description = "링크", example = "https://github.com/")
-    private String link;
+    private List<String> link;
 
     @Schema(description = "메모", example = "호주워홀경험있음")
     private String memo;
@@ -23,8 +21,6 @@ public class SaveEtcRequest {
     public Etc toEntity(Portfolio portfolio) {
         return Etc.builder()
                 .portfolio(portfolio)
-                .physicalDetail(physicalDetail)
-                .nationality(nationality)
                 .link(link)
                 .memo(memo)
                 .build();
