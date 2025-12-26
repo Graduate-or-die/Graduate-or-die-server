@@ -3,22 +3,21 @@ package server.pome.global.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
+import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
+
+import static server.pome.global.exception.BaseResponseStatus.CANNOT_MATE_SELF_REQUEST;
+import static server.pome.global.exception.BaseResponseStatus.OAUTH_ALREADY_LINKED;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "users")
+@Builder
 public class User extends BaseEntity {
-
-  @Column(name = "password", nullable = false)
-  @Comment("비밀번호")
-  private String password;
 
   @Column(name = "user_name", nullable = false)
   @Comment("유저 이름")
@@ -44,9 +43,17 @@ public class User extends BaseEntity {
   @Comment("희망 직무")
   private String job;
 
-  @Column(name = "profile_image", length = 2048)
+  @Column(name = "profile_image_url", length = 2048)
   @Comment("프로필 사진")
   private String profileImage;
+
+  @Column(name = "kakao_id", nullable = false)
+  @Comment("카카오 아이디")
+  private Long kakaoId;
+
+  @Column(name = "email", nullable = false)
+  @Comment("이메일")
+  private String email;
 
   // 회원 정보 업데이트
   public void updateUserInfo(String name, String nickname, boolean matching, String introduction,
@@ -66,5 +73,20 @@ public class User extends BaseEntity {
   // 좋아요 수 감소
   public void disLike() {
     this.likeCount -= 1;
+  }
+
+  public User linkKakao(Long kakaoId, String email) {
+    // 이미 kakaoId가 연동되어 있으면 그대로 사용
+    if (this.kakaoId != null && !this.kakaoId.equals(kakaoId)) {
+      // 다른 카카오 계정이 이미 연동된 상황
+      throw new BaseException(BaseResponseStatus.OAUTH_UNAUTHORIZED);
+    }
+    if (this.kakaoId == null) {
+      this.kakaoId = kakaoId;
+    }
+    if ((this.email == null || this.email.isBlank()) && email != null && !email.isBlank()) {
+      this.email = email;
+    }
+    return this;
   }
 }

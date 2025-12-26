@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import server.pome.global.domain.BaseResponse;
 import server.pome.like.dto.response.LikeResponse;
 import server.pome.like.service.LikeService;
-import server.pome.user.dto.request.CreateUserRequest;
+import server.pome.user.dto.request.KakaoLoginRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
-import server.pome.user.dto.request.UserLoginRequest;
-import server.pome.user.dto.response.CreateUserResponse;
 import server.pome.user.dto.response.GetUserResponse;
+import server.pome.jwt.dto.response.LoginTokensResponse;
 import server.pome.user.dto.response.UpdateUserResponse;
 import server.pome.user.dto.response.UserLoginResponse;
 import server.pome.user.service.UserService;
@@ -37,23 +38,58 @@ public class UserController {
   private final UserService userService;
   private final LikeService likeService;
 
-  // 조회, 수정 API 테스트용 임시 회원가입 API
-  @Operation(summary = "회원가입")
-  @PostMapping("/signup")
-  public ResponseEntity<BaseResponse<CreateUserResponse>> createUser(
-      @Valid @RequestBody CreateUserRequest request) {
-    CreateUserResponse response = userService.createUser(request);
-    return ResponseEntity.ok(BaseResponse.success(response));
+  // 카카오 로그인
+  @Operation(summary = "카카오 로그인", description = "카카오가 직접 리다이렉트 하는 용도")
+  @GetMapping("/login")
+  public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLoginCallback(
+          @RequestParam("code") String code
+  ) {
+    LoginTokensResponse tokens = userService.loginWithKakaoCode(code);
+
+    ResponseCookie responseCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/")
+            .build();
+
+    UserLoginResponse body = UserLoginResponse.builder()
+            .userId(tokens.getUserId())
+            .userName(tokens.getUserName())
+            .nickName(tokens.getNickName())
+            .accessToken(tokens.getAccessToken())
+            .build();
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+            .body(BaseResponse.success(body));
   }
 
-  // 로그인
-  @Operation(summary = "로그인")
+  // 카카오 로그인
+  @Operation(summary = "카카오 로그인 (프론트 용)", description = "프론트가 code를 보내주는 용도")
   @PostMapping("/login")
-  public ResponseEntity<BaseResponse<UserLoginResponse>> login(
-      @Valid @RequestBody UserLoginRequest userLoginRequest
+  public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLogin(
+          @Valid @RequestBody KakaoLoginRequest request
   ) {
-    UserLoginResponse result = userService.login(userLoginRequest);
-    return ResponseEntity.ok(BaseResponse.success(result));
+    LoginTokensResponse tokens = userService.loginWithKakaoCode(request.getCode());
+
+    ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/")
+            .build();
+
+    UserLoginResponse body = UserLoginResponse.builder()
+            .userId(tokens.getUserId())
+            .userName(tokens.getUserName())
+            .nickName(tokens.getNickName())
+            .accessToken(tokens.getAccessToken())
+            .build();
+
+    return ResponseEntity.ok()
+            .header(org.springframework.http.HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .body(BaseResponse.success(body));
   }
 
   // 회원 정보 조회
@@ -121,4 +157,5 @@ public class UserController {
     LikeResponse result = likeService.unlike(mateId, userId);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
+
 }

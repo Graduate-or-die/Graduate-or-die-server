@@ -36,4 +36,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query("SELECT COALESCE(u.likeCount, 0) FROM User u WHERE u.id = :id")
   int findLikeCountById(@Param("id") Long mateId);
+
+  // 카카오 ID로 사용자 조회
+  Optional<User> findByKakaoId(Long kakaoId);
+
+  // 이메일로 사용자 조회
+  Optional<User> findByEmail(String email);
+
+  // 이메일 중복 여부 확인 (신규 가입 시 체크용)
+  boolean existsByEmail(String email);
 }
