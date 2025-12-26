@@ -118,8 +118,6 @@ public class UserService {
             .block();
   }
 
-  // DB 매핑 (임시 버전)
-
   private User findOrCreateUserFromKakao(KakaoUserResponse kakaoUser) {
     Long kakaoId = kakaoUser.getId();
     String email = (kakaoUser.getKakaoAccount() != null)
