@@ -19,10 +19,6 @@ import static server.pome.global.exception.BaseResponseStatus.OAUTH_ALREADY_LINK
 @Builder
 public class User extends BaseEntity {
 
-  //@Column(name = "password", nullable = false)
-  //@Comment("비밀번호")
-  //private String password;
-
   @Column(name = "user_name", nullable = false)
   @Comment("유저 이름")
   private String userName;

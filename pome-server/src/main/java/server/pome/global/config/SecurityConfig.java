@@ -21,20 +21,19 @@ public class SecurityConfig {
     http.httpBasic(AbstractHttpConfigurer::disable);
 
     http.authorizeHttpRequests(auth -> auth
-            // 카카오 콜백 + 프론트에서 호출하는 로그인 API
-            .requestMatchers("/users/login", "/users/login/**").permitAll()
             // 스웨거 / 에러 / 파비콘 등 기본 접근 허용
             .requestMatchers(
+                    "/users/login",
+                    "/users/login/**",
+                    "/auth/reissue",
+                    "/auth/logout",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/error",
                     "/favicon.ico"
             ).permitAll()
 
-            // 테스트용
-            .requestMatchers("/users/me").authenticated()
-
-            .anyRequest().permitAll()
+            .anyRequest().authenticated()
     );
 
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
