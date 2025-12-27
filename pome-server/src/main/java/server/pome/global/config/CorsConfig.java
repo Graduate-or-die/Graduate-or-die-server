@@ -13,9 +13,9 @@ public class CorsConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     var c = new CorsConfiguration();
-    c.setAllowedOrigins(List.of(
-        "http://localhost:3000",
-        "http://localhost:5173",
+    c.setAllowedOriginPatterns(List.of(
+        "http://localhost:*",
+        "http://127.0.0.1:*",
         "http://alb-spring-722955680.ap-northeast-2.elb.amazonaws.com"
     ));
     c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
