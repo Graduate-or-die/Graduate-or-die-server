@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import server.pome.global.domain.BaseResponse;
 import server.pome.like.dto.response.LikeResponse;
 import server.pome.like.service.LikeService;
-import server.pome.user.dto.request.KakaoLoginRequest;
+import server.pome.jwt.dto.request.KakaoLoginRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.response.GetUserResponse;
 import server.pome.jwt.dto.response.LoginTokensResponse;
 import server.pome.user.dto.response.UpdateUserResponse;
-import server.pome.user.dto.response.UserLoginResponse;
+import server.pome.jwt.dto.response.UserLoginResponse;
 import server.pome.user.service.UserService;
 
 @RequiredArgsConstructor
@@ -37,60 +37,6 @@ public class UserController {
 
   private final UserService userService;
   private final LikeService likeService;
-
-  // 카카오 로그인
-  @Operation(summary = "카카오 로그인", description = "카카오가 직접 리다이렉트 하는 용도")
-  @GetMapping("/login")
-  public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLoginCallback(
-          @RequestParam("code") String code
-  ) {
-    LoginTokensResponse tokens = userService.loginWithKakaoCode(code);
-
-    ResponseCookie responseCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None")
-            .path("/")
-            .build();
-
-    UserLoginResponse body = UserLoginResponse.builder()
-            .userId(tokens.getUserId())
-            .userName(tokens.getUserName())
-            .nickName(tokens.getNickName())
-            .accessToken(tokens.getAccessToken())
-            .build();
-
-    return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-            .body(BaseResponse.success(body));
-  }
-
-  // 카카오 로그인
-  @Operation(summary = "카카오 로그인 (프론트 용)", description = "프론트가 code를 보내주는 용도")
-  @PostMapping("/login")
-  public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLogin(
-          @Valid @RequestBody KakaoLoginRequest request
-  ) {
-    LoginTokensResponse tokens = userService.loginWithKakaoCode(request.getCode());
-
-    ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None")
-            .path("/")
-            .build();
-
-    UserLoginResponse body = UserLoginResponse.builder()
-            .userId(tokens.getUserId())
-            .userName(tokens.getUserName())
-            .nickName(tokens.getNickName())
-            .accessToken(tokens.getAccessToken())
-            .build();
-
-    return ResponseEntity.ok()
-            .header(org.springframework.http.HttpHeaders.SET_COOKIE, refreshCookie.toString())
-            .body(BaseResponse.success(body));
-  }
 
   // 회원 정보 조회
   @Operation(summary = "회원 정보 조회")

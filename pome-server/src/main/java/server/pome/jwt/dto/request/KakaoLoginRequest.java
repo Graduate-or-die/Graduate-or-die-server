@@ -1,4 +1,4 @@
-package server.pome.user.dto.request;
+package server.pome.jwt.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

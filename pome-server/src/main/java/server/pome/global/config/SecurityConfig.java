@@ -23,8 +23,8 @@ public class SecurityConfig {
     http.authorizeHttpRequests(auth -> auth
             // 스웨거 / 에러 / 파비콘 등 기본 접근 허용
             .requestMatchers(
-                    "/users/login",
-                    "/users/login/**",
+                    "/auth/login",
+                    "/auth/login/**",
                     "/auth/reissue",
                     "/auth/logout",
                     "/swagger-ui/**",
