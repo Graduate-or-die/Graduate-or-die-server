@@ -55,9 +55,9 @@ public class PortfolioController {
     @GetMapping("/{userId}")
     public ResponseEntity<BaseResponse<Object>> getPortfolio(
         @PathVariable Long userId,
-        @RequestParam(required = false, name = "type") TypeEnum type
+        @RequestParam(required = false) Long typeId
     ) {
-        Object result = portfolioService.getPortfolioSection(userId, type);
+        Object result = portfolioService.getPortfolioSection(userId, typeId);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

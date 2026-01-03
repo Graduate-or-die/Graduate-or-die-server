@@ -182,12 +182,13 @@ public class PortfolioService {
     }
 
     // 포트폴리오 항목별 조회
-    public Object getPortfolioSection(Long userId, TypeEnum type) {
+    public Object getPortfolioSection(Long userId, Long typeId) {
         Portfolio portfolio = getPortfolio(userId);
         Long portfolioId = portfolio.getId();
 
         // 단일 항목 조회
-        if (type != null) {
+        if (typeId != null) {
+            TypeEnum type = TypeEnum.fromId(typeId);
             PortfolioSectionQueryHandler handler = handlerMap.get(type);
             if (handler == null) {
                 throw new BaseException(INVALID_TYPE_ENUM);
