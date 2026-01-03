@@ -49,10 +49,6 @@ public class PortfolioService {
 
     @PostConstruct
     void initHandlerMap() {
-        for (PortfolioSectionQueryHandler h : handlers) {
-            System.out.println("[Handler] " + h.getClass().getName() + " -> " + h.supports());
-        }
-
         handlerMap = handlers.stream()
             .collect(Collectors.toMap(
                 PortfolioSectionQueryHandler::supports,
