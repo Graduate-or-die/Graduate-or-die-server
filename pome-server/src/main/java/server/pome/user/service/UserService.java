@@ -204,9 +204,9 @@ public class UserService {
   // 공통 응답 생성 메서드
   private GetUserResponse buildUserResponse(User user) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(user.getId());
-    List<String> tags = (portfolio != null) ? portfolio.getTag() : new ArrayList<>();
+    //List<String> tags = (portfolio != null) ? portfolio.getTag() : new ArrayList<>();
 
-    return GetUserResponse.from(user, tags);
+    return GetUserResponse.from(user);
   }
 
   // 유저 조회 메서드

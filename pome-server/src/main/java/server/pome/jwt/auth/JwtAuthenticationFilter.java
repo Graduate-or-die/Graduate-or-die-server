@@ -40,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7); // "Bearer " 이후
+        if (token.isEmpty() || token.equals("null") || token.equals("undefined")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             // 토큰 검증

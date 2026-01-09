@@ -23,6 +23,9 @@ public enum TypeEnum {
     private final Long id;
 
     public static TypeEnum fromId(Long id) {
+        if (id == null) {
+            throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+        }
         for (TypeEnum t : values()) {
             if (t.getId().equals(id)) {
                 return t;
