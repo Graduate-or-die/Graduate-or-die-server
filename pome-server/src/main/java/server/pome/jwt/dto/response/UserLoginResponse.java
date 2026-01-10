@@ -1,4 +1,4 @@
-package server.pome.user.dto.response;
+package server.pome.jwt.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -21,6 +21,6 @@ public class UserLoginResponse {
     @Schema(description = "카카오 닉네임", example = "혜리미")
     private String nickName;
 
-    @Schema(description = "서비스 엑세스 토큰 (JWT)", example = "혜리미")
+    @Schema(description = "서비스 엑세스 토큰 (JWT)")
     private String accessToken;
 }

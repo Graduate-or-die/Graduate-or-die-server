@@ -1,4 +1,4 @@
-package server.pome.user.dto.response;
+package server.pome.jwt.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
