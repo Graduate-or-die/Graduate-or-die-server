@@ -84,7 +84,7 @@ public class PortfolioController {
             @Parameter(name = "typeId", description = "항목 ID", required = true),
             @Parameter(name = "blockIds", description = "삭제할 블록 ID 리스트", required = true)
     })
-    @PostMapping("/bulk-delete")
+    @PostMapping("/bulkDelete")
     public ResponseEntity<BaseResponse<Void>> bulkDeletePortfolioBlocks(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody BulkDeletePortfolioBlockRequest request
