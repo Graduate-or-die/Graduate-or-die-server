@@ -3,6 +3,7 @@ package server.pome.qualification.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Qualification;
 import server.pome.global.exception.BaseException;
@@ -83,5 +84,13 @@ public class QualificationService {
 
         qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score, qualificationFile);
         return SaveUpdateQualificationResponse.from(qualification);
+    }
+
+    // 자격증 삭제
+    public void delete(Long blockId, Long userId) {
+        Qualification qualification = qualificationRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+        qualificationRepository.delete(qualification);
     }
 }

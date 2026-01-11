@@ -72,4 +72,13 @@ public class ExperienceService {
         experience.updateExperience(workplace, spot, experienceStartAt, experienceEndAt);
         return SaveUpdateExperienceResponse.from(experience);
     }
+
+    // 경력 삭제
+    public void delete(Long blockId, Long userId) {
+        Experience experience = experienceRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+
+        experienceRepository.delete(experience);
+    }
 }

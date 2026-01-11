@@ -1,5 +1,6 @@
 package server.pome.portfolio.service;
 
+import static server.pome.global.enums.TypeEnum.*;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 
@@ -10,9 +11,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import server.pome.activity.service.ActivityService;
+import server.pome.award.service.AwardService;
 import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.etc.repository.EtcRepository;
+import server.pome.experience.repository.ExperienceRepository;
+import server.pome.experience.service.ExperienceService;
 import server.pome.global.domain.Etc;
+import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
@@ -23,6 +29,8 @@ import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.enums.TypeEnum;
+import server.pome.project.service.ProjectService;
+import server.pome.qualification.service.QualificationService;
 import server.pome.user.repository.UserRepository;
 
 import java.util.LinkedHashMap;
@@ -39,10 +47,14 @@ public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
-    private final ChatFieldRepository chatFieldRepository;
     private final EtcRepository etcRepository;
     private final List<PortfolioSectionQueryHandler> handlers;
     private Map<TypeEnum, PortfolioSectionQueryHandler> handlerMap;
+    private final ExperienceService experienceService;
+    private final ActivityService activityService;
+    private final AwardService awardService;
+    private final QualificationService qualificationService;
+    private final ProjectService projectService;
 
     private static final long START_TYPE = 1L;
     private static final long END_TYPE = 7L;
@@ -224,5 +236,23 @@ public class PortfolioService {
             case 2 -> Math.min(2, requested);
             default -> Math.min(3, requested);
         };
+    }
+
+    // 포트폴리오 블록 삭제
+    public void deletePortfolioBlock(Long userId, Long typeId, Long blockId) {
+
+        if (typeId == 1L || typeId == 7L) {
+            throw new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED);
+        }
+
+        switch (TypeEnum.fromId(typeId)) {
+            case EXPERIENCES -> experienceService.delete(blockId, userId);
+            case ACTIVITIES -> activityService.delete(blockId, userId);
+            case AWARDS -> awardService.delete(blockId, userId);
+            case QUALIFICATIONS -> qualificationService.delete(blockId, userId);
+            case PROJECTS -> projectService.delete(blockId, userId);
+            default -> throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+        }
+
     }
 }

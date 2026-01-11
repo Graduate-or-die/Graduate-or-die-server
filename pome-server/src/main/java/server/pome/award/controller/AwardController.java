@@ -2,6 +2,7 @@ package server.pome.award.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.service.AwardService;
 import server.pome.global.domain.BaseResponse;
+import server.pome.global.domain.User;
 
 @RequiredArgsConstructor
 @RestController
@@ -23,9 +25,11 @@ public class AwardController {
 
     @Operation(summary = "수상경력 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
-    @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(@PathVariable Long userId, @Valid @RequestBody SaveAwardRequest request) {
+    @PostMapping
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @Valid @RequestBody SaveAwardRequest request) {
 
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         SaveUpdateAwardResponse result = awardService.saveAward(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
@@ -33,8 +37,10 @@ public class AwardController {
     @Operation(summary = "수상경력 수정")
     @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "수상경력 ID", required = true)
-    @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateAwardRequest request) {
+    @PatchMapping
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateAwardRequest request) {
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }

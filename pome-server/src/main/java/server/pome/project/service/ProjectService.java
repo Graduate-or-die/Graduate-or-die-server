@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Project;
+import server.pome.global.domain.Qualification;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
@@ -75,7 +76,13 @@ public class ProjectService {
         return SaveUpdateProjectResponse.from(project);
 
 
+    }
 
-
+    // 프로젝트 삭제
+    public void delete(Long blockId, Long userId) {
+        Project project = projectRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+        projectRepository.delete(project);
     }
 }
