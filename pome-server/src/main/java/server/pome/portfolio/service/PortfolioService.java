@@ -255,4 +255,24 @@ public class PortfolioService {
         }
 
     }
+
+    public void deletePortfolioBlocks(Long userId, Long typeId, List<Long> blockIds) {
+
+        if (typeId == 1L || typeId == 7L) {
+            throw new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED);
+        }
+
+        TypeEnum type = TypeEnum.fromId(typeId);
+
+        for (Long blockId : blockIds) {
+            switch (type) {
+                case EXPERIENCES -> experienceService.delete(blockId, userId);
+                case ACTIVITIES -> activityService.delete(blockId, userId);
+                case AWARDS -> awardService.delete(blockId, userId);
+                case QUALIFICATIONS -> qualificationService.delete(blockId, userId);
+                case PROJECTS -> projectService.delete(blockId, userId);
+                default -> throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+            }
+        }
+    }
 }
