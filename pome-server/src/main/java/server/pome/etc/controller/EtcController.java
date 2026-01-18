@@ -24,7 +24,6 @@ public class EtcController {
     private final EtcService etcService;
 
     @Operation(summary = "기타 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateEtcResponse>> saveEtc(Authentication authentication, @Valid @RequestBody SaveEtcRequest request) {
 
