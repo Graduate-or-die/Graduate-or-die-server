@@ -36,7 +36,6 @@ public class QualificationController {
     }
 
     @Operation(summary = "자격증 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "자격증 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> updateQualification(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateQualificationRequest request) {
