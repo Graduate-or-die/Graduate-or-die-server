@@ -3,16 +3,22 @@ package server.pome.qualification.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import server.pome.global.domain.BaseResponse;
+import server.pome.global.domain.User;
 import server.pome.qualification.dto.request.SaveQualificationRequest;
 import server.pome.qualification.dto.request.UpdateQualificationRequest;
 import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
 import server.pome.qualification.service.QualificationService;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,10 +30,13 @@ public class QualificationController {
 
     @Operation(summary = "자격증 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
-    @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(@PathVariable Long userId, @Valid @RequestBody SaveQualificationRequest request) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(Authentication authentication,  @Valid @RequestBody SaveQualificationRequest request,  @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
-        SaveUpdateQualificationResponse result = qualificationService.saveQualification(userId, request);
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
+
+        SaveUpdateQualificationResponse result = qualificationService.saveQualification(userId, request, files);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 

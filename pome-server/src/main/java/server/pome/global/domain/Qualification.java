@@ -46,11 +46,6 @@ public class Qualification extends BaseEntity{
     @Comment("등급/점수")
     private int score;
 
-    @ElementCollection // 추후 첨부 파일 관련 테이블 생성 예정  @CollectionTable
-    @Column(name = "qulification_file", nullable = true)
-    @Comment("첨부")
-    private List<String> qualificationFile = new ArrayList<>();
-
     // DB 저장 전에 해당 메서드 항상 호출
     @PrePersist
     @PreUpdate
@@ -73,14 +68,13 @@ public class Qualification extends BaseEntity{
         this.qualificationEndAt = null;
     }
 
-    public void updateQualification(String qualificationName, String qualificationOrganization,  LocalDate qualificationStartAt, LocalDate qualificationEndAt, boolean hasQualificationEndAt, int score, List<String> qualificationFile) {
+    public void updateQualification(String qualificationName, String qualificationOrganization,  LocalDate qualificationStartAt, LocalDate qualificationEndAt, boolean hasQualificationEndAt, int score) {
         this.qualificationName = qualificationName;
         this.qualificationOrganization = qualificationOrganization;
         this.qualificationStartAt = qualificationStartAt;
         this.qualificationEndAt = qualificationEndAt;
         this.hasQualificationEndAt = hasQualificationEndAt;
         this.score = score;
-        this.qualificationFile = qualificationFile;
     }
 
 }

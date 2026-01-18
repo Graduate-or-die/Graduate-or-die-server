@@ -3,12 +3,15 @@ package server.pome.award.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import server.pome.attachment.service.AttachmentService;
 import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
+import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
@@ -25,9 +28,10 @@ public class AwardService {
     private final AwardRepository awardRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final AttachmentService attachmentService;
 
     // 수상경력 저장
-    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request) {
+    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, List<MultipartFile> files) {
 
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
@@ -35,10 +39,23 @@ public class AwardService {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
         }
 
-        // 일단 임시 요청으로 들어온 URL를 save
-        // TODO: S3가 붙으면 request에서의 awardFile이 아닌 S3의 URL로 교체 예정
         Award award = request.toEntity(portfolio);
         awardRepository.save(award);
+
+        if (files != null && !files.isEmpty()) {
+            TypeEnum type = TypeEnum.AWARDS;
+
+            if (type.getS3Dir() == null) {
+                throw new BaseException(BaseResponseStatus.FILE_NOT_SUPPORTED_TYPE);
+            }
+
+            attachmentService.uploadAll(
+                    portfolio,
+                    type.getId(),
+                    award.getId(),
+                    files
+            );
+        }
 
         return SaveUpdateAwardResponse.from(award);
     }
@@ -57,9 +74,8 @@ public class AwardService {
         String awardOrganization = request.getAwardOrganization() != null && !request.getAwardOrganization().isEmpty() ? request.getAwardOrganization() : award.getAwardOrganization();
         LocalDate awardAt = request.getAwardAt() != null ? request.getAwardAt() : award.getAwardAt();
         String awardGrade = request.getAwardGrade() != null && !request.getAwardGrade().isEmpty() ? request.getAwardGrade() : award.getAwardGrade();
-        List<String> awardFile = request.getAwardFile() != null && !request.getAwardFile().isEmpty() ? request.getAwardFile() : award.getAwardFile();
 
-        award.updateAward(awardName, awardOrganization, awardAt, awardGrade, awardFile);
+        award.updateAward(awardName, awardOrganization, awardAt, awardGrade);
         return SaveUpdateAwardResponse.from(award);
     }
 }

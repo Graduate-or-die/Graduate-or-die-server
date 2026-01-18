@@ -16,10 +16,8 @@ public record GetAwardListResponse(
   LocalDate awardAt,
 
   @Schema(description = "시상등급", example = "대상")
-  String awardGrade,
+  String awardGrade
 
-  @Schema(description = "첨부", example = "awardimg/url")
-  List<String> awardFile
 ) {
 
   public static GetAwardListResponse from(Award award) {
@@ -27,8 +25,7 @@ public record GetAwardListResponse(
         award.getAwardName(),
         award.getAwardOrganization(),
         award.getAwardAt(),
-        award.getAwardGrade(),
-        award.getAwardFile()
+        award.getAwardGrade()
     );
   }
 }

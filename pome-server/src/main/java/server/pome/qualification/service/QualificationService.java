@@ -3,8 +3,11 @@ package server.pome.qualification.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import server.pome.attachment.service.AttachmentService;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Qualification;
+import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
@@ -25,9 +28,10 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final AttachmentService attachmentService;
 
     // 자격증 저장
-    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request) {
+    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, List<MultipartFile> files) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -44,10 +48,23 @@ public class QualificationService {
             }
         }
 
-        // 일단 임시 요청으로 들어온 URL를 save
-        // TODO: S3가 붙으면 request에서의 qualificationFile이 아닌 S3의 URL로 교체 예정
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
+
+        if (files != null && !files.isEmpty()) {
+            TypeEnum type = TypeEnum.AWARDS;
+
+            if (type.getS3Dir() == null) {
+                throw new BaseException(BaseResponseStatus.FILE_NOT_SUPPORTED_TYPE);
+            }
+
+            attachmentService.uploadAll(
+                    portfolio,
+                    type.getId(),
+                    qualification.getId(),
+                    files
+            );
+        }
 
         return SaveUpdateQualificationResponse.from(qualification);
     }
@@ -79,9 +96,8 @@ public class QualificationService {
         LocalDate qualificationEndAt = request.getQualificationEndAt() != null ? request.getQualificationEndAt() : qualification.getQualificationEndAt();
         boolean hasQualificationEndAt = request.isHasQualificationEndAt();
         int score = request.getScore();
-        List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
 
-        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score, qualificationFile);
+        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score);
         return SaveUpdateQualificationResponse.from(qualification);
     }
 }

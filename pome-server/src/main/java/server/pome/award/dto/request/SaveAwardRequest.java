@@ -24,8 +24,6 @@ public class SaveAwardRequest {
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;
 
-    @Schema(description = "첨부", example = "awardimg/url")
-    private List<String> awardFile = new ArrayList<>();
 
     public Award toEntity(Portfolio portfolio) {
         return Award.builder()
@@ -34,7 +32,6 @@ public class SaveAwardRequest {
                 .awardOrganization(awardOrganization)
                 .awardAt(awardAt)
                 .awardGrade(awardGrade)
-                .awardFile(awardFile)
                 .build();
     }
 }

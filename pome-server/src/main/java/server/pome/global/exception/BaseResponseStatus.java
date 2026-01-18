@@ -20,6 +20,7 @@ public enum BaseResponseStatus {
 
   // portfolios
   INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
+  FILE_NOT_SUPPORTED_TYPE(false, HttpStatus.BAD_REQUEST, 2112, "해당 포트폴리오 타입은 파일 첨부를 지원하지 않습니다."),
 
   // education
   EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),

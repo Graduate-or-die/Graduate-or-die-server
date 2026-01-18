@@ -30,9 +30,6 @@ public class SaveQualificationRequest {
     @Schema(description = "등급/점수", example = "1")
     private int score;
 
-    @Schema(description = "첨부", example = "qulificationimg/url")
-    private List<String> qualificationFile = new ArrayList<>();
-
     public Qualification toEntity(Portfolio portfolio) {
         return Qualification.builder()
                 .portfolio(portfolio)
@@ -42,7 +39,6 @@ public class SaveQualificationRequest {
                 .qualificationEndAt(qualificationEndAt)
                 .hasQualificationEndAt(hasQualificationEndAt)
                 .score(score)
-                .qualificationFile(qualificationFile)
                 .build();
     }
 

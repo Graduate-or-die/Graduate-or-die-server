@@ -28,6 +28,4 @@ public class UpdateQualificationRequest {
     @Schema(description = "등급/점수", example = "1")
     private int score;
 
-    @Schema(description = "첨부", example = "qulificationimg/url")
-    private List<String> qualificationFile = new ArrayList<>();
 }

@@ -31,19 +31,15 @@ public class SaveUpdateAwardResponse {
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;
 
-    @Schema(description = "첨부", example = "awardimg/url")
-    private List<String> awardFile = new ArrayList<>();
 
     public static SaveUpdateAwardResponse from(Award award) {
-        List<String> files = award.getAwardFile();
+
         return SaveUpdateAwardResponse.builder()
                 .awardId(award.getId())
                 .awardName(award.getAwardName())
                 .awardOrganization(award.getAwardOrganization())
                 .awardAt(award.getAwardAt())
                 .awardGrade(award.getAwardGrade())
-                // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
-                .awardFile(files == null ? Collections.emptyList() : new ArrayList<>(files))
                 .build();
     }
 }

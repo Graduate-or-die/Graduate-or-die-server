@@ -22,10 +22,7 @@ public record GetQualificationListResponse(
   boolean hasQualificationEndAt,
 
   @Schema(description = "등급/점수", example = "1")
-  int score,
-
-  @Schema(description = "첨부", example = "qulificationimg/url")
-  List<String> qualificationFile
+  int score
 ) {
 
   public static GetQualificationListResponse from(Qualification qualification) {
@@ -35,8 +32,7 @@ public record GetQualificationListResponse(
         qualification.getQualificationStartAt(),
         qualification.getQualificationEndAt(),
         qualification.isHasQualificationEndAt(),
-        qualification.getScore(),
-        qualification.getQualificationFile()
+        qualification.getScore()
     );
   }
 }
