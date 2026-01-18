@@ -24,7 +24,6 @@ public class AwardController {
     private final AwardService awardService;
 
     @Operation(summary = "수상경력 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @Valid @RequestBody SaveAwardRequest request) {
 
