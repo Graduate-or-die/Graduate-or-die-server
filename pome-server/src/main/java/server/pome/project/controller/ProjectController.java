@@ -34,7 +34,6 @@ public class ProjectController {
     }
 
     @Operation(summary = "프로젝트 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "프로젝트 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> updateProject(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateProjectRequest request) {
