@@ -23,7 +23,6 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @Operation(summary = "프로젝트 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> saveProject(Authentication authentication, @Valid @RequestBody SaveProjectRequest request) {
 
