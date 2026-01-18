@@ -23,7 +23,6 @@ public class ExperienceController {
     private final ExperienceService experienceService;
 
     @Operation(summary = "경력 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateExperienceResponse>> saveExperience(Authentication authentication, @Valid @RequestBody SaveExperienceRequest request) {
         User user = (User) authentication.getPrincipal();
