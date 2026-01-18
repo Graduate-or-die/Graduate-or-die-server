@@ -24,7 +24,6 @@ public class EducationController {
     private final EducationService educationService;
 
     @Operation(summary = "학력 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateEducationResponse>> saveEducation(Authentication authentication, @Valid @RequestBody SaveEducationRequest request) {
 
