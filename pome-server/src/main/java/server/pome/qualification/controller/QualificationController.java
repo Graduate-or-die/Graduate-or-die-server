@@ -25,7 +25,6 @@ public class QualificationController {
     private final QualificationService qualificationService;
 
     @Operation(summary = "자격증 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(Authentication authentication, @Valid @RequestBody SaveQualificationRequest request) {
 
