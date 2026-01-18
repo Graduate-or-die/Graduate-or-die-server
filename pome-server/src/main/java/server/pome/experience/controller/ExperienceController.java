@@ -32,7 +32,6 @@ public class ExperienceController {
     }
 
     @Operation(summary = "경력 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "경력 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateExperienceResponse>> updateExperience(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateExperienceRequest request) {
