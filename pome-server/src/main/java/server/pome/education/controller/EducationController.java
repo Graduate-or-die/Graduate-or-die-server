@@ -34,7 +34,6 @@ public class EducationController {
     }
 
     @Operation(summary = "학력 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateEducationResponse>> updateEducation(Authentication authentication, @Valid @RequestBody UpdateEducationRequest request) {
 
