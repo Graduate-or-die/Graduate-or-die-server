@@ -35,7 +35,6 @@ public class ActivityController {
     }
 
     @Operation(summary = "대내외활동 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "대내외활동 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateActivityResponse>> updateActivity(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateActivityRequest request) {
