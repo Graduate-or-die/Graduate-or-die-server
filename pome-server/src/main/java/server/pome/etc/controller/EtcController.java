@@ -34,7 +34,6 @@ public class EtcController {
     }
 
     @Operation(summary = "기타 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateEtcResponse>> updateEtc(Authentication authentication, @Valid @RequestBody UpdateEtcRequest request) {
 
