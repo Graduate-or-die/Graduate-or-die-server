@@ -34,7 +34,6 @@ public class AwardController {
     }
 
     @Operation(summary = "수상경력 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "수상경력 ID", required = true)
     @PatchMapping
     public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateAwardRequest request) {
