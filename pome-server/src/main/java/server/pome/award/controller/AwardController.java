@@ -29,8 +29,8 @@ public class AwardController {
 
     @Operation(summary = "수상경력 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @Valid @RequestBody SaveAwardRequest request, @RequestPart(value = "files", required = false) List<MultipartFile> files
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @RequestPart("award") SaveAwardRequest request, @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) {
 
         User user = (User) authentication.getPrincipal();

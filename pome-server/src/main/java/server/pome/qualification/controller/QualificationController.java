@@ -30,8 +30,8 @@ public class QualificationController {
 
     @Operation(summary = "자격증 저장")
     @Parameter(name = "userId", description = "회원 ID", required = true)
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(Authentication authentication,  @Valid @RequestBody SaveQualificationRequest request,  @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(Authentication authentication,  @RequestPart("qualification") SaveQualificationRequest request,  @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
