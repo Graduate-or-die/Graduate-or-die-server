@@ -24,7 +24,6 @@ public class ActivityController {
     private final ActivityService activityService;
 
     @Operation(summary = "대내외활동 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping
     public ResponseEntity<BaseResponse<SaveUpdateActivityResponse>> saveActivity(Authentication authentication, @Valid @RequestBody SaveActivityRequest request) {
 

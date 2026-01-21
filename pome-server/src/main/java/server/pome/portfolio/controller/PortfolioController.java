@@ -3,19 +3,17 @@ package server.pome.portfolio.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import server.pome.global.domain.BaseResponse;
 import server.pome.global.domain.User;
-import server.pome.portfolio.dto.request.BulkDeletePortfolioBlockRequest;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.service.PortfolioService;
-import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -84,16 +82,17 @@ public class PortfolioController {
             @Parameter(name = "typeId", description = "항목 ID", required = true),
             @Parameter(name = "blockIds", description = "삭제할 블록 ID 리스트", required = true)
     })
-    @PostMapping("/bulkDelete")
+    @DeleteMapping("/bulk-delete")
     public ResponseEntity<BaseResponse<Void>> bulkDeletePortfolioBlocks(
             @AuthenticationPrincipal User user,
-            @Valid @RequestBody BulkDeletePortfolioBlockRequest request
+            @RequestParam Long typeId,
+            @RequestParam String blockId
     ) {
-        portfolioService.deletePortfolioBlocks(
-                user.getId(),
-                request.getTypeId(),
-                request.getBlockIds()
-        );
+        List<Long> blockIds = Arrays.stream(blockId.split(","))
+                .map(id -> Long.parseLong(id))
+                .toList();
+
+        portfolioService.deletePortfolioBlocks(user.getId(),typeId, blockIds);
         return ResponseEntity.ok(BaseResponse.success(null));
     }
 }
