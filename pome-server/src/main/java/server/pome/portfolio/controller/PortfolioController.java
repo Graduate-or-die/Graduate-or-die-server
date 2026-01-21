@@ -5,14 +5,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import server.pome.global.domain.BaseResponse;
-import server.pome.global.enums.TypeEnum;
-import server.pome.portfolio.dto.response.GetPortfolioResponse;
+import server.pome.global.domain.User;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.service.PortfolioService;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -59,5 +60,39 @@ public class PortfolioController {
     ) {
         Object result = portfolioService.getPortfolioSection(userId, typeId);
         return ResponseEntity.ok(BaseResponse.success(result));
+    }
+
+    @Operation(summary = "포트폴리오 블록별 삭제")
+    @Parameters({
+            @Parameter(name = "typeId", description = "항목 ID", required = true),
+            @Parameter(name = "blockId", description = "블록 ID", required = true)
+    })
+    @DeleteMapping
+    public ResponseEntity<BaseResponse<Void>> deletePortfolioBlock(
+            @AuthenticationPrincipal User user,
+            @RequestParam Long typeId,
+            @RequestParam Long blockId
+    ) {
+        portfolioService.deletePortfolioBlock(user.getId(), typeId, blockId);
+        return ResponseEntity.ok(BaseResponse.success(null));
+    }
+
+    @Operation(summary = "포트폴리오 벌크 삭제")
+    @Parameters({
+            @Parameter(name = "typeId", description = "항목 ID", required = true),
+            @Parameter(name = "blockIds", description = "삭제할 블록 ID 리스트", required = true)
+    })
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<BaseResponse<Void>> bulkDeletePortfolioBlocks(
+            @AuthenticationPrincipal User user,
+            @RequestParam Long typeId,
+            @RequestParam String blockId
+    ) {
+        List<Long> blockIds = Arrays.stream(blockId.split(","))
+                .map(id -> Long.parseLong(id))
+                .toList();
+
+        portfolioService.deletePortfolioBlocks(user.getId(),typeId, blockIds);
+        return ResponseEntity.ok(BaseResponse.success(null));
     }
 }

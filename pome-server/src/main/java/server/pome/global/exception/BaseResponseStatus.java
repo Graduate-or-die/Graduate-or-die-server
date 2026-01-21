@@ -20,6 +20,8 @@ public enum BaseResponseStatus {
 
   // portfolios
   INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
+  PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED(false, HttpStatus.BAD_REQUEST, 2110, "블록 삭제가 불가합니다."),
+  PORTFOLIO_BLOCK_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2111, "해당 블록을 찾을 수 없습니다."),
 
   // education
   EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),

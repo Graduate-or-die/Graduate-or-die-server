@@ -7,6 +7,7 @@ import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
+import server.pome.global.domain.Activity;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
@@ -61,5 +62,13 @@ public class AwardService {
 
         award.updateAward(awardName, awardOrganization, awardAt, awardGrade, awardFile);
         return SaveUpdateAwardResponse.from(award);
+    }
+
+    // 수상경력 삭제
+    public void delete(Long blockId, Long userId) {
+        Award award = awardRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+        awardRepository.delete(award);
     }
 }

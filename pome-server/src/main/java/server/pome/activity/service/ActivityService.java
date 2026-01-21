@@ -8,6 +8,7 @@ import server.pome.activity.dto.request.UpdateActivityRequest;
 import server.pome.activity.dto.response.SaveUpdateActivityResponse;
 import server.pome.activity.repository.ActivityRepository;
 import server.pome.global.domain.Activity;
+import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
@@ -72,5 +73,14 @@ public class ActivityService {
 
         activity.updateActivity(activityName, activityRole, activityStartAt, activityEndAt, result);
         return SaveUpdateActivityResponse.from(activity);
+    }
+
+    // 대내외활동 삭제
+    public void delete(Long blockId, Long userId) {
+        Activity activity = activityRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+
+        activityRepository.delete(activity);
     }
 }
