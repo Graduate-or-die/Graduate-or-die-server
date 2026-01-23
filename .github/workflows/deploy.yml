@@ -2,9 +2,9 @@ name: Deploy to EC2 via SSH
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch: {}
 
 jobs:
@@ -49,7 +49,7 @@ jobs:
           echo "jar=$JAR_PATH" >> "$GITHUB_OUTPUT"
           echo "Found JAR: $JAR_PATH"
 
-      # --- 배포는 push 일 때만 실행 (PR은 빌드만) ---
+      # 배포는 push 일 때만 실행 (PR은 빌드만)
       - name: Stop if not push (skip deploy on PR)
         if: github.event_name != 'push'
         run: echo "PR run → build only. Deploy is skipped."
@@ -68,25 +68,29 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Copy JAR to EC2
-        if: github.event_name == 'push'
-        run: |
-          set -euo pipefail
-          scp -i key.pem "${{ steps.jar.outputs.jar }}" "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/app-new.jar"
-
-      - name: Deploy on EC2
+      # EC2 고정 경로의 jar만 교체 (app 재시작/재기동 안 함)
+      - name: Copy JAR to EC2 (replace only)
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
-            /opt/app/deploy.sh /home/${{ secrets.EC2_USER }}/app-new.jar && \
-            rm -f /home/${{ secrets.EC2_USER }}/app-new.jar \
+            set -euo pipefail; \
+            mkdir -p /home/${{ secrets.EC2_USER }}/pome/app; \
           "
+          scp -i key.pem "${{ steps.jar.outputs.jar }}" "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/pome/app/app.jar"
 
-      - name: Post-check (remote health check)
+      # app이 켜져 있으면 health 체크, 꺼져 있으면 스킵 (실패 처리 안 함)
+      - name: Post-check (health if app is running)
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
-            curl -fsS http://127.0.0.1:8080/health/check >/dev/null \
+            set -euo pipefail; \
+            if docker ps --format '{{.Names}}' | grep -q '^pome-app$'; then \
+              echo '[CHECK] app container is running -> health check'; \
+              curl -fsS http://127.0.0.1:8080/health/check >/dev/null; \
+              echo '[CHECK] health ok'; \
+            else \
+              echo '[CHECK] app is OFF -> skip health check (A-mode)'; \
+            fi \
           "
