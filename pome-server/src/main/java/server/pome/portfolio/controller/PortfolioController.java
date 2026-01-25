@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import server.pome.global.domain.BaseResponse;
@@ -24,40 +25,46 @@ public class PortfolioController {
     private final PortfolioService portfolioService;
 
     @Operation(summary = "항목별 공개범위 설정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "typeId", description = "항목 ID", required = true)
-    @PostMapping("/visibility/{userId}")
+    @PostMapping("/visibility")
     public ResponseEntity<BaseResponse<VisibilityResponse>> toggleVisibility(
-        @PathVariable Long userId,
+            Authentication authentication,
         @RequestParam("typeId") Long typeId) {
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         boolean updatedState = portfolioService.toggleVisible(userId, typeId);
         return ResponseEntity.ok(
             BaseResponse.success(new VisibilityResponse(typeId, updatedState)));
     }
 
     @Operation(summary = "공개범위 여부 리스트 조회")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "limit", description = "미리보기 개수 (최대 3개)", required = false)
-    @GetMapping("/visibility/{userId}")
+    @GetMapping("/visibility")
     public ResponseEntity<BaseResponse<PreviewResponse>> getVisibilityAndPreview(
-        @PathVariable Long userId,
+            Authentication authentication,
         @RequestParam(required = false) Integer limit,
         @RequestParam(required = false) List<Long> typeIds
     ) {
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         PreviewResponse response = portfolioService.getVisibilityAndPreview(userId, limit, typeIds);
         return ResponseEntity.ok(BaseResponse.success(response));
     }
 
     @Operation(summary = "포트폴리오 항목별 조회")
     @Parameters({
-        @Parameter(name = "userId", description = "회원 ID", required = true),
         @Parameter(name = "typeId", description = "항목 ID")
     })
-    @GetMapping("/{userId}")
+    @GetMapping
     public ResponseEntity<BaseResponse<Object>> getPortfolio(
-        @PathVariable Long userId,
+            Authentication authentication,
         @RequestParam(required = false) Long typeId
     ) {
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         Object result = portfolioService.getPortfolioSection(userId, typeId);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
