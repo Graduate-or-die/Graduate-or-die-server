@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.pome.global.domain.BaseResponse;
+import server.pome.global.domain.User;
 import server.pome.project.dto.request.SaveProjectRequest;
 import server.pome.project.dto.request.UpdateProjectRequest;
 import server.pome.project.dto.response.SaveUpdateProjectResponse;
@@ -21,18 +23,21 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @Operation(summary = "프로젝트 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
-    @PostMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> saveProject(@PathVariable Long userId, @Valid @RequestBody SaveProjectRequest request) {
+    @PostMapping
+    public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> saveProject(Authentication authentication, @Valid @RequestBody SaveProjectRequest request) {
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         SaveUpdateProjectResponse result = projectService.saveProject(userId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     @Operation(summary = "프로젝트 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "프로젝트 ID", required = true)
-    @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> updateProject(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateProjectRequest request) {
+    @PatchMapping
+    public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> updateProject(Authentication authentication, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateProjectRequest request) {
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
         SaveUpdateProjectResponse result = projectService.updateProject(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
