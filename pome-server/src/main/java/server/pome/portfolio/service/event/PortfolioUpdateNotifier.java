@@ -12,6 +12,7 @@ public class PortfolioUpdateNotifier {
   private final ApplicationEventPublisher publisher;
 
   public void notifyUpdated(Long userId) {
+    // update 시작 이벤트 발행
     publisher.publishEvent(new PortfolioUpdateRequestedEvent(userId));
   }
 }
