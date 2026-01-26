@@ -20,6 +20,8 @@ public enum BaseResponseStatus {
 
   // portfolios
   INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
+  PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED(false, HttpStatus.BAD_REQUEST, 2110, "블록 삭제가 불가합니다."),
+  PORTFOLIO_BLOCK_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2111, "해당 블록을 찾을 수 없습니다."),
 
   // education
   EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),
@@ -42,6 +44,7 @@ public enum BaseResponseStatus {
   // etc
   ETC_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2070, "해당 유저의 기타 사항을 찾을 수 없습니다."),
   DUPLICATE_ETC(false, HttpStatus.BAD_REQUEST, 2071, "해당 유저의 기타 사항이 이미 존재합니다."),
+  ETC_LINK_LIMIT_EXCEEDED(false, HttpStatus.BAD_REQUEST,2072, "링크는 최대 4개까지만 등록할 수 있습니다."),
 
   // project
   PROJECT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2060, "해당 프로젝트를 찾을 수 없습니다."),
@@ -73,12 +76,21 @@ public enum BaseResponseStatus {
   USER_NOT_PARTICIPANT(false, HttpStatus.BAD_REQUEST, 2041, "채팅방의 참가자 권한이 없는 유저입니다."),
   NOT_MATCHED_MATE(false, HttpStatus.BAD_REQUEST, 2014, "매칭된 메이트가 아닙니다."),
 
+  // kakao
+  OAUTH_INVALID_CODE(false, HttpStatus.BAD_REQUEST, 2100, "유효하지 않거나 만료된 인가코드입니다."),
+  OAUTH_UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED, 2101, "카카오 인증에 실패했습니다."),
+  OAUTH_EMAIL_REQUIRED(false, HttpStatus.BAD_REQUEST, 2102, "카카오 이메일 동의가 필요합니다."),
+  OAUTH_COMMUNICATION_ERROR(false, HttpStatus.BAD_GATEWAY, 2103, "카카오 서버와 통신 중 오류가 발생했습니다."),
+  OAUTH_SERVER_ERROR(false, HttpStatus.BAD_GATEWAY, 2104, "카카오 서버 오류입니다. 잠시 후 다시 시도해주세요."),
+  OAUTH_ALREADY_LINKED(false, HttpStatus.BAD_REQUEST, 2105, "이미 카카오 계정이 연동되어 있습니다."),
+
   // 3000번대: 응답 오류
   RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
 
   // 4000번대: 서버/DB 오류
   DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4000, "데이터베이스 연결에 실패하였습니다."),
   SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4001, "서버와의 연결에 실패하였습니다."),
+  S3_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4002, "파일 업로드에 실패하였습니다"),
   ;
   private final boolean isSuccess;
   private final HttpStatus httpStatus;

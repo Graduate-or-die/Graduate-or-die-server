@@ -12,6 +12,7 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 
 @Service
@@ -22,6 +23,8 @@ public class EducationService {
     private final EducationRepository educationRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 학력 저장
     public SaveUpdateEducationResponse saveEducation(Long userId, SaveEducationRequest request) {
@@ -38,8 +41,9 @@ public class EducationService {
         Education education = request.toEntity(portfolio);
         educationRepository.save(education);
 
-        return SaveUpdateEducationResponse.from(education);
+        portfolioUpdateNotifier.notifyUpdated(userId);
 
+        return SaveUpdateEducationResponse.from(education);
     }
 
     // 학력 수정
@@ -58,7 +62,8 @@ public class EducationService {
 
         education.updateEducation(school, major, degree);
 
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateEducationResponse.from(education);
     }
-
 }

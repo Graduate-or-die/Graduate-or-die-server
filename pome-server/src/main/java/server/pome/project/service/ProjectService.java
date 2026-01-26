@@ -8,6 +8,7 @@ import server.pome.global.domain.Project;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.project.dto.request.SaveProjectRequest;
 import server.pome.project.dto.request.UpdateProjectRequest;
 import server.pome.project.dto.response.SaveUpdateProjectResponse;
@@ -24,6 +25,8 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 프로젝트 저장
     public SaveUpdateProjectResponse saveProject(Long userId, SaveProjectRequest request) {
@@ -44,6 +47,8 @@ public class ProjectService {
 
         Project project = request.toEntity(portfolio);
         projectRepository.save(project);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
 
         return SaveUpdateProjectResponse.from(project);
     }
@@ -72,10 +77,17 @@ public class ProjectService {
         String projectAward = request.getProjectAward() != null &&  !request.getProjectAward().isEmpty() ? request.getProjectAward() : project.getProjectAward();
 
         project.UpdateProject(projectName, projectStartAt, projectEndAt, projectRole, projectDescription, projectAward);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateProjectResponse.from(project);
+    }
 
-
-
-
+    // 프로젝트 삭제
+    public void delete(Long blockId, Long userId) {
+        Project project = projectRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+        projectRepository.delete(project);
     }
 }

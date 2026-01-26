@@ -12,6 +12,4 @@ public class CreateUserRequest {
   @Schema(description = "유저 닉네임", example = "김혜림")
   private String nickName;
 
-  @Schema(description = "비밀번호", example = "1234")
-  private String password;
 }

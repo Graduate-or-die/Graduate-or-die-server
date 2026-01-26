@@ -35,14 +35,14 @@ public class GetUserResponse {
 
 // TODO: 프로필 이미지 (S3 연동 후 추가)
 
-  public static GetUserResponse from(User user, List<String> tags) {
+  public static GetUserResponse from(User user) {
 
     return GetUserResponse.builder()
         .userId(user.getId())
         .userName(user.getUserName())
         .nickName(user.getNickName())
         .likeCount(user.getLikeCount())
-        .tags(tags)
+        .tags(user.getTags())
         .matching(user.getMatching())
         .introduction(user.getIntroduction())
         .job(user.getJob())

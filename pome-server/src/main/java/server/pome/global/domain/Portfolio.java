@@ -25,12 +25,6 @@ public class Portfolio extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ElementCollection
-    @CollectionTable(name = "portfolio_tags", joinColumns = @JoinColumn(name = "portfolio_id"))
-    @Column(name = "tag")
-    @Comment("AI 태그 목록")
-    private List<String> tag = new ArrayList<>();
-
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "portfolio_visibility", joinColumns = @JoinColumn(name = "portfolio_id"))
     @MapKeyColumn(name = "type_id")
@@ -38,9 +32,21 @@ public class Portfolio extends BaseEntity {
     @Comment("알람 여부 매핑")
     private Map<Long, Boolean> visibilityMap = new HashMap<>();
 
+    @Version
+    @Column(nullable = false)
+    @Comment("단조 증가값")
+    private Long version;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private long touch = 0L;
+
+    public void touch() {
+        this.touch++;
+    }
+
     public Portfolio(User user, Map<Long, Boolean> visibilityMap) {
         this.user = user;
         this.visibilityMap = visibilityMap;
     }
-
 }

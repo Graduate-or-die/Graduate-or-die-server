@@ -12,6 +12,7 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -24,6 +25,8 @@ public class ActivityService {
     private final ActivityRepository activityRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 대내외활동 저장
     public SaveUpdateActivityResponse saveActivity(Long userId, SaveActivityRequest request) {
@@ -44,6 +47,8 @@ public class ActivityService {
 
         Activity activity = request.toEntity(portfolio);
         activityRepository.save(activity);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
 
         return SaveUpdateActivityResponse.from(activity);
     }
@@ -71,6 +76,18 @@ public class ActivityService {
         String result = request.getResult() != null && !request.getResult().isEmpty() ? request.getResult() : activity.getResult();
 
         activity.updateActivity(activityName, activityRole, activityStartAt, activityEndAt, result);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateActivityResponse.from(activity);
+    }
+
+    // 대내외활동 삭제
+    public void delete(Long blockId, Long userId) {
+        Activity activity = activityRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+
+        activityRepository.delete(activity);
     }
 }

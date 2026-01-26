@@ -36,4 +36,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query("SELECT COALESCE(u.likeCount, 0) FROM User u WHERE u.id = :id")
   int findLikeCountById(@Param("id") Long mateId);
+
 }

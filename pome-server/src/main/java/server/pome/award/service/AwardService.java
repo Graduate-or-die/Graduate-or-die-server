@@ -12,6 +12,7 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -26,6 +27,8 @@ public class AwardService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
 
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
+
     // 수상경력 저장
     public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request) {
 
@@ -39,6 +42,8 @@ public class AwardService {
         // TODO: S3가 붙으면 request에서의 awardFile이 아닌 S3의 URL로 교체 예정
         Award award = request.toEntity(portfolio);
         awardRepository.save(award);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
 
         return SaveUpdateAwardResponse.from(award);
     }
@@ -60,6 +65,17 @@ public class AwardService {
         List<String> awardFile = request.getAwardFile() != null && !request.getAwardFile().isEmpty() ? request.getAwardFile() : award.getAwardFile();
 
         award.updateAward(awardName, awardOrganization, awardAt, awardGrade, awardFile);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateAwardResponse.from(award);
+    }
+
+    // 수상경력 삭제
+    public void delete(Long blockId, Long userId) {
+        Award award = awardRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+        awardRepository.delete(award);
     }
 }

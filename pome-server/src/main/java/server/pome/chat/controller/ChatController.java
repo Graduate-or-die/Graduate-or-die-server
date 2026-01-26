@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import server.pome.chat.dto.response.GetChatListResponse;
 import server.pome.chat.service.ChatMessageService;
 import server.pome.global.domain.BaseEntity;
 import server.pome.global.domain.BaseResponse;
+import server.pome.global.domain.User;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,32 +36,32 @@ public class ChatController {
   private final ChatMessageService chatMessageService;
 
   @Operation(summary = "채팅 생성")
-  @Parameters({
-      @Parameter(name = "mateId", description = "조회 당한 메이트의 ID", required = true),
-      @Parameter(name = "userId", description = "조회한 회원 ID", required = true)
-  })
-  @PostMapping("/{mateId}/{userId}")
+  @Parameter(name = "mateId", description = "조회 당한 메이트의 ID", required = true)
+  @PostMapping("/{mateId}")
   public ResponseEntity<BaseResponse<CreateChatResponse>> createChat(
       @PathVariable Long mateId,
-      @PathVariable Long userId,
+      Authentication authentication,
       @Valid @RequestBody CreateChatRequest createChatRequest
   ) {
+
+    User user = (User) authentication.getPrincipal();
+    Long userId = user.getId();
     CreateChatResponse result = chatMessageService.createChat(mateId, userId, createChatRequest);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
 
   @Operation(summary = "필드의 전체 채팅 조회")
-  @Parameters({
-      @Parameter(name = "mateId", description = "조회 당한 메이트의 ID", required = true),
-      @Parameter(name = "userId", description = "조회한 회원 ID", required = true)
-  })
-  @PostMapping("/list/{mateId}/{userId}")
+  @Parameter(name = "mateId", description = "조회 당한 메이트의 ID", required = true)
+  @PostMapping("/list/{mateId}")
   public ResponseEntity<BaseResponse<List<GetChatListResponse>>> getChatList(
       @PathVariable Long mateId,
-      @PathVariable Long userId,
+      Authentication authentication,
       @Valid @RequestBody ReadRequest readRequest,
       @ParameterObject
       @PageableDefault(size = 50, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+
+    User user = (User) authentication.getPrincipal();
+    Long userId = user.getId();
     List<GetChatListResponse> result = chatMessageService.getChatList(mateId, userId, readRequest,
         pageable);
     return ResponseEntity.ok(BaseResponse.success(result));
@@ -68,16 +70,18 @@ public class ChatController {
   @Operation(summary = "채팅 삭제")
   @Parameters({
       @Parameter(name = "mateId", description = "조회 당한 메이트의 ID", required = true),
-      @Parameter(name = "userId", description = "조회한 회원 ID", required = true),
       @Parameter(name = "messageId", description = "삭제할 메시지 ID", required = true)
   })
-  @PostMapping("/delete/{mateId}/{messageId}/{userId}")
+  @PostMapping("/delete/{mateId}/{messageId}")
   public ResponseEntity<BaseResponse<String>> deleteChat(
       @PathVariable Long mateId,
       @PathVariable Long messageId,
-      @PathVariable Long userId,
+      Authentication authentication,
       @Valid @RequestBody ReadRequest readRequest
   ) {
+
+    User user = (User) authentication.getPrincipal();
+    Long userId = user.getId();
     chatMessageService.deleteChat(mateId, messageId, userId, readRequest);
     return ResponseEntity.ok(BaseResponse.success(messageId + ": 삭제 완료"));
   }

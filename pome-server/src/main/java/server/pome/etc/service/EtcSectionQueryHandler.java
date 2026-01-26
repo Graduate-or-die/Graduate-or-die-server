@@ -1,0 +1,30 @@
+package server.pome.etc.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import server.pome.etc.dto.response.EtcSectionResponse;
+import server.pome.etc.dto.response.GetEtcListResponse;
+import server.pome.etc.repository.EtcRepository;
+import server.pome.global.enums.TypeEnum;
+import server.pome.portfolio.service.PortfolioSectionQueryHandler;
+
+@Component
+@RequiredArgsConstructor
+public class EtcSectionQueryHandler implements PortfolioSectionQueryHandler {
+  private final EtcRepository etcRepository;
+
+  @Override
+  public TypeEnum supports() {
+    return TypeEnum.ETCS;
+  }
+
+  @Override
+  public Object query(Long portfolioId, Long userId) {
+    var items = etcRepository.findAllByPortfolio_Id(portfolioId)
+        .stream()
+        .map(GetEtcListResponse::from)
+        .toList();
+
+    return new EtcSectionResponse(items);
+  }
+}

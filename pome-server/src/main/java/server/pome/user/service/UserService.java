@@ -2,68 +2,41 @@ package server.pome.user.service;
 
 import static server.pome.global.exception.BaseResponseStatus.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.pome.like.dto.response.LikeResponse;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import server.pome.jwt.dto.response.KakaoTokenResponse;
+import server.pome.jwt.dto.response.KakaoUserResponse;
+import server.pome.jwt.dto.response.LoginTokensResponse;
+import server.pome.jwt.provider.JwtTokenProvider;
+import server.pome.jwt.service.RefreshTokenService;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
 import server.pome.portfolio.service.PortfolioService;
-import server.pome.user.dto.request.CreateUserRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
-import server.pome.user.dto.request.UserLoginRequest;
-import server.pome.user.dto.response.CreateUserResponse;
-import server.pome.user.dto.response.GetUserResponse;
-import server.pome.user.dto.response.UpdateUserResponse;
-import server.pome.user.dto.response.UserLoginResponse;
+import server.pome.user.dto.response.*;
 import server.pome.user.repository.UserRepository;
 
 @Transactional
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class UserService {
 
   private final UserRepository userRepository;
   private final PortfolioRepository portfolioRepository;
-  private final PortfolioService portfolioService;
-
-  // 회원가입 (API 테스트용 임시 코드)
-  public CreateUserResponse createUser(CreateUserRequest request) {
-    // 중복 닉네임 방지
-    if (userRepository.existsByNickName(request.getNickName())) {
-      throw new BaseException(DUPLICATE_USER);
-    }
-    User user = new User(
-        request.getPassword(),
-        request.getUserName(),
-        request.getNickName(),
-        0, // likeCount
-        true, //matching
-        null, // introduction
-        null, // job
-        null // profileImage
-    );
-
-    userRepository.save(user);
-    portfolioService.createInitialPortfolio(user);
-
-    return CreateUserResponse.builder()
-        .userId(user.getId())
-        .userName(user.getUserName())
-        .nickName(user.getNickName())
-        .build();
-  }
-
-  // 로그인
-  public UserLoginResponse login(UserLoginRequest request) {
-    // TODO: 소셜 로그인 구현
-    return null;
-  }
 
   // 회원 정보 조회
   public GetUserResponse getUserInfo(Long userId) {
@@ -107,9 +80,9 @@ public class UserService {
   // 공통 응답 생성 메서드
   private GetUserResponse buildUserResponse(User user) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(user.getId());
-    List<String> tags = (portfolio != null) ? portfolio.getTag() : new ArrayList<>();
+    //List<String> tags = (portfolio != null) ? portfolio.getTag() : new ArrayList<>();
 
-    return GetUserResponse.from(user, tags);
+    return GetUserResponse.from(user);
   }
 
   // 유저 조회 메서드
@@ -117,4 +90,5 @@ public class UserService {
     return userRepository.findById(id)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
   }
+
 }
