@@ -22,10 +22,14 @@ public class PortfolioTouchListener {
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handle(PortfolioUpdateRequestedEvent event) {
+    // 포트폴리오 조회
     Portfolio portfolio = portfolioService.getPortfolio(event.userId());
+
+    // 포트폴리오 버전 업데이트
     portfolio.touch();
     entityManager.flush();
 
+    // 포트폴리오 수정 이벤트 발행
     publisher.publishEvent(new PortfolioUpdatedEvent(
         event.userId(),
         portfolio.getId(),
