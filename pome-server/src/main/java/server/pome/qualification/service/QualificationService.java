@@ -9,6 +9,7 @@ import server.pome.global.domain.Qualification;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.qualification.dto.request.SaveQualificationRequest;
 import server.pome.qualification.dto.request.UpdateQualificationRequest;
 import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
@@ -26,6 +27,8 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 자격증 저장
     public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request) {
@@ -49,6 +52,8 @@ public class QualificationService {
         // TODO: S3가 붙으면 request에서의 qualificationFile이 아닌 S3의 URL로 교체 예정
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
 
         return SaveUpdateQualificationResponse.from(qualification);
     }
@@ -83,6 +88,9 @@ public class QualificationService {
         List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
 
         qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score, qualificationFile);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateQualificationResponse.from(qualification);
     }
 

@@ -12,6 +12,7 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public class EtcService {
     private final EtcRepository etcRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 기타 저장
     public SaveUpdateEtcResponse saveEtc(Long userId, SaveEtcRequest request) {
@@ -45,6 +48,8 @@ public class EtcService {
         Etc etc = request.toEntity(portfolio);
         etcRepository.save(etc);
 
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateEtcResponse.from(etc);
     }
 
@@ -62,6 +67,9 @@ public class EtcService {
         String memo = request.getMemo() != null && !request.getMemo().isEmpty() ? request.getMemo() : etc.getMemo();
 
         etc.updateEtc(link, memo);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateEtcResponse.from(etc);
     }
 }

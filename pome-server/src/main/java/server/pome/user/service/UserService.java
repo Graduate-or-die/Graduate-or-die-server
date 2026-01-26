@@ -2,8 +2,6 @@ package server.pome.user.service;
 
 import static server.pome.global.exception.BaseResponseStatus.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
