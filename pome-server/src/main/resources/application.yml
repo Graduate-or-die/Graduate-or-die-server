@@ -43,6 +43,11 @@ jwt:
       max-file-size: 10MB
       max-request-size: 10MB
 
+openai:
+  base-url: ${OPENAI_BASE_URL}
+  api-key: ${OPENAI_API_KEY}
+  model: ${OPENAI_MODEL}
+
 cloud:
   aws:
     credentials:
