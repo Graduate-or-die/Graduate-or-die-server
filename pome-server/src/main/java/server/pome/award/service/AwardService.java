@@ -10,7 +10,6 @@ import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
-import server.pome.global.domain.Activity;
 import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
@@ -18,7 +17,6 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
-import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
 import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;

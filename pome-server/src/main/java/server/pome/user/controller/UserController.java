@@ -2,12 +2,9 @@ package server.pome.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,12 +20,9 @@ import server.pome.global.domain.BaseResponse;
 import server.pome.global.domain.User;
 import server.pome.like.dto.response.LikeResponse;
 import server.pome.like.service.LikeService;
-import server.pome.jwt.dto.request.KakaoLoginRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.response.GetUserResponse;
-import server.pome.jwt.dto.response.LoginTokensResponse;
 import server.pome.user.dto.response.UpdateUserResponse;
-import server.pome.jwt.dto.response.UserLoginResponse;
 import server.pome.user.service.UserService;
 
 @RequiredArgsConstructor
@@ -109,5 +103,4 @@ public class UserController {
     LikeResponse result = likeService.unlike(mateId, userId);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
-
 }

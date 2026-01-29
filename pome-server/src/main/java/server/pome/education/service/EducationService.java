@@ -60,5 +60,4 @@ public class EducationService {
 
         return SaveUpdateEducationResponse.from(education);
     }
-
 }

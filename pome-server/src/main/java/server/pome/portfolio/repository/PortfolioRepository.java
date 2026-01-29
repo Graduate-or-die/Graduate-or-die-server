@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import server.pome.global.domain.Portfolio;
 import java.util.Collections;
-
 import java.util.List;
 
 @Repository

@@ -7,11 +7,7 @@ import lombok.Getter;
 import server.pome.attachment.dto.response.FileResponse;
 import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Award;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Getter

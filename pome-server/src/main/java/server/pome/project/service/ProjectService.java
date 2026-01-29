@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Project;
-import server.pome.global.domain.Qualification;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
@@ -74,8 +73,6 @@ public class ProjectService {
 
         project.UpdateProject(projectName, projectStartAt, projectEndAt, projectRole, projectDescription, projectAward);
         return SaveUpdateProjectResponse.from(project);
-
-
     }
 
     // 프로젝트 삭제

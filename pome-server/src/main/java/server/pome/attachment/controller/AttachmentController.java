@@ -7,13 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import server.pome.attachment.dto.response.AttachmentResponse;
 import server.pome.attachment.service.AttachmentService;
 import server.pome.global.domain.BaseResponse;
 import server.pome.global.domain.User;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

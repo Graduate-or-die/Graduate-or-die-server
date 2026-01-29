@@ -1,32 +1,15 @@
 package server.pome.user.service;
 
 import static server.pome.global.exception.BaseResponseStatus.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import server.pome.jwt.dto.response.KakaoTokenResponse;
-import server.pome.jwt.dto.response.KakaoUserResponse;
-import server.pome.jwt.dto.response.LoginTokensResponse;
-import server.pome.jwt.provider.JwtTokenProvider;
-import server.pome.jwt.service.RefreshTokenService;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
-import server.pome.portfolio.service.PortfolioService;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.response.*;
 import server.pome.user.repository.UserRepository;
@@ -92,5 +75,4 @@ public class UserService {
     return userRepository.findById(id)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
   }
-
 }

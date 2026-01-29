@@ -5,7 +5,6 @@ import static server.pome.global.exception.BaseResponseStatus.CHAT_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
@@ -150,6 +149,4 @@ public class ChatMessageService {
       throw new BaseException(USER_NOT_PARTICIPANT);
     }
   }
-
-
 }

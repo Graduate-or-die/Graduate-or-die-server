@@ -13,7 +13,6 @@ import server.pome.global.domain.User;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.service.PortfolioService;
-
 import java.util.Arrays;
 import java.util.List;
 

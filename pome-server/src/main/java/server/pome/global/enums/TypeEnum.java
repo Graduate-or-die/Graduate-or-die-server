@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
-
 import java.util.HashMap;
 import java.util.Map;
 

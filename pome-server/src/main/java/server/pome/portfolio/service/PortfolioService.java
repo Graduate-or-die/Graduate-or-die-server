@@ -1,9 +1,7 @@
 package server.pome.portfolio.service;
 
-import static server.pome.global.enums.TypeEnum.*;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.util.EnumMap;
@@ -13,12 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.activity.service.ActivityService;
 import server.pome.award.service.AwardService;
-import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.etc.repository.EtcRepository;
-import server.pome.experience.repository.ExperienceRepository;
 import server.pome.experience.service.ExperienceService;
 import server.pome.global.domain.Etc;
-import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
@@ -32,10 +27,8 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.project.service.ProjectService;
 import server.pome.qualification.service.QualificationService;
 import server.pome.user.repository.UserRepository;
-
 import java.util.LinkedHashMap;
 import java.util.stream.LongStream;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

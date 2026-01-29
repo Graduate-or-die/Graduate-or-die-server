@@ -2,7 +2,6 @@ package server.pome.experience.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
 import java.time.LocalDate;
 
 @Getter

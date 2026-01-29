@@ -19,5 +19,4 @@ public class CreateChatRequest
 
   @Schema(description = "채팅 내용", example = "무슨 역할인가요")
   private String content;
-
 }

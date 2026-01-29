@@ -3,10 +3,7 @@ package server.pome.global.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

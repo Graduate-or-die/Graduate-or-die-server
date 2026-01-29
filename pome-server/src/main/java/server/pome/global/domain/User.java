@@ -8,9 +8,6 @@ import org.hibernate.annotations.Comment;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 
-import static server.pome.global.exception.BaseResponseStatus.CANNOT_MATE_SELF_REQUEST;
-import static server.pome.global.exception.BaseResponseStatus.OAUTH_ALREADY_LINKED;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

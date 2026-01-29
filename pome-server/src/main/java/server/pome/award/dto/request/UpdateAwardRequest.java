@@ -2,10 +2,7 @@ package server.pome.award.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class UpdateAwardRequest {

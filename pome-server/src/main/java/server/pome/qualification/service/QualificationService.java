@@ -18,7 +18,6 @@ import server.pome.qualification.dto.request.UpdateQualificationRequest;
 import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
 import server.pome.qualification.repository.QualificationRepository;
 import server.pome.user.repository.UserRepository;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

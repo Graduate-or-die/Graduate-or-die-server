@@ -2,11 +2,9 @@ package server.pome.project.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
 import lombok.NoArgsConstructor;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Project;
-
 import java.time.LocalDate;
 
 @Getter
@@ -42,5 +40,4 @@ public class SaveProjectRequest {
                 .projectAward(projectAward)
                 .build();
     }
-
 }

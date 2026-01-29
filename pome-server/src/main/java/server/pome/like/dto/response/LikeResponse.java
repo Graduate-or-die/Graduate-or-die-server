@@ -21,5 +21,4 @@ public class LikeResponse {
         .likeCount(likeCount)
         .build();
   }
-
 }

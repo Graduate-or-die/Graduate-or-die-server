@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Qualification;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class SaveQualificationRequest {
@@ -41,5 +38,4 @@ public class SaveQualificationRequest {
                 .score(score)
                 .build();
     }
-
 }

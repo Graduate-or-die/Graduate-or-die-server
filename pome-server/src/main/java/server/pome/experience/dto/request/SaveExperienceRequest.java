@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
-
 import java.time.LocalDate;
 
 @Getter

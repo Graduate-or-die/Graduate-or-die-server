@@ -8,7 +8,6 @@ import server.pome.activity.dto.request.UpdateActivityRequest;
 import server.pome.activity.dto.response.SaveUpdateActivityResponse;
 import server.pome.activity.repository.ActivityRepository;
 import server.pome.global.domain.Activity;
-import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
