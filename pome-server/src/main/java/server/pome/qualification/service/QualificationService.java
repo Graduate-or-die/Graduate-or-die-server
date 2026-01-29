@@ -35,7 +35,7 @@ public class QualificationService {
     private final AttachmentRepository attachmentRepository;
 
     // 자격증 저장
-    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, MultipartFile file) {
+    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, List<MultipartFile> files) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -55,7 +55,14 @@ public class QualificationService {
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
 
-        if (file != null && !file.isEmpty()) {
+        if (files != null && !files.isEmpty()) {
+
+            if (files.size() > 1) {
+                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+            }
+
+            MultipartFile file = files.get(0);
+
             attachmentService.uploadFile(
                     userId,
                     TypeEnum.QUALIFICATIONS.getId(),
@@ -64,11 +71,18 @@ public class QualificationService {
             );
         }
 
-        return SaveUpdateQualificationResponse.from(qualification);
+        Optional<Attachment> attachment =
+                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                        qualification.getPortfolio().getId(),
+                        TypeEnum.QUALIFICATIONS.getId(),
+                        qualification.getId()
+                );
+
+        return SaveUpdateQualificationResponse.from(qualification, attachment);
     }
 
     // 자격증 수정
-    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request, MultipartFile file) {
+    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request, List<MultipartFile> files) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -97,7 +111,12 @@ public class QualificationService {
 
         qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score);
 
-        if (file != null && !file.isEmpty()) {
+        if (files != null && !files.isEmpty()) {
+
+            if (files.size() > 1) {
+                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+            }
+
             Optional<Attachment> existing =
                     attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
                             qualification.getPortfolio().getId(),
@@ -109,9 +128,19 @@ public class QualificationService {
                 throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
             }
 
+            MultipartFile file = files.get(0);
+
             attachmentService.uploadFile(userId, TypeEnum.QUALIFICATIONS.getId(), qualificationId, file);
         }
-        return SaveUpdateQualificationResponse.from(qualification);
+
+        Optional<Attachment> attachment =
+                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                        qualification.getPortfolio().getId(),
+                        TypeEnum.QUALIFICATIONS.getId(),
+                        qualification.getId()
+                );
+
+        return SaveUpdateQualificationResponse.from(qualification, attachment);
     }
 
     // 자격증 삭제
@@ -119,6 +148,13 @@ public class QualificationService {
         Qualification qualification = qualificationRepository
                 .findByIdAndPortfolio_User_Id(blockId, userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+
+        attachmentService.deleteByBlock(
+                userId,
+                TypeEnum.QUALIFICATIONS.getId(),
+                blockId
+        );
+
         qualificationRepository.delete(qualification);
     }
 }

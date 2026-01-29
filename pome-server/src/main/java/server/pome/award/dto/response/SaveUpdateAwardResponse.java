@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import server.pome.attachment.dto.response.FileResponse;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Award;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -31,8 +34,15 @@ public class SaveUpdateAwardResponse {
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;
 
+    @Schema(description = "파일")
+    private FileResponse file;
 
-    public static SaveUpdateAwardResponse from(Award award) {
+
+    public static SaveUpdateAwardResponse from(Award award, Optional<Attachment> attachment) {
+
+        FileResponse file = attachment
+                .map(FileResponse::from)
+                .orElse(null);
 
         return SaveUpdateAwardResponse.builder()
                 .awardId(award.getId())
@@ -40,6 +50,7 @@ public class SaveUpdateAwardResponse {
                 .awardOrganization(award.getAwardOrganization())
                 .awardAt(award.getAwardAt())
                 .awardGrade(award.getAwardGrade())
+                .file(file)
                 .build();
     }
 }

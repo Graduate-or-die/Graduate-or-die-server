@@ -32,8 +32,7 @@ public class AwsS3Service {
     objectMetadata.setContentType(file.getContentType());
 
     try (InputStream inputStream = file.getInputStream()) {
-      amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-              .withCannedAcl(CannedAccessControlList.PublicRead));
+      amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata));
     } catch (IOException e){
       throw new BaseException(S3_ERROR);
     }

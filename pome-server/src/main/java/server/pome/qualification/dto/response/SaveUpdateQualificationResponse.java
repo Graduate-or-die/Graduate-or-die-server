@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import server.pome.attachment.dto.response.FileResponse;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Qualification;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -37,8 +40,15 @@ public class SaveUpdateQualificationResponse {
     @Schema(description = "등급/점수", example = "1")
     private int score;
 
+    @Schema(description = "파일")
+    private FileResponse file;
 
-    public static SaveUpdateQualificationResponse from(Qualification qualification) {
+    public static SaveUpdateQualificationResponse from(Qualification qualification, Optional<Attachment> attachment) {
+
+        FileResponse file = attachment
+                .map(FileResponse::from)
+                .orElse(null);
+
         return SaveUpdateQualificationResponse.builder()
                 .qualificationId(qualification.getId())
                 .qualificationName(qualification.getQualificationName())
@@ -47,6 +57,7 @@ public class SaveUpdateQualificationResponse {
                 .qualificationEndAt(qualification.getQualificationEndAt())
                 .hasQualificationEndAt(qualification.isHasQualificationEndAt())
                 .score(qualification.getScore())
+                .file(file)
                 .build();
     }
 }

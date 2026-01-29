@@ -26,7 +26,7 @@ public enum BaseResponseStatus {
   FILE_ALREADY_EXISTS(false, HttpStatus.BAD_REQUEST, 2112, "이미 파일이 존재합니다."),
   FILE_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2113, "파일을 찾을 수 없습니다."),
   PORTFOLIO_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2114, "포트폴리오를 찾을 수 없습니다."),
-
+  FILE_LIMIT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2115, "파일은 하나만 가능합니다."),
   // education
   EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),
   DUPLICATE_EDUCATION(false, HttpStatus.BAD_REQUEST, 2007, "해당 유저의 학력이 이미 존재합니다."),

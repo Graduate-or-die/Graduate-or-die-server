@@ -3,6 +3,10 @@ package server.pome.qualification.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
+import server.pome.attachment.dto.response.FileResponse;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Qualification;
 
 public record GetQualificationListResponse(
@@ -22,17 +26,27 @@ public record GetQualificationListResponse(
   boolean hasQualificationEndAt,
 
   @Schema(description = "등급/점수", example = "1")
-  int score
+  int score,
+
+  @Schema(description = "파일")
+  FileResponse file
+
 ) {
 
-  public static GetQualificationListResponse from(Qualification qualification) {
+  public static GetQualificationListResponse from(Qualification qualification, Optional<Attachment> attachment) {
+
+    FileResponse file = attachment
+            .map(FileResponse::from)
+            .orElse(null);
+
     return new GetQualificationListResponse(
         qualification.getQualificationName(),
         qualification.getQualificationOrganization(),
         qualification.getQualificationStartAt(),
         qualification.getQualificationEndAt(),
         qualification.isHasQualificationEndAt(),
-        qualification.getScore()
+        qualification.getScore(),
+            file
     );
   }
 }

@@ -18,6 +18,7 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
 import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -36,7 +37,7 @@ public class AwardService {
     private final AttachmentRepository attachmentRepository;
 
     // 수상경력 저장
-    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, MultipartFile file) {
+    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, List<MultipartFile> files) {
 
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
@@ -47,7 +48,14 @@ public class AwardService {
         Award award = request.toEntity(portfolio);
         awardRepository.save(award);
 
-        if (file != null && !file.isEmpty()) {
+        if (files != null && !files.isEmpty()) {
+
+            if (files.size() > 1) {
+                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+            }
+
+            MultipartFile file = files.get(0);
+
             attachmentService.uploadFile(
                     userId,
                     TypeEnum.AWARDS.getId(),
@@ -56,11 +64,18 @@ public class AwardService {
             );
         }
 
-        return SaveUpdateAwardResponse.from(award);
+        Optional<Attachment> attachment =
+                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                        award.getPortfolio().getId(),
+                        TypeEnum.AWARDS.getId(),
+                        award.getId()
+                );
+
+        return SaveUpdateAwardResponse.from(award, attachment);
     }
 
     // 수상경력 수정
-    public SaveUpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request, MultipartFile file) {
+    public SaveUpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request, List<MultipartFile> files) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -76,7 +91,12 @@ public class AwardService {
 
         award.updateAward(awardName, awardOrganization, awardAt, awardGrade);
 
-        if (file != null && !file.isEmpty()) {
+        if (files != null && !files.isEmpty()) {
+
+            if (files.size() > 1) {
+                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+            }
+
             Optional<Attachment> existing =
                     attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
                             award.getPortfolio().getId(),
@@ -88,10 +108,20 @@ public class AwardService {
                 throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
             }
 
+            MultipartFile file = files.get(0);
+
             attachmentService.uploadFile(userId, TypeEnum.AWARDS.getId(), awardId, file);
         }
 
-        return SaveUpdateAwardResponse.from(award);
+
+        Optional<Attachment> attachment =
+                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                        award.getPortfolio().getId(),
+                        TypeEnum.AWARDS.getId(),
+                        award.getId()
+                );
+
+        return SaveUpdateAwardResponse.from(award, attachment);
     }
 
     // 수상경력 삭제
@@ -99,6 +129,12 @@ public class AwardService {
         Award award = awardRepository
                 .findByIdAndPortfolio_User_Id(blockId, userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+
+        attachmentService.deleteByBlock(
+                userId,
+                TypeEnum.AWARDS.getId(),
+                blockId
+        );
         awardRepository.delete(award);
     }
 }

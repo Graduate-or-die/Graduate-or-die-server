@@ -2,6 +2,7 @@ package server.pome.qualification.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.global.enums.TypeEnum;
 import server.pome.portfolio.service.PortfolioSectionQueryHandler;
 import server.pome.qualification.dto.response.GetQualificationListResponse;
@@ -13,6 +14,7 @@ import server.pome.qualification.repository.QualificationRepository;
 public class QualificationSectionQueryHandler implements PortfolioSectionQueryHandler {
 
   private final QualificationRepository qualificationRepository;
+  private final AttachmentRepository attachmentRepository;
 
   @Override
   public TypeEnum supports() {
@@ -23,8 +25,17 @@ public class QualificationSectionQueryHandler implements PortfolioSectionQueryHa
   public Object query(Long portfolioId, Long userId) {
     var items = qualificationRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(GetQualificationListResponse::from)
-        .toList();
+            .map(qualification -> {
+              var attachment = attachmentRepository
+                      .findByPortfolio_IdAndTypeIdAndBlockId(
+                              portfolioId,
+                              TypeEnum.QUALIFICATIONS.getId(),
+                              qualification.getId()
+                      );
+
+              return GetQualificationListResponse.from(qualification, attachment);
+            })
+            .toList();
 
     return new QualificationSectionResponse(items);
   }

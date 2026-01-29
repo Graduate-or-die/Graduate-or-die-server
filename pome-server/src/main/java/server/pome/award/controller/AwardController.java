@@ -30,25 +30,25 @@ public class AwardController {
 
     @Operation(summary = "수상경력 저장")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @RequestPart("data") SaveAwardRequest request, @RequestPart(value = "file", required = false) MultipartFile file
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @RequestPart("data") SaveAwardRequest request, @RequestPart(value = "file", required = false) List<MultipartFile>  files
     ) {
 
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        SaveUpdateAwardResponse result = awardService.saveAward(userId, request, file);
+        SaveUpdateAwardResponse result = awardService.saveAward(userId, request, files);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     @Operation(summary = "수상경력 수정")
     @Parameter(name = "blockId", description = "수상경력 ID", required = true)
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(Authentication authentication, @PathVariable Long blockId, @RequestPart("data") UpdateAwardRequest request, @RequestPart(value = "file", required = false) MultipartFile file
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(Authentication authentication, @RequestParam Long blockId, @RequestPart("data") UpdateAwardRequest request, @RequestPart(value = "file", required = false) List<MultipartFile>  files
     ) {
 
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
-        SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request, file);
+        SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request, files);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }
