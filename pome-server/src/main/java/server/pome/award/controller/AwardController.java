@@ -27,25 +27,28 @@ public class AwardController {
 
     private final AwardService awardService;
 
+
     @Operation(summary = "수상경력 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @RequestPart("award") SaveAwardRequest request, @RequestPart(value = "files", required = false) List<MultipartFile> files
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @RequestPart("data") SaveAwardRequest request, @RequestPart(value = "file", required = false) MultipartFile file
     ) {
 
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        SaveUpdateAwardResponse result = awardService.saveAward(userId, request, files);
+        SaveUpdateAwardResponse result = awardService.saveAward(userId, request, file);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     @Operation(summary = "수상경력 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "수상경력 ID", required = true)
-    @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateAwardRequest request) {
-        SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request);
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(Authentication authentication, @PathVariable Long blockId, @RequestPart("data") UpdateAwardRequest request, @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
+        SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request, file);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

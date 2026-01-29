@@ -1,14 +1,13 @@
 package server.pome.attachment.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import server.pome.attachment.dto.response.AttachmentResponse;
 import server.pome.attachment.service.AttachmentService;
 import server.pome.global.domain.BaseResponse;
@@ -24,24 +23,18 @@ public class AttachmentController {
 
     private final AttachmentService attachmentService;
 
-    @Operation(summary = "파일 첨부")
-    @GetMapping
-    public ResponseEntity<BaseResponse<List<AttachmentResponse>>> getAttachments(
+    @Operation(summary = "파일 삭제")
+    @DeleteMapping
+    public ResponseEntity<BaseResponse<String>> deleteFile(
             Authentication authentication,
-            @RequestParam Long typeId,
-            @RequestParam Long blockId
+            @Parameter(description = "타입 ID", required = true) @RequestParam Long typeId,
+            @Parameter(description = "블록 ID", required = true) @RequestParam Long blockId
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        List<AttachmentResponse> result =
-                attachmentService.getAttachments(
-                        userId,
-                        typeId,
-                        blockId
-                );
+        attachmentService.deleteFile(userId, typeId, blockId);
 
-        return ResponseEntity.ok(BaseResponse.success(result));
+        return ResponseEntity.ok(BaseResponse.success(null));
     }
 }

@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.attachment.service.AttachmentService;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Qualification;
 import server.pome.global.enums.TypeEnum;
@@ -19,6 +21,7 @@ import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +32,10 @@ public class QualificationService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
 
     // 자격증 저장
-    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, List<MultipartFile> files) {
+    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, MultipartFile file) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -51,18 +55,12 @@ public class QualificationService {
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
 
-        if (files != null && !files.isEmpty()) {
-            TypeEnum type = TypeEnum.AWARDS;
-
-            if (type.getS3Dir() == null) {
-                throw new BaseException(BaseResponseStatus.FILE_NOT_SUPPORTED_TYPE);
-            }
-
-            attachmentService.uploadAll(
-                    portfolio,
-                    type.getId(),
+        if (file != null && !file.isEmpty()) {
+            attachmentService.uploadFile(
+                    userId,
+                    TypeEnum.QUALIFICATIONS.getId(),
                     qualification.getId(),
-                    files
+                    file
             );
         }
 
@@ -70,7 +68,7 @@ public class QualificationService {
     }
 
     // 자격증 수정
-    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request) {
+    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request, MultipartFile file) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -98,6 +96,29 @@ public class QualificationService {
         int score = request.getScore();
 
         qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score);
+
+        if (file != null && !file.isEmpty()) {
+            Optional<Attachment> existing =
+                    attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                            qualification.getPortfolio().getId(),
+                            TypeEnum.QUALIFICATIONS.getId(),
+                            qualificationId
+                    );
+
+            if (existing.isPresent()) {
+                throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
+            }
+
+            attachmentService.uploadFile(userId, TypeEnum.QUALIFICATIONS.getId(), qualificationId, file);
+        }
         return SaveUpdateQualificationResponse.from(qualification);
+    }
+
+    // 자격증 삭제
+    public void delete(Long blockId, Long userId) {
+        Qualification qualification = qualificationRepository
+                .findByIdAndPortfolio_User_Id(blockId, userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+        qualificationRepository.delete(qualification);
     }
 }

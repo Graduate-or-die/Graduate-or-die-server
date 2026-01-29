@@ -29,24 +29,25 @@ public class QualificationController {
     private final QualificationService qualificationService;
 
     @Operation(summary = "자격증 저장")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(Authentication authentication,  @RequestPart("qualification") SaveQualificationRequest request,  @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> saveQualification(Authentication authentication, @RequestPart("data") SaveQualificationRequest request, @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
 
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        SaveUpdateQualificationResponse result = qualificationService.saveQualification(userId, request, files);
+        SaveUpdateQualificationResponse result = qualificationService.saveQualification(userId, request, file);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     @Operation(summary = "자격증 수정")
-    @Parameter(name = "userId", description = "회원 ID", required = true)
     @Parameter(name = "blockId", description = "자격증 ID", required = true)
-    @PatchMapping("/{userId}")
-    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> updateQualification(@PathVariable Long userId, @RequestParam("blockId") Long blockId, @Valid @RequestBody UpdateQualificationRequest request) {
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse<SaveUpdateQualificationResponse>> updateQualification(Authentication authentication, @PathVariable Long blockId, @RequestPart("data") UpdateQualificationRequest request, @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        SaveUpdateQualificationResponse result = qualificationService.updateQualification(userId, blockId, request);
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
+        SaveUpdateQualificationResponse result = qualificationService.updateQualification(userId, blockId, request, file);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
 }

@@ -4,12 +4,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.attachment.service.AttachmentService;
 import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
 import server.pome.global.domain.Activity;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.enums.TypeEnum;
@@ -20,6 +22,7 @@ import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +33,10 @@ public class AwardService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
 
     // 수상경력 저장
-    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, List<MultipartFile> files) {
+    public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, MultipartFile file) {
 
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
@@ -43,18 +47,12 @@ public class AwardService {
         Award award = request.toEntity(portfolio);
         awardRepository.save(award);
 
-        if (files != null && !files.isEmpty()) {
-            TypeEnum type = TypeEnum.AWARDS;
-
-            if (type.getS3Dir() == null) {
-                throw new BaseException(BaseResponseStatus.FILE_NOT_SUPPORTED_TYPE);
-            }
-
-            attachmentService.uploadAll(
-                    portfolio,
-                    type.getId(),
+        if (file != null && !file.isEmpty()) {
+            attachmentService.uploadFile(
+                    userId,
+                    TypeEnum.AWARDS.getId(),
                     award.getId(),
-                    files
+                    file
             );
         }
 
@@ -62,7 +60,7 @@ public class AwardService {
     }
 
     // 수상경력 수정
-    public SaveUpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request) {
+    public SaveUpdateAwardResponse updateAward(Long userId, Long awardId, UpdateAwardRequest request, MultipartFile file) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
         if (!userRepository.existsById(userId)) {
             throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
@@ -77,6 +75,22 @@ public class AwardService {
         String awardGrade = request.getAwardGrade() != null && !request.getAwardGrade().isEmpty() ? request.getAwardGrade() : award.getAwardGrade();
 
         award.updateAward(awardName, awardOrganization, awardAt, awardGrade);
+
+        if (file != null && !file.isEmpty()) {
+            Optional<Attachment> existing =
+                    attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                            award.getPortfolio().getId(),
+                            TypeEnum.AWARDS.getId(),
+                            awardId
+                    );
+
+            if (existing.isPresent()) {
+                throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
+            }
+
+            attachmentService.uploadFile(userId, TypeEnum.AWARDS.getId(), awardId, file);
+        }
+
         return SaveUpdateAwardResponse.from(award);
     }
 
