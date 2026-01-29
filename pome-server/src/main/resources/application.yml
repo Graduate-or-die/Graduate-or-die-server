@@ -7,16 +7,11 @@ spring:
     import: optional:file:.env[.properties]   # OK
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:prod}
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: ${SPRING_DATASOURCE_URL}
-#    username: ${SPRING_DATASOURCE_USERNAME}
-#    password: ${SPRING_DATASOURCE_PASSWORD}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/pome_local?serverTimezone=Asia/Seoul
-    username: root
-    password: 4454611hae*
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}  # 초기엔 update, 안정화 후 validate 권장
