@@ -13,7 +13,6 @@ public interface QualificationRepository extends JpaRepository<Qualification, In
     // 사용자(userId)가 소유한 자격증(qualificationId)만 조회
     Optional<Qualification> findByIdAndPortfolio_User_Id(Long id, Long qualificationId);
 
-    @EntityGraph(attributePaths = {"qualificationFile"})
     List<Qualification> findAllByPortfolio_Id(Long portfolioId);
 }
 

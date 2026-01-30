@@ -14,6 +14,5 @@ public interface AwardRepository extends JpaRepository<Award, Integer> {
     // 사용자(userId)가 소유한 수상경력(awardId)만 조회
     Optional<Award> findByIdAndPortfolio_User_Id(Long id, Long userId);
 
-    @EntityGraph(attributePaths = {"awardFile"})
     List<Award> findAllByPortfolio_Id(Long portfolioId);
 }

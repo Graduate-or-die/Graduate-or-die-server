@@ -10,7 +10,6 @@ import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
 import server.pome.award.dto.response.SaveUpdateAwardResponse;
 import server.pome.award.repository.AwardRepository;
-import server.pome.global.domain.Activity;
 import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Award;
 import server.pome.global.domain.Portfolio;
@@ -18,7 +17,7 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
-import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -35,6 +34,7 @@ public class AwardService {
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
     private final AttachmentRepository attachmentRepository;
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 수상경력 저장
     public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, List<MultipartFile> files) {
@@ -71,6 +71,7 @@ public class AwardService {
                         award.getId()
                 );
 
+        portfolioUpdateNotifier.notifyUpdated(userId);
         return SaveUpdateAwardResponse.from(award, attachment);
     }
 
@@ -121,6 +122,7 @@ public class AwardService {
                         award.getId()
                 );
 
+        portfolioUpdateNotifier.notifyUpdated(userId);
         return SaveUpdateAwardResponse.from(award, attachment);
     }
 
