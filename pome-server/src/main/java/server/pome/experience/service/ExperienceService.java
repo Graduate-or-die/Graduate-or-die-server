@@ -12,6 +12,7 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 import java.time.LocalDate;
 
@@ -23,6 +24,8 @@ public class ExperienceService {
     private final ExperienceRepository experienceRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 경력 저장
     public SaveUpdateExperienceResponse saveExperience(Long userId, SaveExperienceRequest request) {
@@ -43,6 +46,8 @@ public class ExperienceService {
 
         Experience experience = request.toEntity(portfolio);
         experienceRepository.save(experience);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
 
         return SaveUpdateExperienceResponse.from(experience);
     }
@@ -69,6 +74,9 @@ public class ExperienceService {
         LocalDate experienceEndAt = request.getExperienceEndAt() != null ? request.getExperienceEndAt() : experience.getExperienceEndAt();
 
         experience.updateExperience(workplace, spot, experienceStartAt, experienceEndAt);
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+
         return SaveUpdateExperienceResponse.from(experience);
     }
 

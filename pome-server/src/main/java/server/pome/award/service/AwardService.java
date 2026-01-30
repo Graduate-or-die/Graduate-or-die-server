@@ -17,6 +17,7 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -33,6 +34,8 @@ public class AwardService {
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
     private final AttachmentRepository attachmentRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 수상경력 저장
     public SaveUpdateAwardResponse saveAward(Long userId, SaveAwardRequest request, List<MultipartFile> files) {
@@ -70,6 +73,7 @@ public class AwardService {
                 );
 
         return SaveUpdateAwardResponse.from(award, attachment);
+
     }
 
     // 수상경력 수정
@@ -120,6 +124,7 @@ public class AwardService {
                 );
 
         return SaveUpdateAwardResponse.from(award, attachment);
+
     }
 
     // 수상경력 삭제

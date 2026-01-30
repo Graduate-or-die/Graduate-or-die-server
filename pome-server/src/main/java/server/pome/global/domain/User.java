@@ -1,12 +1,17 @@
 package server.pome.global.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
+import server.pome.user.converter.StringListJsonConverter;
 
 @Getter
 @AllArgsConstructor
@@ -52,6 +57,14 @@ public class User extends BaseEntity {
   @Comment("이메일")
   private String email;
 
+  @Convert(converter = StringListJsonConverter.class)
+  @Column(name = "tags", columnDefinition = "TEXT")
+  @Comment("포트폴리오 태그 목록")
+  private List<String> tags = new ArrayList<>();
+
+  @Column(name = "tags_updated_portfolio_version")
+  private Long tagsUpdatedPortfolioVersion;
+
   // 회원 정보 업데이트
   public void updateUserInfo(String name, String nickname, boolean matching, String introduction,
       String job) {
@@ -60,6 +73,12 @@ public class User extends BaseEntity {
     this.matching = matching;
     this.introduction = introduction;
     this.job = job;
+  }
+
+  // 포트폴리오 태그 업데이트
+  public void updateTags(List<String> tags, Long version) {
+    this.tags = tags;
+    this.tagsUpdatedPortfolioVersion = version;
   }
 
   // 좋아요 수 증가

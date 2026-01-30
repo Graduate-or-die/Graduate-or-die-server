@@ -13,6 +13,7 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
+import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.qualification.dto.request.SaveQualificationRequest;
 import server.pome.qualification.dto.request.UpdateQualificationRequest;
 import server.pome.qualification.dto.response.SaveUpdateQualificationResponse;
@@ -32,6 +33,8 @@ public class QualificationService {
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
     private final AttachmentRepository attachmentRepository;
+
+    private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 자격증 저장
     public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, List<MultipartFile> files) {
@@ -78,6 +81,7 @@ public class QualificationService {
                 );
 
         return SaveUpdateQualificationResponse.from(qualification, attachment);
+
     }
 
     // 자격증 수정
@@ -140,6 +144,7 @@ public class QualificationService {
                 );
 
         return SaveUpdateQualificationResponse.from(qualification, attachment);
+
     }
 
     // 자격증 삭제

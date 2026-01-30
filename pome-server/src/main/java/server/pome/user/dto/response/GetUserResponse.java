@@ -23,8 +23,8 @@ public class GetUserResponse {
   private String nickName;
   @Schema(description = "좋아요 수", example = "57", requiredMode = RequiredMode.REQUIRED)
   private int likeCount;
- // @Schema(description = "포트폴리오 태그 목록", example = "[\"대학재학생\", \"IT\", \"개발자\"]", requiredMode = RequiredMode.NOT_REQUIRED)
-  //private List<String> tags;
+  @Schema(description = "포트폴리오 태그 목록", example = "[\"대학재학생\", \"IT\", \"개발자\"]", requiredMode = RequiredMode.NOT_REQUIRED)
+  private List<String> tags;
   @Schema(description = "매칭 활성화 여부", example = "true", requiredMode = RequiredMode.REQUIRED)
   private boolean matching;
   @Schema(description = "자기소개", example = "저와 개발자 포트폴리오 쌓으실 분 구해요!", requiredMode = RequiredMode.NOT_REQUIRED)
@@ -41,7 +41,7 @@ public class GetUserResponse {
         .userName(user.getUserName())
         .nickName(user.getNickName())
         .likeCount(user.getLikeCount())
-   //     .tags(tags)
+        .tags(user.getTags())
         .matching(user.getMatching())
         .introduction(user.getIntroduction())
         .job(user.getJob())
