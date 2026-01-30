@@ -2,7 +2,6 @@ package server.pome.etc.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
 import java.util.List;
 
 @Getter

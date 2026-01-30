@@ -77,6 +77,4 @@ public class ChatFieldReadController {
     return ResponseEntity.ok(BaseResponse.success(result));
 
   }
-
-
 }

@@ -14,7 +14,6 @@ import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.portfolio.service.event.PortfolioUpdateNotifier;
 import server.pome.user.repository.UserRepository;
-
 import java.time.LocalDate;
 
 @Service

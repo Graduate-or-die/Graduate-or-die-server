@@ -1,9 +1,7 @@
 package server.pome.attachment.service;
 
 import static server.pome.global.exception.BaseResponseStatus.S3_ERROR;
-
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.IOException;

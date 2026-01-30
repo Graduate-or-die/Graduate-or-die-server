@@ -4,10 +4,8 @@ import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FO
 import static server.pome.global.exception.BaseResponseStatus.NOT_MATCHED_MATE;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,5 +96,4 @@ public class MessageService {
 
     return responses;
   }
-
 }

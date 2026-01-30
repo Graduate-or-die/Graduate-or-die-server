@@ -3,12 +3,7 @@ package server.pome.global.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -76,6 +71,5 @@ public class Qualification extends BaseEntity{
         this.hasQualificationEndAt = hasQualificationEndAt;
         this.score = score;
     }
-
 }
 

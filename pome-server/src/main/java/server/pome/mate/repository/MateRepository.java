@@ -86,6 +86,4 @@ public interface MateRepository extends JpaRepository<Mate, Long> {
   boolean isAcceptedMates(@Param("u1") Long u1,
       @Param("u2") Long u2,
       @Param("status") MateRequestStatus status);
-
-
 }

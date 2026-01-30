@@ -2,7 +2,6 @@ package server.pome.award.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import server.pome.attachment.dto.response.FileResponse;

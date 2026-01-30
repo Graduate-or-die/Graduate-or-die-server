@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import server.pome.global.domain.Etc;
-
 import java.util.List;
 
 @Getter
