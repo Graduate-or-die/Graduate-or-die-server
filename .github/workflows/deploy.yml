@@ -68,6 +68,7 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
+
       # EC2 고정 경로의 jar만 교체 (app 재시작/재기동 안 함)
       - name: Copy JAR to EC2 (replace only)
         if: github.event_name == 'push'
@@ -81,6 +82,7 @@ jobs:
 
       # app이 켜져 있으면 health 체크, 꺼져 있으면 스킵 (실패 처리 안 함)
       - name: Post-check (health if app is running)
+
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
@@ -93,4 +95,3 @@ jobs:
             else \
               echo '[CHECK] app is OFF -> skip health check (A-mode)'; \
             fi \
-          "

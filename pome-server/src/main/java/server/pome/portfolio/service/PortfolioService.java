@@ -1,6 +1,6 @@
 package server.pome.portfolio.service;
 
-import static server.pome.global.enums.TypeEnum.*;
+import static server.pome.global.exception.BaseResponseStatus.*;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 
@@ -13,16 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.activity.service.ActivityService;
 import server.pome.award.service.AwardService;
-import server.pome.chat.repository.ChatFieldRepository;
 import server.pome.etc.repository.EtcRepository;
-import server.pome.experience.repository.ExperienceRepository;
 import server.pome.experience.service.ExperienceService;
 import server.pome.global.domain.Etc;
-import server.pome.global.domain.Experience;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.dto.response.GetAllPortfolioResponse;
 import server.pome.portfolio.dto.response.GetPortfolioResponse;
 import server.pome.portfolio.dto.response.PreviewResponse;
@@ -218,7 +214,12 @@ public class PortfolioService {
         return new GetAllPortfolioResponse(userId, portfolioId, sections);
     }
 
-    private Portfolio getPortfolio(Long userId) {
+    // 포트폴리오 전체 조회
+    public GetAllPortfolioResponse getAllPortfolioResponse(Long userId) {
+        return (GetAllPortfolioResponse) getPortfolioSection(userId, null);
+    }
+
+    public Portfolio getPortfolio(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new BaseException(USER_NOT_FOUND);
         }
@@ -242,7 +243,7 @@ public class PortfolioService {
     public void deletePortfolioBlock(Long userId, Long typeId, Long blockId) {
 
         if (typeId == 1L || typeId == 7L) {
-            throw new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED);
+            throw new BaseException(PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED);
         }
 
         switch (TypeEnum.fromId(typeId)) {
@@ -251,7 +252,7 @@ public class PortfolioService {
             case AWARDS -> awardService.delete(blockId, userId);
             case QUALIFICATIONS -> qualificationService.delete(blockId, userId);
             case PROJECTS -> projectService.delete(blockId, userId);
-            default -> throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+            default -> throw new BaseException(INVALID_TYPE_ENUM);
         }
 
     }
@@ -259,7 +260,7 @@ public class PortfolioService {
     public void deletePortfolioBlocks(Long userId, Long typeId, List<Long> blockIds) {
 
         if (typeId == 1L || typeId == 7L) {
-            throw new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED);
+            throw new BaseException(PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED);
         }
 
         TypeEnum type = TypeEnum.fromId(typeId);
@@ -271,7 +272,7 @@ public class PortfolioService {
                 case AWARDS -> awardService.delete(blockId, userId);
                 case QUALIFICATIONS -> qualificationService.delete(blockId, userId);
                 case PROJECTS -> projectService.delete(blockId, userId);
-                default -> throw new BaseException(BaseResponseStatus.INVALID_TYPE_ENUM);
+                default -> throw new BaseException(INVALID_TYPE_ENUM);
             }
         }
     }
