@@ -49,16 +49,20 @@ jobs:
           role-to-assume: arn:aws:iam::042655075951:role/github-actions-ecr-push-role
           aws-region: ap-northeast-2
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR (explicit)
         if: github.event_name == 'push'
-        uses: aws-actions/amazon-ecr-login@v2
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 \
+          | docker login --username AWS --password-stdin \
+            042655075951.dkr.ecr.ap-northeast-2.amazonaws.com
 
       - name: Build & Push Docker image
         if: github.event_name == 'push'
         working-directory: pome-server
         run: |
-          IMAGE=204265507951.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
+          IMAGE=042655075951.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
           TAG=${GITHUB_SHA::7}
+
           docker build -t $IMAGE:$TAG -t $IMAGE:latest -f Dockerfile .
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
