@@ -59,6 +59,7 @@ jobs:
         run: |
           IMAGE=042655075951.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
           TAG=${GITHUB_SHA::7}
+
           docker build -t $IMAGE:$TAG -t $IMAGE:latest -f Dockerfile .
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
@@ -88,6 +89,7 @@ jobs:
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
             cd /home/${{ secrets.EC2_USER }}/pome; \
+
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 042655075951.dkr.ecr.ap-northeast-2.amazonaws.com; \
             docker compose pull app; \
             docker compose up -d app; \
