@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'push'
         working-directory: pome-server
         run: |
-          IMAGE=204265507951.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
+          IMAGE=042655075921.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
           TAG=${GITHUB_SHA::7}
           docker build -t $IMAGE:$TAG -t $IMAGE:latest -f Dockerfile .
           docker push $IMAGE:$TAG
