@@ -82,7 +82,6 @@ jobs:
 
       # app이 켜져 있으면 health 체크, 꺼져 있으면 스킵 (실패 처리 안 함)
       - name: Post-check (health if app is running)
-
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
@@ -95,3 +94,4 @@ jobs:
             else \
               echo '[CHECK] app is OFF -> skip health check (A-mode)'; \
             fi \
+          "
