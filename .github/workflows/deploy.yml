@@ -82,15 +82,18 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy on EC2 (ecr login -> pull -> up)
+      - name: Deploy on EC2 (no awscli on EC2)
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
+
+          # GitHub runner에서 ECR 패스워드 생성 (여기는 awscli 정상)
+          ECR_PASSWORD="$(aws ecr get-login-password --region "${AWS_REGION}")"
+
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
             cd /home/${{ secrets.EC2_USER }}/pome; \
-
-            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 042655075951.dkr.ecr.ap-northeast-2.amazonaws.com; \
+            echo '${ECR_PASSWORD}' | docker login --username AWS --password-stdin ${ECR_REGISTRY}; \
             docker compose pull app; \
             docker compose up -d app; \
             curl -fsS http://127.0.0.1/health/check >/dev/null; \
