@@ -89,9 +89,10 @@ jobs:
             set -euo pipefail; \
             if docker ps --format '{{.Names}}' | grep -q '^pome-app$'; then \
               echo '[CHECK] app container is running -> health check'; \
-              curl -fsS http://127.0.0.1:8080/health/check >/dev/null; \
+              curl -fsS http://127.0.0.1/health/check >/dev/null; \
               echo '[CHECK] health ok'; \
             else \
               echo '[CHECK] app is OFF -> skip health check (A-mode)'; \
             fi \
           "
+
