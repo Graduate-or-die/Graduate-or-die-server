@@ -46,10 +46,10 @@ jobs:
         if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::042655075921:role/github-actions-ecr-push-role
+          role-to-assume: arn:aws:iam::042655075951:role/github-actions-ecr-push-role
           aws-region: ap-northeast-2
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR (GitHub runner)
         if: github.event_name == 'push'
         uses: aws-actions/amazon-ecr-login@v2
 
@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'push'
         working-directory: pome-server
         run: |
-          IMAGE=042655075921.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
+          IMAGE=042655075951.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
           TAG=${GITHUB_SHA::7}
           docker build -t $IMAGE:$TAG -t $IMAGE:latest -f Dockerfile .
           docker push $IMAGE:$TAG
@@ -81,13 +81,14 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy on EC2 (pull & up)
+      - name: Deploy on EC2 (ecr login -> pull -> up)
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
             cd /home/${{ secrets.EC2_USER }}/pome; \
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 042655075951.dkr.ecr.ap-northeast-2.amazonaws.com; \
             docker compose pull app; \
             docker compose up -d app; \
             curl -fsS http://127.0.0.1/health/check >/dev/null; \
