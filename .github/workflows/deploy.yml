@@ -7,6 +7,10 @@ on:
     branches: ["main"]
   workflow_dispatch: {}
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -38,18 +42,27 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean bootJar -x test
 
-      - name: Find built jar
-        id: jar
-        run: |
-          set -euo pipefail
-          JAR_PATH=$(find pome-server/build/libs -maxdepth 1 -type f -name "*.jar" | head -n 1)
-          if [ -z "$JAR_PATH" ]; then
-            echo "No jar found under pome-server/build/libs"; exit 1
-          fi
-          echo "jar=$JAR_PATH" >> "$GITHUB_OUTPUT"
-          echo "Found JAR: $JAR_PATH"
+      - name: Configure AWS credentials (OIDC)
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<GITHUB_ACTIONS_OIDC_ROLE>
+          aws-region: ap-northeast-2
 
-      # 배포는 push 일 때만 실행 (PR은 빌드만)
+      - name: Login to Amazon ECR
+        if: github.event_name == 'push'
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & Push Docker image
+        if: github.event_name == 'push'
+        working-directory: pome-server
+        run: |
+          IMAGE=204265507951.dkr.ecr.ap-northeast-2.amazonaws.com/pome-app
+          TAG=${GITHUB_SHA::7}
+          docker build -t $IMAGE:$TAG -t $IMAGE:latest -f Dockerfile .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
+
       - name: Stop if not push (skip deploy on PR)
         if: github.event_name != 'push'
         run: echo "PR run → build only. Deploy is skipped."
@@ -68,30 +81,15 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-
-      # EC2 고정 경로의 jar만 교체 (app 재시작/재기동 안 함)
-      - name: Copy JAR to EC2 (replace only)
+      - name: Deploy on EC2 (pull & up)
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
-            mkdir -p /home/${{ secrets.EC2_USER }}/pome/app; \
-          "
-          scp -i key.pem "${{ steps.jar.outputs.jar }}" "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/pome/app/app.jar"
-
-      # app이 켜져 있으면 health 체크, 꺼져 있으면 스킵 (실패 처리 안 함)
-      - name: Post-check (health if app is running)
-        if: github.event_name == 'push'
-        run: |
-          set -euo pipefail
-          ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
-            set -euo pipefail; \
-            if docker ps --format '{{.Names}}' | grep -q '^pome-app$'; then \
-              echo '[CHECK] app container is running -> health check'; \
-              curl -fsS http://127.0.0.1/health/check >/dev/null; \
-              echo '[CHECK] health ok'; \
-            else \
-              echo '[CHECK] app is OFF -> skip health check (A-mode)'; \
-            fi \
+            cd /home/${{ secrets.EC2_USER }}/pome; \
+            docker compose pull app; \
+            docker compose up -d app; \
+            curl -fsS http://127.0.0.1/health/check >/dev/null; \
+            echo '[DEPLOY] done'; \
           "
