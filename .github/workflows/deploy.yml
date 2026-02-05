@@ -87,13 +87,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          # GitHub runner에서 ECR 패스워드 생성 (여기는 awscli 정상)
-          ECR_PASSWORD="$(aws ecr get-login-password --region "${AWS_REGION}")"
+          AWS_REGION="ap-northeast-2"
+          ECR_REGISTRY="042655075951.dkr.ecr.ap-northeast-2.amazonaws.com"
+
+          ECR_PASSWORD_B64="$(aws ecr get-login-password --region "${AWS_REGION}" | base64 -w0)"
 
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
             cd /home/${{ secrets.EC2_USER }}/pome; \
-            echo '${ECR_PASSWORD}' | docker login --username AWS --password-stdin ${ECR_REGISTRY}; \
+            echo '${ECR_PASSWORD_B64}' | base64 -d | docker login --username AWS --password-stdin ${ECR_REGISTRY}; \
             docker compose pull app; \
             docker compose up -d app; \
             curl -fsS http://127.0.0.1/health/check >/dev/null; \
