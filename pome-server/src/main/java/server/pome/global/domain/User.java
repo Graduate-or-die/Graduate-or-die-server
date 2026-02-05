@@ -75,6 +75,11 @@ public class User extends BaseEntity {
     this.job = job;
   }
 
+  // 이미지 업데이트
+  public void updateProfileImage(String profileImage) {
+    this.profileImage = profileImage;
+  }
+
   // 포트폴리오 태그 업데이트
   public void updateTags(List<String> tags, Long version) {
     this.tags = tags;
