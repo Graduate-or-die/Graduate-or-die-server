@@ -31,6 +31,6 @@ public class AttachmentController {
 
         attachmentService.deleteFile(userId, typeId, blockId);
 
-        return ResponseEntity.ok(BaseResponse.success(null));
+        return ResponseEntity.ok(BaseResponse.success("삭제가 정상적으로 처리되었습니다."));
     }
 }

@@ -1,8 +1,10 @@
 package server.pome.attachment.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import server.pome.global.domain.Attachment;
 
+@Getter
 public class FileResponse {
     @Schema(description = "파일 이름", example = "s3관련자료")
     private String fileName;
@@ -22,11 +24,4 @@ public class FileResponse {
         );
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
 }
