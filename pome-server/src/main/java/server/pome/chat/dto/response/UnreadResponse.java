@@ -30,5 +30,4 @@ public class UnreadResponse {
         .hasUnread(hasUnread)
         .build();
   }
-
 }

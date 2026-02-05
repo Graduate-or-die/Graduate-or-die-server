@@ -21,7 +21,6 @@ import server.pome.jwt.repository.AuthUserRepository;
 import server.pome.portfolio.service.PortfolioService;
 import server.pome.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;

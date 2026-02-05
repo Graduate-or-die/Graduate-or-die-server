@@ -1,9 +1,7 @@
 package server.pome.activity.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
 import lombok.Getter;
-import org.hibernate.annotations.Comment;
 import server.pome.global.domain.Activity;
 import server.pome.global.domain.Portfolio;
 

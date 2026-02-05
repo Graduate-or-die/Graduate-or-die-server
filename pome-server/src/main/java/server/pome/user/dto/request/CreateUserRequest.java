@@ -11,5 +11,4 @@ public class CreateUserRequest {
 
   @Schema(description = "유저 닉네임", example = "김혜림")
   private String nickName;
-
 }

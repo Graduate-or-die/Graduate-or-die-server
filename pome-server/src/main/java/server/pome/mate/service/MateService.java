@@ -12,7 +12,6 @@ import static server.pome.global.exception.BaseResponseStatus.MATCHING_DISABLED;
 import static server.pome.global.exception.BaseResponseStatus.NOT_MATCHED_MATE;
 import static server.pome.global.exception.BaseResponseStatus.PROPOSER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -19,5 +19,4 @@ public class ReadRequest {
 
   @Schema(description = "필드명", example = "역할")
   private String fieldKey;
-
 }

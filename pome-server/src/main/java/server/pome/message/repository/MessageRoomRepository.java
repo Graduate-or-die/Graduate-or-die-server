@@ -7,6 +7,5 @@ import server.pome.global.domain.MessageRoom;
 
 @Repository
 public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> {
-
   Optional<MessageRoom> findByUserLowIdAndUserHighId(Long userId, Long mateId);
 }

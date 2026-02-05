@@ -2,7 +2,6 @@ package server.pome.chat.service;
 
 import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,5 +51,4 @@ public class ChatFieldService {
               new ChatField(ownerRef, portfolioType, blockId, fieldKey));
         });
     }
-
 }
