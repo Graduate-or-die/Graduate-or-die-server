@@ -51,7 +51,22 @@ public class UserService {
     String introduction = Optional.ofNullable(request.getIntroduction()).orElse(user.getIntroduction());
     String job = Optional.ofNullable(request.getJob()).orElse(user.getJob());
 
-    // 회원 정보 수정
+    if (Boolean.TRUE.equals(request.getRemoveProfileImage())) {
+
+      if (user.getProfileImage() != null) {
+        awsS3Service.deleteFileByUrl(user.getProfileImage());
+      }
+
+      user.updateProfileImage(null);
+    }
+
+    if (Boolean.TRUE.equals(request.getRemoveProfileImage())
+            && files != null
+            && !files.isEmpty()) {
+
+      throw new BaseException(BaseResponseStatus.INVALID_PROFILE_IMAGE_REQUEST);
+    }
+
     user.updateUserInfo(name, nickname, matching, introduction, job);
 
     if (files != null && !files.isEmpty()) {
