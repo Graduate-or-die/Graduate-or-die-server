@@ -90,14 +90,24 @@ jobs:
           AWS_REGION="ap-northeast-2"
           ECR_REGISTRY="042655075951.dkr.ecr.ap-northeast-2.amazonaws.com"
 
-          ECR_PASSWORD_B64="$(aws ecr get-login-password --region "${AWS_REGION}" | base64 -w0)"
+          ECR_PASSWORD="$(aws ecr get-login-password --region "${AWS_REGION}")"
 
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
             cd /home/${{ secrets.EC2_USER }}/pome; \
-            echo '${ECR_PASSWORD_B64}' | base64 -d | docker login --username AWS --password-stdin ${ECR_REGISTRY}; \
+            echo '${ECR_PASSWORD}' | docker login --username AWS --password-stdin ${ECR_REGISTRY}; \
             docker compose pull app; \
             docker compose up -d app; \
-            curl -fsS http://127.0.0.1/health/check >/dev/null; \
-            echo '[DEPLOY] done'; \
+            echo '[DEPLOY] waiting for health...'; \
+            for i in \$(seq 1 30); do \
+              if curl -fsS --max-time 2 http://127.0.0.1/health/check >/dev/null; then \
+                echo '[DEPLOY] health ok'; \
+                exit 0; \
+              fi; \
+              sleep 2; \
+            done; \
+            echo '[DEPLOY] health failed. printing logs...'; \
+            docker compose ps; \
+            docker compose logs --no-color --tail=200 app; \
+            exit 1; \
           "
