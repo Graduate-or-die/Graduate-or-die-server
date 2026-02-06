@@ -33,7 +33,7 @@ public class UpdateUserResponse {
         .matching(user.getMatching())
         .introduction(user.getIntroduction())
         .job(user.getJob())
-            .profileImage(user.getProfileImage())
+        .profileImage(user.getProfileImage())
         .build();
   }
 }
