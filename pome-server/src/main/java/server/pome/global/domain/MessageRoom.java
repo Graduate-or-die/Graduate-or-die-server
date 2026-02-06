@@ -2,10 +2,8 @@ package server.pome.global.domain;
 
 import static server.pome.global.exception.BaseResponseStatus.USER_CANNOT_SAME;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Objects;
 import lombok.AccessLevel;
@@ -14,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // of로만 생성
@@ -52,5 +49,4 @@ public class MessageRoom extends BaseEntity {
   public boolean isParticipant(Long userId) {
     return Objects.equals(userId, userLowId) || Objects.equals(userId, userHighId);
   }
-
 }

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,15 +11,16 @@ import java.util.Map;
 @AllArgsConstructor
 
 public enum TypeEnum {
-    EDUCATIONS(1L),
-    EXPERIENCES(2L),
-    ACTIVITIES(3L),
-    AWARDS(4L),
-    QUALIFICATIONS(5L),
-    PROJECTS(6L),
-    ETCS(7L);
+    EDUCATIONS(1L, null),
+    EXPERIENCES(2L, null),
+    ACTIVITIES(3L, null),
+    AWARDS(4L, "awards"),
+    QUALIFICATIONS(5L, "qualifications"),
+    PROJECTS(6L, null),
+    ETCS(7L, null);
 
     private final Long id;
+    private final String s3Dir;
 
     public static TypeEnum fromId(Long id) {
         if (id == null) {

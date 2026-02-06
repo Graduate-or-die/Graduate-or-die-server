@@ -2,13 +2,14 @@ package server.pome.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.pome.global.domain.User;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -32,8 +33,8 @@ public class GetUserResponse {
   private String introduction;
   @Schema(description = "희망 직무", example = "프론트엔드 개발자", requiredMode = RequiredMode.NOT_REQUIRED)
   private String job;
-
-// TODO: 프로필 이미지 (S3 연동 후 추가)
+  @Schema(description = "프로필 사진", example = "https://pome-bucket.s3.ap-northeast-2.amazonaws.com/profile/배드바츠마루.jpg", requiredMode = RequiredMode.NOT_REQUIRED)
+  private String profileImage;
 
   public static GetUserResponse from(User user) {
 
@@ -46,6 +47,7 @@ public class GetUserResponse {
         .matching(user.getMatching())
         .introduction(user.getIntroduction())
         .job(user.getJob())
+            .profileImage(user.getProfileImage())
         .build();
   }
 }

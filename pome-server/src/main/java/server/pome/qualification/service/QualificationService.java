@@ -3,9 +3,13 @@ package server.pome.qualification.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import server.pome.global.domain.Award;
+import org.springframework.web.multipart.MultipartFile;
+import server.pome.attachment.repository.AttachmentRepository;
+import server.pome.attachment.service.AttachmentService;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.Qualification;
+import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
@@ -18,6 +22,7 @@ import server.pome.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +32,12 @@ public class QualificationService {
     private final QualificationRepository qualificationRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
-
+    private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
     private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 자격증 저장
-    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request) {
+    public SaveUpdateQualificationResponse saveQualification(Long userId, SaveQualificationRequest request, List<MultipartFile> files) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -48,18 +54,38 @@ public class QualificationService {
             }
         }
 
-        // 일단 임시 요청으로 들어온 URL를 save
-        // TODO: S3가 붙으면 request에서의 qualificationFile이 아닌 S3의 URL로 교체 예정
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
 
-        portfolioUpdateNotifier.notifyUpdated(userId);
+        if (files != null && !files.isEmpty()) {
 
-        return SaveUpdateQualificationResponse.from(qualification);
+            if (files.size() > 1) {
+                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+            }
+
+            MultipartFile file = files.get(0);
+
+            attachmentService.uploadFile(
+                    userId,
+                    TypeEnum.QUALIFICATIONS.getId(),
+                    qualification.getId(),
+                    file
+            );
+        }
+
+        Optional<Attachment> attachment =
+                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                        qualification.getPortfolio().getId(),
+                        TypeEnum.QUALIFICATIONS.getId(),
+                        qualification.getId()
+                );
+
+        portfolioUpdateNotifier.notifyUpdated(userId);
+        return SaveUpdateQualificationResponse.from(qualification, attachment);
     }
 
     // 자격증 수정
-    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request) {
+    public SaveUpdateQualificationResponse updateQualification(Long userId, Long qualificationId, UpdateQualificationRequest request, List<MultipartFile> files) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
         if (!userRepository.existsById(userId)) {
@@ -85,13 +111,40 @@ public class QualificationService {
         LocalDate qualificationEndAt = request.getQualificationEndAt() != null ? request.getQualificationEndAt() : qualification.getQualificationEndAt();
         boolean hasQualificationEndAt = request.isHasQualificationEndAt();
         int score = request.getScore();
-        List<String> qualificationFile = request.getQualificationFile() != null && !request.getQualificationFile().isEmpty() ? request.getQualificationFile() : qualification.getQualificationFile();
 
-        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score, qualificationFile);
+        qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score);
+
+        if (files != null && !files.isEmpty()) {
+
+            if (files.size() > 1) {
+                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+            }
+
+            Optional<Attachment> existing =
+                    attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                            qualification.getPortfolio().getId(),
+                            TypeEnum.QUALIFICATIONS.getId(),
+                            qualificationId
+                    );
+
+            if (existing.isPresent()) {
+                throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
+            }
+
+            MultipartFile file = files.get(0);
+
+            attachmentService.uploadFile(userId, TypeEnum.QUALIFICATIONS.getId(), qualificationId, file);
+        }
+
+        Optional<Attachment> attachment =
+                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                        qualification.getPortfolio().getId(),
+                        TypeEnum.QUALIFICATIONS.getId(),
+                        qualification.getId()
+                );
 
         portfolioUpdateNotifier.notifyUpdated(userId);
-
-        return SaveUpdateQualificationResponse.from(qualification);
+        return SaveUpdateQualificationResponse.from(qualification, attachment);
     }
 
     // 자격증 삭제
@@ -99,6 +152,13 @@ public class QualificationService {
         Qualification qualification = qualificationRepository
                 .findByIdAndPortfolio_User_Id(blockId, userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
+
+        attachmentService.deleteByBlock(
+                userId,
+                TypeEnum.QUALIFICATIONS.getId(),
+                blockId
+        );
+
         qualificationRepository.delete(qualification);
     }
 }

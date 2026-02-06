@@ -2,10 +2,7 @@ package server.pome.qualification.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class UpdateQualificationRequest {
@@ -27,7 +24,4 @@ public class UpdateQualificationRequest {
 
     @Schema(description = "등급/점수", example = "1")
     private int score;
-
-    @Schema(description = "첨부", example = "qulificationimg/url")
-    private List<String> qualificationFile = new ArrayList<>();
 }

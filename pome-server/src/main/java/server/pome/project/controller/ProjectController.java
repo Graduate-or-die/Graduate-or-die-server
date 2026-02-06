@@ -41,5 +41,4 @@ public class ProjectController {
         SaveUpdateProjectResponse result = projectService.updateProject(userId, blockId, request);
         return ResponseEntity.ok(BaseResponse.success(result));
     }
-
 }

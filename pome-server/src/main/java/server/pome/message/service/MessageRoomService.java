@@ -24,5 +24,4 @@ public class MessageRoomService {
           return messageRoomRepository.saveAndFlush(MessageRoom.of(user1Id, user2Id));
         });
   }
-
 }

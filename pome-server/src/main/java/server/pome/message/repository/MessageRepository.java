@@ -8,8 +8,5 @@ import server.pome.global.domain.Message;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
-
-
   Page<Message> findByMessageRoomIdOrderByIdAsc(Long MessageRoomId, Pageable pageable);
-
 }

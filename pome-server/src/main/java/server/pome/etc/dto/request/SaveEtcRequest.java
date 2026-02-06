@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import server.pome.global.domain.Etc;
 import server.pome.global.domain.Portfolio;
-import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
-
 import java.util.List;
 
 @Getter

@@ -3,7 +3,6 @@ package server.pome.portfolio.service;
 import static server.pome.global.exception.BaseResponseStatus.*;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.util.EnumMap;
@@ -28,10 +27,8 @@ import server.pome.global.enums.TypeEnum;
 import server.pome.project.service.ProjectService;
 import server.pome.qualification.service.QualificationService;
 import server.pome.user.repository.UserRepository;
-
 import java.util.LinkedHashMap;
 import java.util.stream.LongStream;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

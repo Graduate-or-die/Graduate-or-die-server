@@ -23,7 +23,6 @@ import server.pome.chat.dto.request.ReadRequest;
 import server.pome.chat.dto.response.CreateChatResponse;
 import server.pome.chat.dto.response.GetChatListResponse;
 import server.pome.chat.service.ChatMessageService;
-import server.pome.global.domain.BaseEntity;
 import server.pome.global.domain.BaseResponse;
 import server.pome.global.domain.User;
 

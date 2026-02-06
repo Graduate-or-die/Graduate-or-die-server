@@ -4,12 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import server.pome.attachment.dto.response.FileResponse;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Qualification;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -37,11 +36,15 @@ public class SaveUpdateQualificationResponse {
     @Schema(description = "등급/점수", example = "1")
     private int score;
 
-    @Schema(description = "첨부", example = "qulificationimg/url")
-    private List<String> qualificationFile = new ArrayList<>();
+    @Schema(description = "파일")
+    private FileResponse file;
 
-    public static SaveUpdateQualificationResponse from(Qualification qualification) {
-        List<String> files = qualification.getQualificationFile();
+    public static SaveUpdateQualificationResponse from(Qualification qualification, Optional<Attachment> attachment) {
+
+        FileResponse file = attachment
+                .map(FileResponse::from)
+                .orElse(null);
+
         return SaveUpdateQualificationResponse.builder()
                 .qualificationId(qualification.getId())
                 .qualificationName(qualification.getQualificationName())
@@ -50,8 +53,7 @@ public class SaveUpdateQualificationResponse {
                 .qualificationEndAt(qualification.getQualificationEndAt())
                 .hasQualificationEndAt(qualification.isHasQualificationEndAt())
                 .score(qualification.getScore())
-                // 아직은 첨부파일 부분을 구현못하기에 임시적 방어 로직
-                .qualificationFile(files == null ? Collections.emptyList() : new ArrayList<>(files))
+                .file(file)
                 .build();
     }
 }

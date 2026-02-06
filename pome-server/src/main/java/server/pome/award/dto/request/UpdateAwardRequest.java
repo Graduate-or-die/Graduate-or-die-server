@@ -2,10 +2,7 @@ package server.pome.award.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class UpdateAwardRequest {
@@ -22,6 +19,4 @@ public class UpdateAwardRequest {
     @Schema(description = "시상등급", example = "대상")
     private String awardGrade;
 
-    @Schema(description = "첨부", example = "awardimg/url")
-    private List<String> awardFile = new ArrayList<>();
 }

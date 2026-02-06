@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.Comment;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
-
 import java.util.ArrayList;
 import java.util.List;
 

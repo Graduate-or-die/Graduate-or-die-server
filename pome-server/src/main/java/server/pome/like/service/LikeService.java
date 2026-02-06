@@ -4,7 +4,6 @@ import static server.pome.global.exception.BaseResponseStatus.ALREADY_LIKED;
 import static server.pome.global.exception.BaseResponseStatus.ALREADY_UNLIKED;
 import static server.pome.global.exception.BaseResponseStatus.CANNOT_LIKE_SELF;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,5 +75,4 @@ public class LikeService {
       throw new BaseException(USER_NOT_FOUND);
     }
   }
-
 }

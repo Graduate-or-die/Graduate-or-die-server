@@ -17,11 +17,17 @@ public enum BaseResponseStatus {
   // users
   USER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2003, "존재하지 않는 사용자입니다."),
   DUPLICATE_USER(false, HttpStatus.BAD_REQUEST, 2004, "중복된 닉네임입니다."),
+  INVALID_PROFILE_IMAGE_REQUEST(false, HttpStatus.BAD_REQUEST, 2040, "프로필 이미지를 삭제하면서 동시에 업로드할 수 없습니다."),
 
   // portfolios
   INVALID_TYPE_ENUM(false, HttpStatus.BAD_REQUEST, 2005, "존재하지 않는 TypeEnum입니다."),
+  FILE_NOT_SUPPORTED_TYPE(false, HttpStatus.BAD_REQUEST, 2112, "해당 포트폴리오 타입은 파일 첨부를 지원하지 않습니다."),
   PORTFOLIO_BLOCK_DELETE_NOT_ALLOWED(false, HttpStatus.BAD_REQUEST, 2110, "블록 삭제가 불가합니다."),
   PORTFOLIO_BLOCK_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2111, "해당 블록을 찾을 수 없습니다."),
+  FILE_ALREADY_EXISTS(false, HttpStatus.BAD_REQUEST, 2112, "이미 파일이 존재합니다."),
+  FILE_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2113, "파일을 찾을 수 없습니다."),
+  PORTFOLIO_NOT_FOUND(false, HttpStatus.FORBIDDEN, 2114, "포트폴리오를 찾을 수 없습니다."),
+  FILE_LIMIT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2115, "파일은 하나만 가능합니다."),
 
   // education
   EDUCATION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2006, "해당 유저의 학력을 찾을 수 없습니다."),
