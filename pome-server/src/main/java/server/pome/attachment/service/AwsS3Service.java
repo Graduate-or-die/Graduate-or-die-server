@@ -67,9 +67,9 @@ public class AwsS3Service {
   private String getFileExtension(String fileName) {
     try {
       return fileName.substring(fileName.lastIndexOf("."));
-    } catch (StringIndexOutOfBoundsException e) {
       throw new BaseException(
-              BaseResponseStatus.INVALID_REQUEST_FORM
+              BaseResponseStatus.INVALID_REQUEST_FORM,
+              BAD_REQUEST
       );
     }
   }
