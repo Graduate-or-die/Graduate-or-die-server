@@ -1,5 +1,6 @@
 package server.pome.attachment.service;
 
+import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.S3_ERROR;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import server.pome.attachment.dto.response.UploadedFileInfo;
 import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -67,10 +67,8 @@ public class AwsS3Service {
   private String getFileExtension(String fileName) {
     try {
       return fileName.substring(fileName.lastIndexOf("."));
-      throw new BaseException(
-              BaseResponseStatus.INVALID_REQUEST_FORM,
-              BAD_REQUEST
-      );
+    } catch (StringIndexOutOfBoundsException e) {
+      throw new BaseException(INVALID_REQUEST_FORM);
     }
   }
 }
