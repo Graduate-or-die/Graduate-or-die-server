@@ -15,5 +15,6 @@ public class UpdateUserRequest {
   private String job;
   @Schema(description = "매칭 활성화 여부", example = "true")
   private Boolean matching;
-  // TODO: 프로필 사진 추가
+  @Schema(description = "프로필 사진 기본으로 되돌리기", example = "true")
+  private Boolean removeProfileImage;
 }

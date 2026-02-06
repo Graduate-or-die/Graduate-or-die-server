@@ -22,7 +22,8 @@ public class UpdateUserResponse {
   private String introduction;
   @Schema(description = "희망 직무", example = "프론트엔드 개발자")
   private String job;
-  // TODO: 프로필 사진 추가
+  @Schema(description = "프로필 사진", example = "https://pome-bucket.s3.ap-northeast-2.amazonaws.com/profile/배드바츠마루.jpg", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  private String profileImage;
 
   public static UpdateUserResponse from(User user) {
     return UpdateUserResponse.builder()
@@ -32,6 +33,7 @@ public class UpdateUserResponse {
         .matching(user.getMatching())
         .introduction(user.getIntroduction())
         .job(user.getJob())
+        .profileImage(user.getProfileImage())
         .build();
   }
 }

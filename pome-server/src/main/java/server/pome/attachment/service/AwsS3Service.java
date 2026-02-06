@@ -43,15 +43,34 @@ public class AwsS3Service {
     amazonS3.deleteObject(bucket, fileName);
   }
 
+  // 유저 이미지 관련
+  public void deleteFileByUrl(String imageUrl) {
+    if (!isOurS3Image(imageUrl)) return;
+
+    String storedFileName = extractFileName(imageUrl);
+    deleteFile(storedFileName);
+  }
+
   public String createFileName(String fileName) {
     return UUID.randomUUID().toString().concat(getFileExtension(fileName));
   }
 
-  public String getFileExtension(String fileName) {
+  public boolean isOurS3Image(String imageUrl) {
+    if (imageUrl == null || imageUrl.isBlank()) return false;
+    return imageUrl.contains(bucket);
+  }
+
+  public String extractFileName(String imageUrl) {
+    return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+  }
+
+  private String getFileExtension(String fileName) {
     try {
       return fileName.substring(fileName.lastIndexOf("."));
-    } catch (StringIndexOutOfBoundsException e) {
-      throw new BaseException(BaseResponseStatus.INVALID_REQUEST_FORM, "파일 형식 오류");
+      throw new BaseException(
+              BaseResponseStatus.INVALID_REQUEST_FORM,
+              BAD_REQUEST
+      );
     }
   }
 }
