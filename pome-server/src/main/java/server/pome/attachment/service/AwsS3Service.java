@@ -69,8 +69,7 @@ public class AwsS3Service {
       return fileName.substring(fileName.lastIndexOf("."));
     } catch (StringIndexOutOfBoundsException e) {
       throw new BaseException(
-              BaseResponseStatus.INVALID_REQUEST_FORM,
-              "파일 형식 오류"
+              BaseResponseStatus.INVALID_REQUEST_FORM
       );
     }
   }
