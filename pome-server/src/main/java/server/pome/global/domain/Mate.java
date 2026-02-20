@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,15 @@ import server.pome.global.enums.MateRequestStatus;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "mates")
+@Table(
+    name = "mates",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_mate_from_target",
+            columnNames = {"from_user", "target_user"}
+        )
+    }
+)
 public class Mate {
 
   @Id
@@ -43,5 +52,4 @@ public class Mate {
   @Column(nullable = false, length = 10)
   @Comment("메이트 신청 상태(대기/수락/거절/해제)")
   private MateRequestStatus status;
-
 }
