@@ -90,8 +90,15 @@ public enum BaseResponseStatus {
   OAUTH_SERVER_ERROR(false, HttpStatus.BAD_GATEWAY, 2104, "카카오 서버 오류입니다. 잠시 후 다시 시도해주세요."),
   OAUTH_ALREADY_LINKED(false, HttpStatus.BAD_REQUEST, 2105, "이미 카카오 계정이 연동되어 있습니다."),
 
+  // interview_question
+
+  CSV_FILE_NOT_FOUND(false, HttpStatus.INTERNAL_SERVER_ERROR, 2110, "CSV 파일을 찾을 수 없습니다."),
+  CSV_PARSE_ERROR(false, HttpStatus.BAD_REQUEST, 2111, "CSV 파싱 중 오류가 발생했습니다."),
+  CSV_DATA_INVALID(false, HttpStatus.BAD_REQUEST, 2112, "CSV 데이터 형식이 올바르지 않습니다."),
+  INTERVIEW_BULK_INSERT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR, 2113, "면접 질문 Bulk Insert에 실패했습니다."),
+
   // 3000번대: 응답 오류
-  RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
+  RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니1다."),
 
   // 4000번대: 서버/DB 오류
   DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4000, "데이터베이스 연결에 실패하였습니다."),
