@@ -7,10 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.matching.dto.response.RecommendCandidateDTO;
 import server.pome.vector.domain.Vector;
-import server.pome.vector.infrastructure.embedding.EmbeddingClient;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreClient;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreNamespace;
-import server.pome.vector.infrastructure.vectorstore.model.SearchResult;
+import server.pome.vector.infrastructure.vectorstore.qdrant.dto.SearchHit;
 
 @Service
 @RequiredArgsConstructor
@@ -33,20 +32,20 @@ public class MateRecommendationService {
         VectorStoreNamespace.MATCHING_USERS);
 
     // topK 후보 검색
-    List<SearchResult> hits = vectorStoreClient.search(
+    List<SearchHit> hits = vectorStoreClient.search(
         VectorStoreNamespace.MATCHING_USERS,
         vector.asList(),
         100
     );
 
     List<Long> ids = hits.stream()
-        .map(SearchResult::id).toList();
+        .map(SearchHit::id).toList();
 
     // candidateFilter 적용 후 상위 10명 반환
     Set<Long> eligible = candidateFilterPort.filterEligible(me, ids);
 
     List<RecommendCandidateDTO> out = new ArrayList<>();
-    for (SearchResult h : hits) {
+    for (SearchHit h : hits) {
       if (eligible.contains(h.id())) {
         out.add(new RecommendCandidateDTO(h.id(), h.score()));
         if (out.size() == 10) {

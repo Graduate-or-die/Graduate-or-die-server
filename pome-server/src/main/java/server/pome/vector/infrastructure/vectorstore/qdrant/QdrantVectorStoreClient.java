@@ -11,9 +11,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import server.pome.vector.domain.Vector;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreClient;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreNamespace;
-import server.pome.vector.infrastructure.vectorstore.model.SearchResult;
 import server.pome.vector.infrastructure.vectorstore.qdrant.dto.QdrantPoint;
 import server.pome.vector.infrastructure.vectorstore.qdrant.dto.QdrantRetrieveResponse;
+import server.pome.vector.infrastructure.vectorstore.qdrant.dto.SearchHit;
 import server.pome.vector.infrastructure.vectorstore.qdrant.dto.SearchRequest;
 import server.pome.vector.infrastructure.vectorstore.qdrant.dto.SearchResponse;
 import server.pome.vector.infrastructure.vectorstore.qdrant.dto.UpsertRequest;
@@ -25,7 +25,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
 
   private final WebClient webClient;
   private final QdrantClientFactory factory;
-  @Value("{qdrant.timeout-ms}")
+  @Value("${qdrant.timeout-ms}")
   private final long timeoutMs;
 
   @Override
@@ -43,7 +43,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
   }
 
   @Override
-  public List<SearchResult> search(VectorStoreNamespace ns, List<Float> vector, int limit) {
+  public List<SearchHit> search(VectorStoreNamespace ns, List<Float> vector, int limit) {
     var request = new SearchRequest(vector, limit, false, false);
     SearchResponse response = webClient.post()
         .uri(factory.getBaseUrl() + "/collections/" + ns.collection() + "/points/search")
@@ -59,7 +59,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
     }
 
     return response.result().stream()
-        .map(h -> new SearchResult(h.id(), h.score()))
+        .map(h -> new SearchHit(h.id(), h.score()))
         .toList();
   }
 

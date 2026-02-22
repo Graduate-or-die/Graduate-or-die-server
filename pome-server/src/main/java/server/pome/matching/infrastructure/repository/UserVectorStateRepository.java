@@ -13,6 +13,11 @@ import server.pome.matching.domain.UserVectorState;
 public interface UserVectorStateRepository extends JpaRepository<UserVectorState, Long> {
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query("SELECT u FROM userVectorState u WHERE u.embeddingStatus =: status order by u.updatedAt asc")
+  @Query("""
+        SELECT u
+        FROM UserVectorState u
+        WHERE u.embeddingStatus = :status
+        ORDER BY u.updatedAt ASC
+      """)
   List<UserVectorState> findForUpdate(@Param("status") EmbeddingStatus status, Pageable pageable);
 }

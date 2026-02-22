@@ -10,15 +10,15 @@ import server.pome.vector.infrastructure.embedding.MockEmbeddingClient;
 @Configuration
 public class EmbeddingConfig {
 
-  @Bean
+  @Bean(name = "embeddingClient")
   @ConditionalOnProperty(name = "embedding.mock", havingValue = "true")
   public EmbeddingClient mockEmbeddingClient() {
     return new MockEmbeddingClient();
   }
 
-  @Bean
+  @Bean(name = "embeddingClient")
   @ConditionalOnProperty(name = "embedding.mock", havingValue = "false", matchIfMissing = true)
-  public EmbeddingClient httpEmbeddingClient(HttpEmbeddingClient client) {
+  public EmbeddingClient embeddingClient(HttpEmbeddingClient client) {
     return client;
   }
 }
