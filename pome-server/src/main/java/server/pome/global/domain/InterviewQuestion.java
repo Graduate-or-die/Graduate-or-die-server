@@ -18,7 +18,7 @@ public class InterviewQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, columnDefinition = "TEXT", length = 1000)
+    @Column(nullable = false,  unique = true, columnDefinition = "TEXT")
     @Comment("질문")
     private String questionText;
 

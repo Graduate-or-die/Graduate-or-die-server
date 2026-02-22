@@ -98,7 +98,7 @@ public enum BaseResponseStatus {
   INTERVIEW_BULK_INSERT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR, 2113, "면접 질문 Bulk Insert에 실패했습니다."),
 
   // 3000번대: 응답 오류
-  RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니1다."),
+  RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
 
   // 4000번대: 서버/DB 오류
   DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 4000, "데이터베이스 연결에 실패하였습니다."),
