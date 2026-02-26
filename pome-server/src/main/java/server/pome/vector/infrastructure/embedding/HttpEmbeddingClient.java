@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.util.retry.Retry;
 import server.pome.global.exception.BaseException;
 import server.pome.vector.infrastructure.embedding.dto.EmbeddingRequest;
 import server.pome.vector.infrastructure.embedding.dto.EmbeddingResponse;
 
+@Component
 @RequiredArgsConstructor
 public class HttpEmbeddingClient implements EmbeddingClient {
 

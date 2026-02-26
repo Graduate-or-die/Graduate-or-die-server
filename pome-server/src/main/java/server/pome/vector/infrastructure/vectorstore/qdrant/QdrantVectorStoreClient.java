@@ -26,7 +26,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
   private final WebClient webClient;
   private final QdrantClientFactory factory;
   @Value("${qdrant.timeout-ms}")
-  private final long timeoutMs;
+  private long timeoutMs;
 
   @Override
   public void upsert(VectorStoreNamespace ns, long pointId, List<Float> vector,

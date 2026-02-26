@@ -18,7 +18,7 @@ spring:
     open-in-view: false                                   # 권장
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
   jackson:
     deserialization:
@@ -68,7 +68,7 @@ embedding:
 vector-indexing:
   batch-size: 50
   max-concurrency: 1
-  fixed-deplay-ms: 3000
+  fixed-delay-ms: 10000
 
 cloud:
   aws:
@@ -99,4 +99,3 @@ springdoc:
     enabled: true
     path: /swagger-ui.html
   override-with-generic-response: false
-

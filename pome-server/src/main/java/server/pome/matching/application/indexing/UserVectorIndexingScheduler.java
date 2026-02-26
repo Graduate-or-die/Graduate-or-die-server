@@ -2,7 +2,6 @@ package server.pome.matching.application.indexing;
 
 import java.util.concurrent.Semaphore;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,10 +17,8 @@ public class UserVectorIndexingScheduler {
   private final UserVectorIndexingService indexingService;
   private final Semaphore semaphore;
 
-  @Value("${vector-indexing.max-concurrency:1}")
-  private int maxConcurrency;
-
-  @Scheduled(fixedDelayString = "${vector-indexing.fixed-delay-ms:3000")
+  @Transactional
+  @Scheduled(fixedDelayString = "${vector-indexing.fixed-delay-ms:3000}")
   public void run() {
     if (!semaphore.tryAcquire()) {
       return;
@@ -33,7 +30,6 @@ public class UserVectorIndexingScheduler {
     }
   }
 
-  @Transactional
   protected void doRun() {
     int batchSize = Integer.parseInt(System.getProperty("POME_VECTOR_BATCH", "50"));
 
