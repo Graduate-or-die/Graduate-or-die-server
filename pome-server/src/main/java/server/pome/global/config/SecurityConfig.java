@@ -28,6 +28,7 @@ public class SecurityConfig {
             .requestMatchers(
                     "/auth/login",
                     "/auth/login/**",
+                    "/auth/dev/**",
                     "/auth/reissue",
                     "/auth/logout",
                     "/swagger-ui/**",
