@@ -79,3 +79,8 @@ springdoc:
     path: /swagger-ui.html
   override-with-generic-response: false
 
+app:
+  frontend:
+    kakao-callback-url: http://localhost:3000/auth/callback
+  dev-auth:
+    enabled: ${DEV_AUTH_ENABLED:true}
