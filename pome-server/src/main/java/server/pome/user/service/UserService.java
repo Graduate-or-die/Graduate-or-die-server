@@ -54,7 +54,7 @@ public class UserService {
     if (Boolean.TRUE.equals(request.getRemoveProfileImage())) {
 
       if (user.getProfileImage() != null) {
-        awsS3Service.deleteFileByUrl(user.getProfileImage());
+        awsS3Service.deleteFile(user.getProfileImage());
       }
 
       user.updateProfileImage(null);
@@ -76,12 +76,12 @@ public class UserService {
       }
       MultipartFile file = files.get(0);
 
-      awsS3Service.deleteFileByUrl(user.getProfileImage());
+      awsS3Service.deleteFile(user.getProfileImage());
 
       UploadedFileInfo uploaded =
               awsS3Service.uploadFile(file, "profile");
 
-      user.updateProfileImage(uploaded.getFileUrl());
+      user.updateProfileImage(uploaded.getStoredKey());
     }
 
     return UpdateUserResponse.from(user);
