@@ -21,17 +21,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/portfolios/awards")
-@Tag(name = "Award", description = "포트폴리오_수상경력 API")
+@Tag(name = "Award", description = "포트폴리오 수상경력 API")
 public class AwardController {
 
     private final AwardService awardService;
 
-
     @Operation(summary = "수상경력 저장")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(Authentication authentication, @RequestPart("data") SaveAwardRequest request, @RequestPart(value = "file", required = false) List<MultipartFile>  files
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> saveAward(
+        Authentication authentication, @RequestPart("data") SaveAwardRequest request,
+        @RequestPart(value = "file", required = false) List<MultipartFile> files
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
@@ -42,9 +42,11 @@ public class AwardController {
     @Operation(summary = "수상경력 수정")
     @Parameter(name = "blockId", description = "수상경력 ID", required = true)
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(Authentication authentication, @RequestParam Long blockId, @RequestPart("data") UpdateAwardRequest request, @RequestPart(value = "file", required = false) List<MultipartFile>  files
+    public ResponseEntity<BaseResponse<SaveUpdateAwardResponse>> updateAward(
+        Authentication authentication, @RequestParam Long blockId,
+        @RequestPart("data") UpdateAwardRequest request,
+        @RequestPart(value = "file", required = false) List<MultipartFile> files
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         SaveUpdateAwardResponse result = awardService.updateAward(userId, blockId, request, files);

@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.attachment.service.AttachmentService;
 import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Portfolio;
@@ -33,7 +32,6 @@ public class QualificationService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
-    private final AttachmentRepository attachmentRepository;
     private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 자격증 저장
@@ -57,26 +55,18 @@ public class QualificationService {
         Qualification qualification = request.toEntity(portfolio);
         qualificationRepository.save(qualification);
 
-        if (files != null && !files.isEmpty()) {
-
-            if (files.size() > 1) {
-                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
-            }
-
-            MultipartFile file = files.get(0);
-
-            attachmentService.uploadFile(
-                    userId,
-                    TypeEnum.QUALIFICATIONS.getId(),
-                    qualification.getId(),
-                    file
-            );
-        }
+        attachmentService.uploadSingle(
+                userId,
+                qualification.getPortfolio().getId(),
+                TypeEnum.QUALIFICATIONS,
+                qualification.getId(),
+                files
+        );
 
         Optional<Attachment> attachment =
-                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                attachmentService.findByPortfolioAndTypeAndBlock(
                         qualification.getPortfolio().getId(),
-                        TypeEnum.QUALIFICATIONS.getId(),
+                        TypeEnum.QUALIFICATIONS,
                         qualification.getId()
                 );
 
@@ -114,32 +104,18 @@ public class QualificationService {
 
         qualification.updateQualification(qualificationName, qualificationOrganization, qualificationStartAt, qualificationEndAt, hasQualificationEndAt, score);
 
-        if (files != null && !files.isEmpty()) {
-
-            if (files.size() > 1) {
-                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
-            }
-
-            Optional<Attachment> existing =
-                    attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
-                            qualification.getPortfolio().getId(),
-                            TypeEnum.QUALIFICATIONS.getId(),
-                            qualificationId
-                    );
-
-            if (existing.isPresent()) {
-                throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
-            }
-
-            MultipartFile file = files.get(0);
-
-            attachmentService.uploadFile(userId, TypeEnum.QUALIFICATIONS.getId(), qualificationId, file);
-        }
+        attachmentService.uploadSingle(
+                userId,
+                qualification.getPortfolio().getId(),
+                TypeEnum.QUALIFICATIONS,
+                qualificationId,
+                files
+        );
 
         Optional<Attachment> attachment =
-                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                attachmentService.findByPortfolioAndTypeAndBlock(
                         qualification.getPortfolio().getId(),
-                        TypeEnum.QUALIFICATIONS.getId(),
+                        TypeEnum.QUALIFICATIONS,
                         qualification.getId()
                 );
 
@@ -153,11 +129,7 @@ public class QualificationService {
                 .findByIdAndPortfolio_User_Id(blockId, userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
 
-        attachmentService.deleteByBlock(
-                userId,
-                TypeEnum.QUALIFICATIONS.getId(),
-                blockId
-        );
+        attachmentService.deleteByBlock(userId, TypeEnum.QUALIFICATIONS, blockId);
 
         qualificationRepository.delete(qualification);
     }

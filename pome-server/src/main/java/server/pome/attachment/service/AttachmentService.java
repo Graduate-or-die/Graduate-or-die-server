@@ -1,19 +1,20 @@
 package server.pome.attachment.service;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import server.pome.attachment.dto.response.AttachmentResponse;
+import server.pome.attachment.dto.response.FileResponse;
 import server.pome.attachment.dto.response.UploadedFileInfo;
+import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
 import server.pome.portfolio.repository.PortfolioRepository;
-import server.pome.attachment.repository.AttachmentRepository;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,46 +23,51 @@ public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
     private final PortfolioRepository portfolioRepository;
-    private final AwsS3Service awsS3Service; // 리뉴얼된 S3 서비스
+    private final AwsS3Service awsS3Service;
 
-
-    // 조회 (클라이언트 응답용)
-    public AttachmentResponse getAttachment(
-            Long userId,
-            Long typeId,
-            Long blockId
-    ) {
-        Portfolio portfolio = findPortfolio(userId);
-
-        Attachment attachment = attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
-                        portfolio.getId(), typeId, blockId)
+    // 첨부 파일 조회
+    public FileResponse getAttachment(Long userId, Long typeId, Long blockId) {
+        return findAttachmentByUser(userId, typeId, blockId)
+                .map(FileResponse::from)
                 .orElse(null);
-
-        if (attachment == null) {
-            return null; // 파일 없는 경우 null 반환 가능
-        }
-
-        return AttachmentResponse.from(attachment);
     }
 
-    // 파일 첨부
-    public AttachmentResponse uploadFile(
+    public Optional<Attachment> findByPortfolioAndTypeAndBlock(Long portfolioId, TypeEnum type, Long blockId) {
+        return findAttachment(portfolioId, type.getId(), blockId);
+    }
+
+    // 파일 1개 업로드
+    public void uploadSingle(
             Long userId,
-            Long typeId,
+            Long portfolioId,
+            TypeEnum type,
             Long blockId,
-            MultipartFile file
+            List<MultipartFile> files
     ) {
-        Portfolio portfolio = findPortfolio(userId);
+        if (files == null || files.isEmpty()) {
+            return;
+        }
 
+        if (files.size() > 1) {
+            throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+        }
 
-        Optional<Attachment> existing = attachmentRepository
-                .findByPortfolio_IdAndTypeIdAndBlockId(portfolio.getId(), typeId, blockId);
-
-        if (existing.isPresent()) {
+        if (findByPortfolioAndTypeAndBlock(portfolioId, type, blockId).isPresent()) {
             throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
         }
 
-        // S3 업로드
+        uploadFile(userId, type.getId(), blockId, files.get(0));
+    }
+
+    // 파일 업로드
+    public FileResponse uploadFile(Long userId, Long typeId, Long blockId, MultipartFile file) {
+        Portfolio portfolio = findPortfolio(userId);
+
+        if (findAttachment(portfolio.getId(), typeId, blockId).isPresent()) {
+            throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
+        }
+
+        // 타입별 업로드 가능 여부 확인
         TypeEnum type = TypeEnum.fromId(typeId);
         if (type.getS3Dir() == null) {
             throw new BaseException(BaseResponseStatus.FILE_NOT_SUPPORTED_TYPE);
@@ -76,64 +82,51 @@ public class AttachmentService {
                 .typeId(typeId)
                 .blockId(blockId)
                 .originalFileName(file.getOriginalFilename())
-                .storedFileName(info.getStoredFileName())
-                .fileUrl(info.getFileUrl())
+                .S3ObjectKey(info.getStoredKey())
                 .build();
 
         attachmentRepository.save(attachment);
-
-        return AttachmentResponse.from(attachment);
+        return FileResponse.from(attachment);
     }
 
-
-    // 파일 삭제 (블록 유지)
-    public void deleteFile(
-            Long userId,
-            Long typeId,
-            Long blockId
-    ) {
-        Portfolio portfolio = findPortfolio(userId);
-
-        Attachment attachment = attachmentRepository
-                .findByPortfolio_IdAndTypeIdAndBlockId(portfolio.getId(), typeId, blockId)
+    // 파일 삭제
+    public void deleteFile(Long userId, Long typeId, Long blockId) {
+        Attachment attachment = findAttachmentByUser(userId, typeId, blockId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.FILE_NOT_FOUND));
 
-        // S3 삭제
-        awsS3Service.deleteFile(attachment.getStoredFileName());
-
-        // DB 삭제
-        attachmentRepository.delete(attachment);
+        deleteAttachment(attachment);
     }
 
-
-
-    // 블록 삭제 시 파일 삭제 + DB 제거
-    public void deleteByBlock(
-            Long userId,
-            Long typeId,
-            Long blockId
-    ) {
-        // Portfolio 조회 (권한/소유 검사)
-        Portfolio portfolio = findPortfolio(userId);
-
-        // Attachment가 있으면 삭제
-        Optional<Attachment> attachment = attachmentRepository
-                .findByPortfolio_IdAndTypeIdAndBlockId(portfolio.getId(), typeId, blockId);
-
-        attachment.ifPresent(att -> {
-            awsS3Service.deleteFile(att.getStoredFileName());
-            attachmentRepository.delete(att);
-        });
+    // 블록 삭제 시 첨부가 있으면 함께 삭제
+    public void deleteByBlock(Long userId, Long typeId, Long blockId) {
+        findAttachmentByUser(userId, typeId, blockId)
+                .ifPresent(this::deleteAttachment);
     }
 
-    // 유틸: 사용자 소유 포트폴리오 조회
+    public void deleteByBlock(Long userId, TypeEnum type, Long blockId) {
+        deleteByBlock(userId, type.getId(), blockId);
+    }
+
+    // 사용자의 포트폴리오 조회
     private Portfolio findPortfolio(Long userId) {
         Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
-
         if (portfolio == null) {
             throw new BaseException(BaseResponseStatus.PORTFOLIO_NOT_FOUND);
         }
-
         return portfolio;
+    }
+
+    private Optional<Attachment> findAttachmentByUser(Long userId, Long typeId, Long blockId) {
+        Portfolio portfolio = findPortfolio(userId);
+        return findAttachment(portfolio.getId(), typeId, blockId);
+    }
+
+    private Optional<Attachment> findAttachment(Long portfolioId, Long typeId, Long blockId) {
+        return attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(portfolioId, typeId, blockId);
+    }
+
+    private void deleteAttachment(Attachment attachment) {
+        awsS3Service.deleteFile(attachment.getS3ObjectKey());
+        attachmentRepository.delete(attachment);
     }
 }
