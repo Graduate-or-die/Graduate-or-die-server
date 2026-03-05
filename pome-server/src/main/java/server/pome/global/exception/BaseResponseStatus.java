@@ -95,6 +95,7 @@ public enum BaseResponseStatus {
   CSV_PARSE_ERROR(false, HttpStatus.BAD_REQUEST, 2111, "CSV 파싱 중 오류가 발생했습니다."),
   CSV_DATA_INVALID(false, HttpStatus.BAD_REQUEST, 2112, "CSV 데이터 형식이 올바르지 않습니다."),
   INTERVIEW_BULK_INSERT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR, 2113, "면접 질문 Bulk Insert에 실패했습니다."),
+  MATE_PORTFOLIO_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2114, "메이트 포트폴리오가 존재하지 않습니다."),
 
 
   // embedding
