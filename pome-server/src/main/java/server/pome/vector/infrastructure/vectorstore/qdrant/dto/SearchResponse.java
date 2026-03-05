@@ -1,0 +1,7 @@
+package server.pome.vector.infrastructure.vectorstore.qdrant.dto;
+
+import java.util.List;
+
+public record SearchResponse(
+    List<SearchHit> result
+) {}
