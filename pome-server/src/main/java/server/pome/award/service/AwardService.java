@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.attachment.service.AttachmentService;
 import server.pome.award.dto.request.SaveAwardRequest;
 import server.pome.award.dto.request.UpdateAwardRequest;
@@ -33,7 +32,6 @@ public class AwardService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
-    private final AttachmentRepository attachmentRepository;
     private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
     // 수상경력 저장
@@ -48,26 +46,18 @@ public class AwardService {
         Award award = request.toEntity(portfolio);
         awardRepository.save(award);
 
-        if (files != null && !files.isEmpty()) {
-
-            if (files.size() > 1) {
-                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
-            }
-
-            MultipartFile file = files.get(0);
-
-            attachmentService.uploadFile(
-                    userId,
-                    TypeEnum.AWARDS.getId(),
-                    award.getId(),
-                    file
-            );
-        }
+        attachmentService.uploadSingle(
+                userId,
+                award.getPortfolio().getId(),
+                TypeEnum.AWARDS,
+                award.getId(),
+                files
+        );
 
         Optional<Attachment> attachment =
-                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                attachmentService.findByPortfolioAndTypeAndBlock(
                         award.getPortfolio().getId(),
-                        TypeEnum.AWARDS.getId(),
+                        TypeEnum.AWARDS,
                         award.getId()
                 );
 
@@ -92,33 +82,19 @@ public class AwardService {
 
         award.updateAward(awardName, awardOrganization, awardAt, awardGrade);
 
-        if (files != null && !files.isEmpty()) {
-
-            if (files.size() > 1) {
-                throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
-            }
-
-            Optional<Attachment> existing =
-                    attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
-                            award.getPortfolio().getId(),
-                            TypeEnum.AWARDS.getId(),
-                            awardId
-                    );
-
-            if (existing.isPresent()) {
-                throw new BaseException(BaseResponseStatus.FILE_ALREADY_EXISTS);
-            }
-
-            MultipartFile file = files.get(0);
-
-            attachmentService.uploadFile(userId, TypeEnum.AWARDS.getId(), awardId, file);
-        }
+        attachmentService.uploadSingle(
+                userId,
+                award.getPortfolio().getId(),
+                TypeEnum.AWARDS,
+                awardId,
+                files
+        );
 
 
         Optional<Attachment> attachment =
-                attachmentRepository.findByPortfolio_IdAndTypeIdAndBlockId(
+                attachmentService.findByPortfolioAndTypeAndBlock(
                         award.getPortfolio().getId(),
-                        TypeEnum.AWARDS.getId(),
+                        TypeEnum.AWARDS,
                         award.getId()
                 );
 
@@ -132,11 +108,7 @@ public class AwardService {
                 .findByIdAndPortfolio_User_Id(blockId, userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
 
-        attachmentService.deleteByBlock(
-                userId,
-                TypeEnum.AWARDS.getId(),
-                blockId
-        );
+        attachmentService.deleteByBlock(userId, TypeEnum.AWARDS, blockId);
         awardRepository.delete(award);
     }
 }

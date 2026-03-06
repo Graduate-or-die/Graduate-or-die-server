@@ -8,9 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UploadedFileInfo {
 
-    @Schema(description = "S3 저장 파일명", example = "대회상장/00자격증")
-    private String storedFileName;
-
-    @Schema(description = "파일 URI", example = "https://s3.amazonaws.com/.../abc123.pdf")
-    private String fileUrl;
+    @Schema(description = "S3 객체 key", example = "portfolio/123/550e8400-e29b-41d4-a716-446655440000.pdf")
+    private String storedKey;
 }

@@ -28,12 +28,7 @@ public class Attachment extends BaseEntity {
     @Comment("원본 파일명")
     private String originalFileName;
 
-    @Column(nullable = false)
-    @Comment("S3 저장 파일명")
-    private String storedFileName;
-
-    @Column(nullable = false)
-    @Comment("파일 URI")
-    private String fileUrl;
-
+    @Column(name = "s3_object_key", nullable = false)
+    @Comment("S3 Key")
+    private String S3ObjectKey;
 }
