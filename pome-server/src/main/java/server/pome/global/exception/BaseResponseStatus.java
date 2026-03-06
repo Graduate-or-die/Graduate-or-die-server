@@ -92,6 +92,9 @@ public enum BaseResponseStatus {
   OAUTH_SERVER_ERROR(false, HttpStatus.BAD_GATEWAY, 2104, "카카오 서버 오류입니다. 잠시 후 다시 시도해주세요."),
   OAUTH_ALREADY_LINKED(false, HttpStatus.BAD_REQUEST, 2105, "이미 카카오 계정이 연동되어 있습니다."),
 
+  // embedding
+  INVALID_EMBEDDING_RESPONSE(false, HttpStatus.INTERNAL_SERVER_ERROR, 2120,
+      "유효하지 않은 임베딩 응답이 생성되었습니다."),
   // 3000번대: 응답 오류
   RESPONSE_ERROR(false, HttpStatus.BAD_REQUEST, 3000, "값을 불러오는데 실패하였습니다."),
 

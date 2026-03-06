@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.pome.global.domain.Mate;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.matching.application.UserMatchService;
 import server.pome.mate.dto.response.GetMateRequestResponse;
 import server.pome.mate.repository.MateRepository;
 import server.pome.message.service.MessageRoomService;
@@ -33,6 +34,7 @@ public class MateService {
   private final UserRepository userRepository;
   private final MateRepository mateRepository;
   private final MessageRoomService messageRoomService;
+  private final UserMatchService userMatchService;
 
   // 메이트 신청자 리스트 조회
   @Transactional(readOnly = true)
@@ -144,6 +146,9 @@ public class MateService {
       throw new BaseException(CONFLICT_STATE);
     }
 
+    // 확정 매칭 기록
+    userMatchService.recordMatch(userId, mateId);
+
     // 채팅방 생성
     messageRoomService.getOrCreateMessageRoom(userId, mateId);
 
@@ -175,6 +180,8 @@ public class MateService {
     if (updated == 0) {
       throw new BaseException(CONFLICT_STATE);
     }
+
+    userMatchService.removeMatch(userId, mateId);
 
     // TODO: 채팅방, 코멘트, 채팅, 메시지 삭제
 
