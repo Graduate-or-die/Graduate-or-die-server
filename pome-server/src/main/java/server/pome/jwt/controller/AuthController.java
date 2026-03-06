@@ -3,10 +3,13 @@ package server.pome.jwt.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import server.pome.global.domain.BaseResponse;
 import server.pome.jwt.dto.request.KakaoLoginRequest;
 import server.pome.jwt.dto.response.LoginTokensResponse;
@@ -21,31 +24,22 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 카카오 로그인
+    @Value("${app.frontend.kakao-callback-url:http://localhost:3000/auth/callback}")
+    private String kakaoFrontendCallbackUrl;
+
     @Operation(summary = "카카오 로그인", description = "카카오가 직접 리다이렉트 하는 용도")
     @GetMapping("/login")
-    public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoLoginCallback(
+    public ResponseEntity<Void> kakaoLoginCallback(
             @RequestParam("code") String code
     ) {
-        LoginTokensResponse tokens = authService.loginWithKakaoCode(code);
+        String redirectUrl = UriComponentsBuilder.fromUriString(kakaoFrontendCallbackUrl)
+                .queryParam("code", code)
+                .build()
+                .toUriString();
 
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .path("/")
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(java.net.URI.create(redirectUrl))
                 .build();
-
-        UserLoginResponse body = UserLoginResponse.builder()
-                .userId(tokens.getUserId())
-                .userName(tokens.getUserName())
-                .nickName(tokens.getNickName())
-                .accessToken(tokens.getAccessToken())
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(BaseResponse.success(body));
     }
 
     // 카카오 로그인
@@ -75,7 +69,6 @@ public class AuthController {
                 .body(BaseResponse.success(body));
     }
 
-    // refreshToken으로 accessToken 재발급
     @Operation(summary = "refreshToken으로 accessToken 재발급")
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<TokenReissueResponse>> reissue(
@@ -95,7 +88,6 @@ public class AuthController {
                 .body(BaseResponse.success(result));
     }
 
-    // 로그아웃
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<TokenReissueResponse>> logout(
