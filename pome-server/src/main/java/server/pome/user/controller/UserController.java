@@ -14,7 +14,6 @@ import server.pome.global.domain.BaseResponse;
 import server.pome.global.domain.User;
 import server.pome.like.dto.response.LikeResponse;
 import server.pome.like.service.LikeService;
-import server.pome.qualification.dto.request.SaveQualificationRequest;
 import server.pome.user.dto.request.UpdateUserRequest;
 import server.pome.user.dto.response.GetUserResponse;
 import server.pome.user.dto.response.UpdateUserResponse;
