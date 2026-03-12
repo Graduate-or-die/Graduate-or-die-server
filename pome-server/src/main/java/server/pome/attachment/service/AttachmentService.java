@@ -89,6 +89,28 @@ public class AttachmentService {
         return FileResponse.from(attachment);
     }
 
+    // 파일 교체
+    public void replaceSingle(
+        Long userId,
+        Long portfolioId,
+        TypeEnum type,
+        Long blockId,
+        List<MultipartFile> files
+    ) {
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+
+        if (files.size() > 1) {
+            throw new BaseException(BaseResponseStatus.FILE_LIMIT_EXCEEDED);
+        }
+
+        findByPortfolioAndTypeAndBlock(portfolioId, type, blockId)
+            .ifPresent(this::deleteAttachment);
+
+        uploadFile(userId, type.getId(), blockId, files.get(0));
+    }
+
     // 파일 삭제
     public void deleteFile(Long userId, Long typeId, Long blockId) {
         Attachment attachment = findAttachmentByUser(userId, typeId, blockId)

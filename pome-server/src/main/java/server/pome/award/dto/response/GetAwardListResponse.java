@@ -3,12 +3,14 @@ package server.pome.award.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.Optional;
-
 import server.pome.attachment.dto.response.FileResponse;
 import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Award;
 
 public record GetAwardListResponse(
+  @Schema(description = "수상경력 블록 ID", example = "1")
+  Long blockId,
+
   @Schema(description = "대회명", example = "빨리먹기대회")
   String awardName,
 
@@ -18,26 +20,25 @@ public record GetAwardListResponse(
   @Schema(description = "수상일자", example = "2025-09-01")
   LocalDate awardAt,
 
-  @Schema(description = "시상등급", example = "대상")
+  @Schema(description = "수상등급", example = "대상")
   String awardGrade,
 
   @Schema(description = "파일")
   FileResponse file
-
 ) {
 
   public static GetAwardListResponse from(Award award, Optional<Attachment> attachment) {
-
     FileResponse file = attachment
-            .map(FileResponse::from)
-            .orElse(null);
+        .map(FileResponse::from)
+        .orElse(null);
 
     return new GetAwardListResponse(
+        award.getId(),
         award.getAwardName(),
         award.getAwardOrganization(),
         award.getAwardAt(),
         award.getAwardGrade(),
-            file
+        file
     );
   }
 }

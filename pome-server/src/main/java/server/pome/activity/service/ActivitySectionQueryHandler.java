@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import server.pome.activity.dto.response.ActivitySectionResponse;
 import server.pome.activity.dto.response.GetActivityListResponse;
 import server.pome.activity.repository.ActivityRepository;
+import server.pome.attachment.service.AttachmentService;
 import server.pome.global.enums.TypeEnum;
 import server.pome.portfolio.service.PortfolioSectionQueryHandler;
 
@@ -13,6 +14,7 @@ import server.pome.portfolio.service.PortfolioSectionQueryHandler;
 public class ActivitySectionQueryHandler implements PortfolioSectionQueryHandler {
 
   private final ActivityRepository activityRepository;
+  private final AttachmentService attachmentService;
 
   @Override
   public TypeEnum supports() {
@@ -23,7 +25,15 @@ public class ActivitySectionQueryHandler implements PortfolioSectionQueryHandler
   public Object query(Long portfolioId, Long userId) {
     var items = activityRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(GetActivityListResponse::from)
+        .map(activity -> {
+          var attachment = attachmentService.findByPortfolioAndTypeAndBlock(
+              portfolioId,
+              TypeEnum.ACTIVITIES,
+              activity.getId()
+          );
+
+          return GetActivityListResponse.from(activity, attachment);
+        })
         .toList();
 
     return new ActivitySectionResponse(items);

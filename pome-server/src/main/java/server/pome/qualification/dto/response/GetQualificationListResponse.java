@@ -8,6 +8,9 @@ import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Qualification;
 
 public record GetQualificationListResponse(
+  @Schema(description = "자격증 블록 ID", example = "1")
+  Long blockId,
+
   @Schema(description = "자격증명", example = "정보처리기사")
   String qualificationName,
 
@@ -31,20 +34,23 @@ public record GetQualificationListResponse(
 
 ) {
 
-  public static GetQualificationListResponse from(Qualification qualification, Optional<Attachment> attachment) {
-
+  public static GetQualificationListResponse from(
+      Qualification qualification,
+      Optional<Attachment> attachment
+  ) {
     FileResponse file = attachment
-            .map(FileResponse::from)
-            .orElse(null);
+        .map(FileResponse::from)
+        .orElse(null);
 
     return new GetQualificationListResponse(
+        qualification.getId(),
         qualification.getQualificationName(),
         qualification.getQualificationOrganization(),
         qualification.getQualificationStartAt(),
         qualification.getQualificationEndAt(),
         qualification.isHasQualificationEndAt(),
         qualification.getScore(),
-            file
+        file
     );
   }
 }
