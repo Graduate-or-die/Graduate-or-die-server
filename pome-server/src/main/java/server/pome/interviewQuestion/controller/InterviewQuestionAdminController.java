@@ -31,7 +31,7 @@ public class InterviewQuestionAdminController {
     }
 
     @PostMapping("/embedding")
-    public ResponseEntity<String> generateEmbedding() {
+    public ResponseEntity<BaseResponse<String>> generateEmbedding() {
 
         interviewEmbeddingService.generateAndUpload();
 
