@@ -2,9 +2,15 @@ package server.pome.project.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import java.util.Optional;
+import server.pome.attachment.dto.response.FileResponse;
+import server.pome.global.domain.Attachment;
 import server.pome.global.domain.Project;
 
 public record GetProjectListResponse(
+  @Schema(description = "프로젝트 블록 ID", example = "1")
+  Long blockId,
+
   @Schema(description = "프로젝트명", example = "졸업프로젝트")
   String projectName,
 
@@ -21,17 +27,26 @@ public record GetProjectListResponse(
   String projectDescription,
 
   @Schema(description = "프로젝트 성과", example = "졸업가능상태")
-  String projectAward
+  String projectAward,
+
+  @Schema(description = "파일")
+  FileResponse file
 ) {
 
-  public static GetProjectListResponse from(Project project) {
+  public static GetProjectListResponse from(Project project, Optional<Attachment> attachment) {
+    FileResponse file = attachment
+        .map(FileResponse::from)
+        .orElse(null);
+
     return new GetProjectListResponse(
+        project.getId(),
         project.getProjectName(),
         project.getProjectStartAt(),
         project.getProjectEndAt(),
         project.getProjectRole(),
         project.getProjectDescription(),
-        project.getProjectAward()
+        project.getProjectAward(),
+        file
     );
   }
 }

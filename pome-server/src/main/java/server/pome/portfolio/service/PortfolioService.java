@@ -244,11 +244,11 @@ public class PortfolioService {
         }
 
         switch (TypeEnum.fromId(typeId)) {
-            case EXPERIENCES -> experienceService.delete(blockId, userId);
+            case EXPERIENCES -> experienceService.deleteExperience(blockId, userId);
             case ACTIVITIES -> activityService.delete(blockId, userId);
-            case AWARDS -> awardService.delete(blockId, userId);
-            case QUALIFICATIONS -> qualificationService.delete(blockId, userId);
-            case PROJECTS -> projectService.delete(blockId, userId);
+            case AWARDS -> awardService.deleteAward(blockId, userId);
+            case QUALIFICATIONS -> qualificationService.deleteQualification(blockId, userId);
+            case PROJECTS -> projectService.deleteProject(blockId, userId);
             default -> throw new BaseException(INVALID_TYPE_ENUM);
         }
 
@@ -264,11 +264,11 @@ public class PortfolioService {
 
         for (Long blockId : blockIds) {
             switch (type) {
-                case EXPERIENCES -> experienceService.delete(blockId, userId);
+                case EXPERIENCES -> experienceService.deleteExperience(blockId, userId);
                 case ACTIVITIES -> activityService.delete(blockId, userId);
-                case AWARDS -> awardService.delete(blockId, userId);
-                case QUALIFICATIONS -> qualificationService.delete(blockId, userId);
-                case PROJECTS -> projectService.delete(blockId, userId);
+                case AWARDS -> awardService.deleteAward(blockId, userId);
+                case QUALIFICATIONS -> qualificationService.deleteQualification(blockId, userId);
+                case PROJECTS -> projectService.deleteProject(blockId, userId);
                 default -> throw new BaseException(INVALID_TYPE_ENUM);
             }
         }

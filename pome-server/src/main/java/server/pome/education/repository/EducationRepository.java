@@ -9,7 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface EducationRepository extends JpaRepository<Education, Long> {
-    Optional<Education> findByPortfolio(Portfolio portfolio);
+  Optional<Education> findByPortfolio(Portfolio portfolio);
 
-    Optional<Education> findAllByPortfolio_Id(Long portfolioId);
+  Optional<Education> findAllByPortfolio_Id(Long portfolioId);
+
+  Optional<Education> findByIdAndPortfolio_User_Id(Long educationId, Long userId);
 }
