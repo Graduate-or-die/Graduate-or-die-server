@@ -22,7 +22,6 @@ public class PortfolioCanonicalService {
     private final QualificationRepository qualificationRepository;
     private final ExperienceRepository experienceRepository;
     private final ProjectRepository projectRepository;
-    private final EtcRepository etcRepository;
 
     public String build(Long portfolioId) {
 
@@ -72,15 +71,10 @@ public class PortfolioCanonicalService {
         projectRepository.findAllByPortfolio_Id(portfolioId)
                 .forEach(p -> joiner.add(
                         "PROJECT: " +
-                                safe(p.getProjectName())
+                                safe(p.getProjectName()) + " " +
+                                safe(p.getProjectRole())
                 ));
 
-        // ETC
-//        etcRepository.findAllByPortfolio_Id(portfolioId)
-//                .forEach(e -> joiner.add(
-//                        "ETC: " +
-//                                safe(e.getMemo())
-//                ));
 
         return joiner.toString();
     }

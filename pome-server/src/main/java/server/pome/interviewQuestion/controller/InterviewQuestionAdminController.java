@@ -30,11 +30,12 @@ public class InterviewQuestionAdminController {
         );
     }
 
+    @Operation(summary = "면접 질문 임베딩 생성 및 Qdrant 업로드")
     @PostMapping("/embedding")
     public ResponseEntity<String> generateEmbedding() {
 
         interviewEmbeddingService.generateAndUpload();
 
-        return ResponseEntity.ok("Interview question embeddings uploaded");
+        return ResponseEntity.ok("면접 질문 임베딩 업로드");
     }
 }

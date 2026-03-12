@@ -35,9 +35,9 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/error",
                     "/favicon.ico",
-                    "/health/check",
-                    "/admin/interview-questions/**"
+                    "/health/check"
             ).permitAll()
+            .requestMatchers("/admin/**").authenticated()
             .anyRequest().authenticated()
     );
 
