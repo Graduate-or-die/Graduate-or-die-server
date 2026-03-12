@@ -11,8 +11,10 @@ import java.util.Optional;
 @Repository
 public interface EtcRepository extends JpaRepository<Etc, Long> {
 
-    Optional<Etc> findByPortfolio(Portfolio portfolio);
+  Optional<Etc> findByPortfolio(Portfolio portfolio);
 
-    @EntityGraph(attributePaths = {"link"})
-    Optional<Etc> findAllByPortfolio_Id(Long portfolioId);
+  @EntityGraph(attributePaths = {"link"})
+  Optional<Etc> findAllByPortfolio_Id(Long portfolioId);
+
+  Optional<Etc> findByIdAndPortfolio_User_Id(Long etcId, Long userId);
 }

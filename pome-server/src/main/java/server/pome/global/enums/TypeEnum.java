@@ -9,15 +9,14 @@ import java.util.Map;
 
 @Getter
 @AllArgsConstructor
-
 public enum TypeEnum {
-    EDUCATIONS(1L, null),
-    EXPERIENCES(2L, null),
-    ACTIVITIES(3L, null),
+    EDUCATIONS(1L, "educations"),
+    EXPERIENCES(2L, "experiences"),
+    ACTIVITIES(3L, "activities"),
     AWARDS(4L, "awards"),
     QUALIFICATIONS(5L, "qualifications"),
-    PROJECTS(6L, null),
-    ETCS(7L, null);
+    PROJECTS(6L, "projects"),
+    ETCS(7L, "etcs");
 
     private final Long id;
     private final String s3Dir;
