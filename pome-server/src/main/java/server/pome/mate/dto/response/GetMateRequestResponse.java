@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import server.pome.file.FileDownloadUrls;
+import server.pome.global.domain.Mate;
+import server.pome.global.domain.User;
 
 @Getter
 @Builder
@@ -20,11 +23,22 @@ public class GetMateRequestResponse {
   @Schema(description = "메이트 신청자 닉네임", example = "구준회", requiredMode = RequiredMode.REQUIRED)
   private String mateNickname;
 
-  public static GetMateRequestResponse from(Long mateId, String mateNickname) {
+  @Schema(description = "메이트 신청자 프로필 URL", example = "/files/profile", requiredMode = RequiredMode.NOT_REQUIRED)
+  private String mateProfileImage;
 
+  public static GetMateRequestResponse from(Mate mate) {
+    User mateUser = mate.getFromUser();
     return GetMateRequestResponse.builder()
-        .mateId(mateId)
-        .mateNickname(mateNickname)
-        .build();
+            .mateId(mateUser.getId())
+            .mateNickname(mateUser.getNickName())
+            .mateProfileImage(buildProfileImageUrl(mateUser))
+            .build();
+  }
+
+  private static String buildProfileImageUrl(User user) {
+    if (user.getProfileImage() == null || user.getProfileImage().isBlank()) {
+      return null;
+    }
+    return FileDownloadUrls.profileImage();
   }
 }

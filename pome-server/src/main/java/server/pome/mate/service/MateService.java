@@ -46,15 +46,9 @@ public class MateService {
 
     // 신청자의 아이디, 닉네임을 추출하여 응답 리스트에 저장
     List<GetMateRequestResponse> responseList = new ArrayList<>();
+
     for (Mate mate : mateRequestList) {
-      User mateUser = mate.getFromUser();
-      responseList.add(
-          GetMateRequestResponse.from(
-              mateUser.getId(),
-              mateUser.getNickName()
-              // TODO: mateUser.getProfileImage()
-          )
-      );
+      responseList.add(GetMateRequestResponse.from(mate));
     }
 
     return responseList;
