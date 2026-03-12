@@ -30,7 +30,7 @@ public class InterviewEmbeddingService {
 
             String canonical = CanonicalTextBuilder.build(q);
 
-            List<Float> vector = embeddingClient.embed(canonical);
+            Vector vector = embeddingClient.embed(canonical);
 
             Map<String, Object> payload = new HashMap<>();
             payload.put("topic", q.getTopic());
