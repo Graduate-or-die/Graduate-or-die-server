@@ -35,6 +35,6 @@ public class InterviewQuestionAdminController {
 
         interviewEmbeddingService.generateAndUpload();
 
-        return ResponseEntity.ok("Interview question embeddings uploaded");
+        return ResponseEntity.ok(BaseResponse.success("Interview question embeddings uploaded"));
     }
 }
