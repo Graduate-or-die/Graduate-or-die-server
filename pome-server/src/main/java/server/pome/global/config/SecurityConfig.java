@@ -37,7 +37,6 @@ public class SecurityConfig {
                     "/favicon.ico",
                     "/health/check"
             ).permitAll()
-            .requestMatchers("/admin/**").authenticated()
             .anyRequest().authenticated()
     );
 

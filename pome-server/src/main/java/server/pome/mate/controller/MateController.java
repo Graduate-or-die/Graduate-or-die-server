@@ -16,6 +16,7 @@ import server.pome.mate.dto.response.GetMateRequestResponse;
 import server.pome.mate.service.MateQueryService;
 import server.pome.mate.service.MateService;
 import server.pome.portfolio.dto.response.GetPortfolioResponse;
+import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.user.dto.response.GetUserResponse;
 
 @RequiredArgsConstructor
@@ -79,16 +80,14 @@ public class MateController {
     }
 
     @Operation(summary = "메이트 해제")
-    @Parameter(name = "mateId", description = "해제 대상 유저 ID", required = true)
-    @PatchMapping("/{mateId}")
+    @DeleteMapping
     public ResponseEntity<BaseResponse<String>> unmatchMate(
-            @PathVariable Long mateId,
             Authentication authentication
     ) {
 
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
-        return ResponseEntity.ok(BaseResponse.success(mateService.unmatchMate(mateId, userId)));
+        return ResponseEntity.ok(BaseResponse.success(mateService.unmatchMate(userId)));
     }
 
     @Operation(summary = "메이트 프로필 조회")
@@ -119,5 +118,21 @@ public class MateController {
 
         Object result = mateQueryService.getMatePortfolio(userId, typeId);
         return ResponseEntity.ok(BaseResponse.success(result));
+    }
+
+    @Operation(summary = "메이트 포트폴리오 공개범위 여부 리스트 조회")
+    @Parameter(name = "limit", description = "미리보기 개수 (최대 3개)", required = false)
+    @GetMapping("/visibility")
+    public ResponseEntity<BaseResponse<PreviewResponse>> getVisibilityAndPreview(
+            Authentication authentication,
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) List<Long> typeIds
+    ) {
+
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
+
+        PreviewResponse response = mateQueryService.getVisibilityAndPreview(userId, limit, typeIds);
+        return ResponseEntity.ok(BaseResponse.success(response));
     }
 }

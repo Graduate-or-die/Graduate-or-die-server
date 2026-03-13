@@ -151,9 +151,11 @@ public class MateService {
 
   // 메이트 해제
   @Transactional
-  public String unmatchMate(Long mateId, Long userId) {
-    // 본인에게 메이트 API 호출 금지
-    ensureNoSelfMate(mateId, userId);
+  public String unmatchMate(Long userId) {
+
+    Long mateId = mateRepository
+            .findMateIdByUserIdAndStatus(userId, ACCEPTED)
+            .orElseThrow(() -> new BaseException(NOT_MATCHED_MATE));
 
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0];
