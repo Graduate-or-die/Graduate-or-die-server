@@ -49,8 +49,8 @@ public class PortfolioService {
     private final QualificationService qualificationService;
     private final ProjectService projectService;
 
-    private static final long START_TYPE = 1L;
-    private static final long END_TYPE = 7L;
+    public static final long START_TYPE = 1L;
+    public static final long END_TYPE = 7L;
 
     @PostConstruct
     void initHandlerMap() {

@@ -46,15 +46,9 @@ public class MateService {
 
     // 신청자의 아이디, 닉네임을 추출하여 응답 리스트에 저장
     List<GetMateRequestResponse> responseList = new ArrayList<>();
+
     for (Mate mate : mateRequestList) {
-      User mateUser = mate.getFromUser();
-      responseList.add(
-          GetMateRequestResponse.from(
-              mateUser.getId(),
-              mateUser.getNickName()
-              // TODO: mateUser.getProfileImage()
-          )
-      );
+      responseList.add(GetMateRequestResponse.from(mate));
     }
 
     return responseList;
@@ -157,9 +151,11 @@ public class MateService {
 
   // 메이트 해제
   @Transactional
-  public String unmatchMate(Long mateId, Long userId) {
-    // 본인에게 메이트 API 호출 금지
-    ensureNoSelfMate(mateId, userId);
+  public String unmatchMate(Long userId) {
+
+    Long mateId = mateRepository
+            .findMateIdByUserIdAndStatus(userId, ACCEPTED)
+            .orElseThrow(() -> new BaseException(NOT_MATCHED_MATE));
 
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0];
