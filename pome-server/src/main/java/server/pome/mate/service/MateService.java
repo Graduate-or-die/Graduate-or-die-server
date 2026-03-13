@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.pome.global.domain.Mate;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.matching.application.UserMatchService;
 import server.pome.mate.dto.response.GetMateRequestResponse;
 import server.pome.mate.repository.MateRepository;
 import server.pome.message.service.MessageRoomService;
@@ -33,6 +34,7 @@ public class MateService {
   private final UserRepository userRepository;
   private final MateRepository mateRepository;
   private final MessageRoomService messageRoomService;
+  private final UserMatchService userMatchService;
 
   // 메이트 신청자 리스트 조회
   @Transactional(readOnly = true)
@@ -44,15 +46,9 @@ public class MateService {
 
     // 신청자의 아이디, 닉네임을 추출하여 응답 리스트에 저장
     List<GetMateRequestResponse> responseList = new ArrayList<>();
+
     for (Mate mate : mateRequestList) {
-      User mateUser = mate.getFromUser();
-      responseList.add(
-          GetMateRequestResponse.from(
-              mateUser.getId(),
-              mateUser.getNickName()
-              // TODO: mateUser.getProfileImage()
-          )
-      );
+      responseList.add(GetMateRequestResponse.from(mate));
     }
 
     return responseList;
@@ -144,6 +140,9 @@ public class MateService {
       throw new BaseException(CONFLICT_STATE);
     }
 
+    // 확정 매칭 기록
+    userMatchService.recordMatch(userId, mateId);
+
     // 채팅방 생성
     messageRoomService.getOrCreateMessageRoom(userId, mateId);
 
@@ -152,9 +151,11 @@ public class MateService {
 
   // 메이트 해제
   @Transactional
-  public String unmatchMate(Long mateId, Long userId) {
-    // 본인에게 메이트 API 호출 금지
-    ensureNoSelfMate(mateId, userId);
+  public String unmatchMate(Long userId) {
+
+    Long mateId = mateRepository
+            .findMateIdByUserIdAndStatus(userId, ACCEPTED)
+            .orElseThrow(() -> new BaseException(NOT_MATCHED_MATE));
 
     User[] pair = lockPair(mateId, userId);
     User mateUser = pair[0];
@@ -175,6 +176,8 @@ public class MateService {
     if (updated == 0) {
       throw new BaseException(CONFLICT_STATE);
     }
+
+    userMatchService.removeMatch(userId, mateId);
 
     // TODO: 채팅방, 코멘트, 채팅, 메시지 삭제
 
