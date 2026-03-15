@@ -25,12 +25,17 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
 
   private final WebClient webClient;
   private final QdrantClientFactory factory;
+
   @Value("${qdrant.timeout-ms}")
   private long timeoutMs;
 
   @Override
-  public void upsert(VectorStoreNamespace ns, long pointId, List<Float> vector,
-      Map<String, Object> payload) {
+  public void upsert(
+      VectorStoreNamespace ns,
+      long pointId,
+      List<Float> vector,
+      Map<String, Object> payload
+  ) {
     var request = new UpsertRequest(List.of(new QdrantPoint(pointId, vector, payload)));
     webClient.put()
         .uri(factory.getBaseUrl() + "/collections/" + ns.collection() + "/points?wait=true")
@@ -59,7 +64,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
     }
 
     return response.result().stream()
-        .map(h -> new SearchHit(h.id(), h.score()))
+        .map(hit -> new SearchHit(hit.id(), hit.score()))
         .toList();
   }
 
@@ -71,12 +76,13 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
         "with_payload", false
     );
 
-    // Qdrant retrieve API 호출
     QdrantRetrieveResponse response = webClient.post()
-        .uri("/collections/{collection}/points/retrieve", ns.collection())
+        .uri(factory.getBaseUrl() + "/collections/" + ns.collection() + "/points")
+        .header("api-key", factory.getApiKey())
         .bodyValue(body)
         .retrieve()
         .bodyToMono(QdrantRetrieveResponse.class)
+        .timeout(Duration.ofMillis(timeoutMs))
         .block();
 
     if (response == null || response.result() == null || response.result().isEmpty()) {
@@ -84,9 +90,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
     }
 
     List<Float> vector = response.result().get(0).vector();
-
     new Vector(vector).validateDimension(ns);
-
     return Optional.of(vector);
   }
 }
