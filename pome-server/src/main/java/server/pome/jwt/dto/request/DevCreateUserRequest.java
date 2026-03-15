@@ -1,6 +1,7 @@
 package server.pome.jwt.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +20,7 @@ public class DevCreateUserRequest {
 
     @Schema(description = "매칭 활성화 여부(미입력 시 true)", example = "true")
     private Boolean matching;
+
+    @Schema(description = "태그 목록(미입력 시 임의 태그 생성)")
+    private List<String> tags;
 }
