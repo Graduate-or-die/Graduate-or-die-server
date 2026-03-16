@@ -1,6 +1,7 @@
 package server.pome.jwt.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +27,9 @@ public class DevCreateUserResponse {
 
     @Schema(description = "내부 테스트용 kakaoId", example = "123456789012345")
     private Long kakaoId;
+
+    @Schema(description = "태그 목록")
+    private List<String> tags;
 
     @Schema(description = "생성 직후 발급된 access token(JWT)")
     private String accessToken;
