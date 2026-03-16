@@ -61,19 +61,8 @@ public class InterviewQuestionAdminController {
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        StringBuilder portfolioBuilder = new StringBuilder();
-
-        for (long typeId = 1; typeId <= 6; typeId++) {
-
-            Object section =
-                    mateQueryService.getMatePortfolio(userId, typeId);
-
-            if (section != null) {
-                portfolioBuilder.append(section.toString()).append("\n");
-            }
-        }
-
-        String portfolio = portfolioBuilder.toString();
+        String portfolio =
+                interviewSearchService.buildPortfolio(userId);
 
         List<String> similarQuestions =
                 interviewSearchService.findSimilarQuestions(portfolio);
