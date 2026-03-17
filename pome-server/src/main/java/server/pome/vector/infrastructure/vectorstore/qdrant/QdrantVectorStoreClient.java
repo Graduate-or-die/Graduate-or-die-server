@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import server.pome.vector.domain.Vector;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreClient;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreNamespace;
@@ -21,23 +24,41 @@ import server.pome.vector.infrastructure.vectorstore.qdrant.dto.UpsertResponse;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class QdrantVectorStoreClient implements VectorStoreClient {
 
   private final WebClient webClient;
   private final QdrantClientFactory factory;
+
   @Value("${qdrant.timeout-ms}")
   private long timeoutMs;
 
   @Override
-  public void upsert(VectorStoreNamespace ns, long pointId, List<Float> vector,
-      Map<String, Object> payload) {
+  public void upsert(
+      VectorStoreNamespace ns,
+      long pointId,
+      List<Float> vector,
+      Map<String, Object> payload
+  ) {
     var request = new UpsertRequest(List.of(new QdrantPoint(pointId, vector, payload)));
     webClient.put()
         .uri(factory.getBaseUrl() + "/collections/" + ns.collection() + "/points?wait=true")
         .header("api-key", factory.getApiKey())
         .bodyValue(request)
-        .retrieve()
-        .bodyToMono(UpsertResponse.class)
+        .exchangeToMono(clientResponse -> {
+          HttpStatusCode status = clientResponse.statusCode();
+          if (status.is2xxSuccessful()) {
+            return clientResponse.bodyToMono(UpsertResponse.class);
+          }
+
+          return clientResponse.bodyToMono(String.class)
+              .defaultIfEmpty("")
+              .flatMap(body -> {
+                log.error("Qdrant upsert failed. status={}, namespace={}, pointId={}, body={}",
+                    status.value(), ns, pointId, body);
+                return clientResponse.createException().flatMap(Mono::error);
+              });
+        })
         .timeout(Duration.ofMillis(timeoutMs))
         .block();
   }
@@ -59,7 +80,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
     }
 
     return response.result().stream()
-        .map(h -> new SearchHit(h.id(), h.score()))
+        .map(hit -> new SearchHit(hit.id(), hit.score()))
         .toList();
   }
 
@@ -71,12 +92,13 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
         "with_payload", false
     );
 
-    // Qdrant retrieve API 호출
     QdrantRetrieveResponse response = webClient.post()
-        .uri("/collections/{collection}/points/retrieve", ns.collection())
+        .uri(factory.getBaseUrl() + "/collections/" + ns.collection() + "/points")
+        .header("api-key", factory.getApiKey())
         .bodyValue(body)
         .retrieve()
         .bodyToMono(QdrantRetrieveResponse.class)
+        .timeout(Duration.ofMillis(timeoutMs))
         .block();
 
     if (response == null || response.result() == null || response.result().isEmpty()) {
@@ -84,9 +106,7 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
     }
 
     List<Float> vector = response.result().get(0).vector();
-
     new Vector(vector).validateDimension(ns);
-
     return Optional.of(vector);
   }
 }
