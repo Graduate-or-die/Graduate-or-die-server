@@ -26,7 +26,7 @@ public class HttpEmbeddingClient implements EmbeddingClient {
   private String baseUrl;
   @Value("${embedding.vector-size}")
   private int vectorSize;
-  @Value("${embedding.timeout-ms:2000}")
+  @Value("${embedding.timeout-ms:500000}")
   private long timeoutMs;
   @Value("${embedding.retry.max-attempts:2}")
   private int maxAttempts;
