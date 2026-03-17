@@ -99,8 +99,8 @@ jobs:
             docker compose pull app; \
             docker compose up -d app; \
             echo '[DEPLOY] waiting for health...'; \
-            for i in \$(seq 1 60); do \
-              if curl -fsS --max-time 10 http://127.0.0.1/health/check >/dev/null; then \
+            for i in \$(seq 1 30); do \
+              if curl -fsS --max-time 2 http://127.0.0.1/health/check >/dev/null; then \
                 echo '[DEPLOY] health ok'; \
                 exit 0; \
               fi; \
