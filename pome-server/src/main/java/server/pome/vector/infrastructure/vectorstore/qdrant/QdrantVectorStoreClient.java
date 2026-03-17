@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import server.pome.vector.domain.Vector;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreClient;
 import server.pome.vector.infrastructure.vectorstore.VectorStoreNamespace;
@@ -21,6 +24,7 @@ import server.pome.vector.infrastructure.vectorstore.qdrant.dto.UpsertResponse;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class QdrantVectorStoreClient implements VectorStoreClient {
 
   private final WebClient webClient;
@@ -41,8 +45,20 @@ public class QdrantVectorStoreClient implements VectorStoreClient {
         .uri(factory.getBaseUrl() + "/collections/" + ns.collection() + "/points?wait=true")
         .header("api-key", factory.getApiKey())
         .bodyValue(request)
-        .retrieve()
-        .bodyToMono(UpsertResponse.class)
+        .exchangeToMono(clientResponse -> {
+          HttpStatusCode status = clientResponse.statusCode();
+          if (status.is2xxSuccessful()) {
+            return clientResponse.bodyToMono(UpsertResponse.class);
+          }
+
+          return clientResponse.bodyToMono(String.class)
+              .defaultIfEmpty("")
+              .flatMap(body -> {
+                log.error("Qdrant upsert failed. status={}, namespace={}, pointId={}, body={}",
+                    status.value(), ns, pointId, body);
+                return clientResponse.createException().flatMap(Mono::error);
+              });
+        })
         .timeout(Duration.ofMillis(timeoutMs))
         .block();
   }
