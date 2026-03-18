@@ -75,14 +75,14 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Add EC2 host to known_hosts
-        if: github.event_name == 'push'
-        run: |
-          set -euo pipefail
-          mkdir -p ~/.ssh
-          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts || true
+      - name: Add EC2 host to known_hosts                                                                                                                                                              
+        if: github.event_name == 'push'                                                                                                                                                                
+        run: |                                                                                                                                                                                         
+          set -euo pipefail                                                                                                                                                                            
+          mkdir -p ~/.ssh                                                                                                                                                                              
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts    
 
-      - name: Deploy on EC2 (no awscli on EC2)
+      - name: Deploy on EC2
         if: github.event_name == 'push'
         run: |
           set -euo pipefail
@@ -92,6 +92,9 @@ jobs:
 
           ECR_PASSWORD="$(aws ecr get-login-password --region "${AWS_REGION}")"
 
+          mkdir -p ~/.ssh                                                                                                                                                                              
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+          
           ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" "\
             set -euo pipefail; \
             cd /home/${{ secrets.EC2_USER }}/pome; \
