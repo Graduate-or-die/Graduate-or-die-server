@@ -82,37 +82,39 @@ jobs:
           mkdir -p ~/.ssh                                                                                                                                                                              
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts    
 
-      - name: Deploy on EC2 (no awscli on EC2)
+      - name: Deploy on EC2
         if: github.event_name == 'push'
         run: |
-          set -euo pipefail
+          set -euxo pipefail
       
           AWS_REGION="ap-northeast-2"
           ECR_REGISTRY="042655075951.dkr.ecr.ap-northeast-2.amazonaws.com"
           ECR_PASSWORD="$(aws ecr get-login-password --region "${AWS_REGION}")"
       
-          mkdir -p ~/.ssh
-          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+          ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" \
+            ECR_PASSWORD="${ECR_PASSWORD}" ECR_REGISTRY="${ECR_REGISTRY}" 'bash -se' <<'EOF'
+          set -euxo pipefail
+          cd /home/${{ secrets.EC2_USER }}/pome
       
-          ssh -i key.pem "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" <<EOF
-            set -euo pipefail
-            cd /home/${{ secrets.EC2_USER }}/pome
+          echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          docker compose pull app
+          docker compose up -d app
       
-            echo '${ECR_PASSWORD}' | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-            docker compose pull app
-            docker compose up -d app
+          echo '[DEPLOY] waiting for health...'
+          ok=0
+          for i in $(seq 1 180); do
+            if curl -fsS --max-time 5 http://127.0.0.1/health/check >/dev/null; then
+              echo '[DEPLOY] health ok'
+              ok=1
+              break
+            fi
+            sleep 5
+          done
       
-            echo '[DEPLOY] waiting for health...'
-            for i in \$(seq 1 180); do
-              if curl -fsS --max-time 5 http://127.0.0.1/health/check >/dev/null; then
-                echo '[DEPLOY] health ok'
-                exit 0
-              fi
-              sleep 5
-            done
-      
+          if [ "$ok" -ne 1 ]; then
             echo '[DEPLOY] health failed. printing logs...'
             docker compose ps
             docker compose logs --no-color --tail=300 app
             exit 1
+          fi
           EOF
