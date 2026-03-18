@@ -100,7 +100,7 @@ jobs:
             docker compose up -d app; \
             echo '[DEPLOY] waiting for health...'; \
             for i in \$(seq 1 30); do \
-              if curl -fsS --max-time 2 http://127.0.0.1/health/check >/dev/null; then \
+              if curl -fsS --max-time 2 http://127.0.0.1:8080/health/check >/dev/null; then \
                 echo '[DEPLOY] health ok'; \
                 exit 0; \
               fi; \
