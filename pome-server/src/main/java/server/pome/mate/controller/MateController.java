@@ -135,4 +135,16 @@ public class MateController {
         PreviewResponse response = mateQueryService.getVisibilityAndPreview(userId, limit, typeIds);
         return ResponseEntity.ok(BaseResponse.success(response));
     }
+
+    @Operation(summary = "메이트 존재 여부 확인 ")
+    @GetMapping("/exists")
+    public ResponseEntity<BaseResponse<Boolean>> hasMate(
+            Authentication authentication
+    ) {
+        User user = (User) authentication.getPrincipal();
+        Long userId = user.getId();
+
+        boolean result = mateService.hasMate(userId);
+        return ResponseEntity.ok(BaseResponse.success(result));
+    }
 }
