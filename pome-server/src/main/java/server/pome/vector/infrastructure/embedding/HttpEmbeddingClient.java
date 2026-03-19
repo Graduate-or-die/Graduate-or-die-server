@@ -26,8 +26,6 @@ public class HttpEmbeddingClient implements EmbeddingClient {
   private String baseUrl;
   @Value("${embedding.vector-size}")
   private int vectorSize;
-  @Value("${embedding.timeout-ms:2000}")
-  private long timeoutMs;
   @Value("${embedding.retry.max-attempts:2}")
   private int maxAttempts;
   @Value("${embedding.retry.backoff-ms:200}")
@@ -52,7 +50,6 @@ public class HttpEmbeddingClient implements EmbeddingClient {
                 return clientResponse.createException().flatMap(reactor.core.publisher.Mono::error);
               });
         })
-        .timeout(Duration.ofMillis(timeoutMs))
         .retryWhen(Retry.backoff(Math.max(0, maxAttempts - 1), Duration.ofMillis(backOffMs)))
         .block();
 
