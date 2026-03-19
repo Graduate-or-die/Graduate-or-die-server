@@ -60,7 +60,6 @@ embedding:
   model: ${EMBEDDING_MODEL}
   vector-size: ${VECTOR_SIZE}
   base-url: ${EMBEDDING_BASE_URL}
-  timeout-ms: 2000
   retry:
     max-attempts: 2
     backoff-ms: 200
