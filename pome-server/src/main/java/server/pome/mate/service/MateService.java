@@ -230,4 +230,10 @@ public class MateService {
   public boolean isAcceptedMates(Long u1, Long u2) {
     return mateRepository.isAcceptedMates(u1, u2, ACCEPTED);
   }
+
+  // 메이트 존재 여부
+  public boolean hasMate(Long userId) {
+    User user = findUserById(userId);
+    return mateRepository.existsAcceptedByUser(user);
+  }
 }
