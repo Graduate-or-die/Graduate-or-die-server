@@ -27,17 +27,10 @@ public record GetProjectListResponse(
   String projectDescription,
 
   @Schema(description = "프로젝트 성과", example = "졸업가능상태")
-  String projectAward,
-
-  @Schema(description = "파일")
-  FileResponse file
+  String projectAward
 ) {
 
-  public static GetProjectListResponse from(Project project, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
-
+  public static GetProjectListResponse from(Project project) {
     return new GetProjectListResponse(
         project.getId(),
         project.getProjectName(),
@@ -45,8 +38,7 @@ public record GetProjectListResponse(
         project.getProjectEndAt(),
         project.getProjectRole(),
         project.getProjectDescription(),
-        project.getProjectAward(),
-        file
+        project.getProjectAward()
     );
   }
 }

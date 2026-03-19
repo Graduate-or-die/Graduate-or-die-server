@@ -21,24 +21,17 @@ public record GetExperienceListResponse (
   LocalDate experienceStartAt,
 
   @Schema(description = "근무 마감일", example = "2025-08-01")
-  LocalDate experienceEndAt,
-
-  @Schema(description = "파일")
-  FileResponse file
+  LocalDate experienceEndAt
 ) {
 
-  public static GetExperienceListResponse from(Experience experience, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
+  public static GetExperienceListResponse from(Experience experience) {
 
     return new GetExperienceListResponse(
         experience.getId(),
         experience.getWorkplace(),
         experience.getSpot(),
         experience.getExperienceStartAt(),
-        experience.getExperienceEndAt(),
-        file
+        experience.getExperienceEndAt()
     );
   }
 }

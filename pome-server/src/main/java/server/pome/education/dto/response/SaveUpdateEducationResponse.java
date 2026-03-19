@@ -26,20 +26,12 @@ public class SaveUpdateEducationResponse {
   @Schema(description = "학위", example = "학사")
   private String degree;
 
-  @Schema(description = "파일")
-  private FileResponse file;
-
-  public static SaveUpdateEducationResponse from(Education education, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
-
+  public static SaveUpdateEducationResponse from(Education education) {
     return SaveUpdateEducationResponse.builder()
         .blockId(education.getId())
         .school(education.getSchool())
         .major(education.getMajor())
         .degree(education.getDegree())
-        .file(file)
         .build();
   }
 }

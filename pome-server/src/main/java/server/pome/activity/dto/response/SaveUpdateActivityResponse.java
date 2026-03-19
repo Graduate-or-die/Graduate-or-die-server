@@ -33,13 +33,8 @@ public class SaveUpdateActivityResponse {
   @Schema(description = "성과", example = "우수상")
   private String result;
 
-  @Schema(description = "파일")
-  private FileResponse file;
 
-  public static SaveUpdateActivityResponse from(Activity activity, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
+  public static SaveUpdateActivityResponse from(Activity activity) {
 
     return SaveUpdateActivityResponse.builder()
         .blockId(activity.getId())
@@ -48,7 +43,6 @@ public class SaveUpdateActivityResponse {
         .activityStartAt(activity.getActivityStartAt())
         .activityEndAt(activity.getActivityEndAt())
         .result(activity.getResult())
-        .file(file)
         .build();
   }
 }

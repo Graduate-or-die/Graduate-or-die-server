@@ -36,8 +36,7 @@ public class ProjectService {
   // 프로젝트 저장
   public SaveUpdateProjectResponse saveProject(
       Long userId,
-      SaveProjectRequest request,
-      List<MultipartFile> files
+      SaveProjectRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
@@ -49,29 +48,15 @@ public class ProjectService {
     Project project = request.toEntity(portfolio);
     projectRepository.save(project);
 
-    attachmentService.uploadSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.PROJECTS,
-        project.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.PROJECTS,
-        project.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateProjectResponse.from(project, attachment);
+    return SaveUpdateProjectResponse.from(project);
   }
 
   // 프로젝트 수정
   public SaveUpdateProjectResponse updateProject(
       Long userId,
       Long projectId,
-      UpdateProjectRequest request,
-      List<MultipartFile> files
+      UpdateProjectRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
@@ -105,21 +90,8 @@ public class ProjectService {
         projectAward
     );
 
-    attachmentService.replaceSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.PROJECTS,
-        project.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.PROJECTS,
-        project.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateProjectResponse.from(project, attachment);
+    return SaveUpdateProjectResponse.from(project);
   }
 
   // 프로젝트 삭제
@@ -128,7 +100,6 @@ public class ProjectService {
         .findByIdAndPortfolio_User_Id(blockId, userId)
         .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
 
-    attachmentService.deleteByBlock(userId, TypeEnum.PROJECTS, blockId);
     projectRepository.delete(project);
   }
 

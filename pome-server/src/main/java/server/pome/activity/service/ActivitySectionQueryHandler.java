@@ -25,15 +25,7 @@ public class ActivitySectionQueryHandler implements PortfolioSectionQueryHandler
   public Object query(Long portfolioId, Long userId) {
     var items = activityRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(activity -> {
-          var attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-              portfolioId,
-              TypeEnum.ACTIVITIES,
-              activity.getId()
-          );
-
-          return GetActivityListResponse.from(activity, attachment);
-        })
+            .map(GetActivityListResponse::from)
         .toList();
 
     return new ActivitySectionResponse(items);

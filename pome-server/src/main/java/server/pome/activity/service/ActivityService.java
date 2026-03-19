@@ -36,8 +36,7 @@ public class ActivityService {
   // 대내외활동 저장
   public SaveUpdateActivityResponse saveActivity(
       Long userId,
-      SaveActivityRequest request,
-      List<MultipartFile> files
+      SaveActivityRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
@@ -49,29 +48,15 @@ public class ActivityService {
     Activity activity = request.toEntity(portfolio);
     activityRepository.save(activity);
 
-    attachmentService.uploadSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.ACTIVITIES,
-        activity.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.ACTIVITIES,
-        activity.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateActivityResponse.from(activity, attachment);
+    return SaveUpdateActivityResponse.from(activity);
   }
 
   // 대내외활동 수정
   public SaveUpdateActivityResponse updateActivity(
       Long userId,
       Long activityId,
-      UpdateActivityRequest request,
-      List<MultipartFile> files
+      UpdateActivityRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
@@ -96,29 +81,16 @@ public class ActivityService {
 
     activity.updateActivity(activityName, activityRole, activityStartAt, activityEndAt, result);
 
-    attachmentService.replaceSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.ACTIVITIES,
-        activity.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.ACTIVITIES,
-        activity.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateActivityResponse.from(activity, attachment);
+    return SaveUpdateActivityResponse.from(activity);
   }
 
+  // 대내외활동 삭제
   public void delete(Long blockId, Long userId) {
     Activity activity = activityRepository
         .findByIdAndPortfolio_User_Id(blockId, userId)
         .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
 
-    attachmentService.deleteByBlock(userId, TypeEnum.ACTIVITIES, blockId);
     activityRepository.delete(activity);
   }
 
