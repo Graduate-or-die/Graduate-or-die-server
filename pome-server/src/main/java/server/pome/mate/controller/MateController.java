@@ -7,15 +7,19 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import server.pome.global.domain.BaseResponse;
-import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
-import server.pome.global.enums.TypeEnum;
 import server.pome.mate.dto.response.GetMateRequestResponse;
 import server.pome.mate.service.MateQueryService;
 import server.pome.mate.service.MateService;
-import server.pome.portfolio.dto.response.GetPortfolioResponse;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.user.dto.response.GetUserResponse;
 
@@ -33,7 +37,6 @@ public class MateController {
     public ResponseEntity<BaseResponse<List<GetMateRequestResponse>>> getMateRequest(
             Authentication authentication
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         List<GetMateRequestResponse> result = mateService.getMateRequest(userId);
@@ -47,7 +50,6 @@ public class MateController {
             @PathVariable Long mateId,
             Authentication authentication
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         return ResponseEntity.ok(BaseResponse.success(mateService.requestMate(mateId, userId)));
@@ -60,7 +62,6 @@ public class MateController {
             @PathVariable Long mateId,
             Authentication authentication
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         return ResponseEntity.ok(BaseResponse.success(mateService.matchMate(mateId, userId)));
@@ -73,7 +74,6 @@ public class MateController {
             @PathVariable Long mateId,
             Authentication authentication
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         return ResponseEntity.ok(BaseResponse.success(mateService.rejectMate(mateId, userId)));
@@ -84,7 +84,6 @@ public class MateController {
     public ResponseEntity<BaseResponse<String>> unmatchMate(
             Authentication authentication
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
         return ResponseEntity.ok(BaseResponse.success(mateService.unmatchMate(userId)));
@@ -95,14 +94,10 @@ public class MateController {
     public ResponseEntity<BaseResponse<GetUserResponse>> getMateProfile(
             Authentication authentication
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        User mate = mateQueryService.getMateProfile(userId);
-
-        GetUserResponse result = GetUserResponse.from(mate);
-        return ResponseEntity.ok(BaseResponse.success(result));
+        return ResponseEntity.ok(BaseResponse.success(mateQueryService.getMateProfile(userId)));
     }
 
     @Operation(summary = "메이트 포트폴리오 조회")
@@ -112,7 +107,6 @@ public class MateController {
             Authentication authentication,
             @RequestParam(required = false) Long typeId
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
@@ -128,7 +122,6 @@ public class MateController {
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) List<Long> typeIds
     ) {
-
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 

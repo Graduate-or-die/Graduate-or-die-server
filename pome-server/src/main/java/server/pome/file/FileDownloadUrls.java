@@ -9,6 +9,10 @@ public class FileDownloadUrls {
     return "/files/profile";
   }
 
+  public String profileImage(Long userId) {
+    return "/files/profile/" + userId;
+  }
+
   public String portfolioAttachment(Long attachmentId) {
     return "/files/portfolio/" + attachmentId;
   }

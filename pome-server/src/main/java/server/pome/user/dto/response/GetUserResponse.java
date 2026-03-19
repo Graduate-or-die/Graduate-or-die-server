@@ -29,7 +29,11 @@ public class GetUserResponse {
   @Schema(description = "좋아요 수", example = "57", requiredMode = RequiredMode.REQUIRED)
   private int likeCount;
 
-  @Schema(description = "포트폴리오 태그 목록", example = "[\"대학재학생\", \"IT\", \"개발자\"]", requiredMode = RequiredMode.NOT_REQUIRED)
+  @Schema(
+      description = "태그 목록",
+      example = "[\"대학재학생\", \"IT\", \"개발자\"]",
+      requiredMode = RequiredMode.NOT_REQUIRED
+  )
   private List<String> tags;
 
   @Schema(description = "매칭 활성화 여부", example = "true", requiredMode = RequiredMode.REQUIRED)
@@ -45,6 +49,10 @@ public class GetUserResponse {
   private String profileImage;
 
   public static GetUserResponse from(User user) {
+    return from(user, false);
+  }
+
+  public static GetUserResponse from(User user, boolean targetUserProfileImage) {
     return GetUserResponse.builder()
         .userId(user.getId())
         .userName(user.getUserName())
@@ -54,13 +62,16 @@ public class GetUserResponse {
         .matching(user.getMatching())
         .introduction(user.getIntroduction())
         .job(user.getJob())
-        .profileImage(buildProfileImageUrl(user))
+        .profileImage(buildProfileImageUrl(user, targetUserProfileImage))
         .build();
   }
 
-  private static String buildProfileImageUrl(User user) {
+  private static String buildProfileImageUrl(User user, boolean targetUserProfileImage) {
     if (user.getProfileImage() == null || user.getProfileImage().isBlank()) {
       return null;
+    }
+    if (targetUserProfileImage) {
+      return FileDownloadUrls.profileImage(user.getId());
     }
     return FileDownloadUrls.profileImage();
   }

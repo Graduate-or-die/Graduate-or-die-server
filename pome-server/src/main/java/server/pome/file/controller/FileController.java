@@ -36,6 +36,15 @@ public class FileController {
         return buildResponse(download);
     }
 
+    @Operation(summary = "특정 유저 프로필 이미지 조회")
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<InputStreamResource> getProfileImageByUserId(
+            @PathVariable Long userId
+    ) {
+        FileDownload download = fileService.downloadProfileImage(userId);
+        return buildResponse(download);
+    }
+
     @Operation(summary = "포트폴리오 첨부 조회/다운로드")
     @GetMapping("/portfolio/{attachmentId}")
     public ResponseEntity<InputStreamResource> getPortfolioAttachment(
