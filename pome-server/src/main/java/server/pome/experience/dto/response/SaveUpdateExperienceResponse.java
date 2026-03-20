@@ -30,21 +30,13 @@ public class SaveUpdateExperienceResponse {
   @Schema(description = "근무 마감일", example = "2025-08-01")
   private LocalDate experienceEndAt;
 
-  @Schema(description = "파일")
-  private FileResponse file;
-
-  public static SaveUpdateExperienceResponse from(Experience experience, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
-
+  public static SaveUpdateExperienceResponse from(Experience experience) {
     return SaveUpdateExperienceResponse.builder()
         .blockId(experience.getId())
         .workplace(experience.getWorkplace())
         .spot(experience.getSpot())
         .experienceStartAt(experience.getExperienceStartAt())
         .experienceEndAt(experience.getExperienceEndAt())
-        .file(file)
         .build();
   }
 }

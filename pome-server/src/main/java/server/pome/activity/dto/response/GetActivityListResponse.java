@@ -24,16 +24,11 @@ public record GetActivityListResponse(
   LocalDate activityEndAt,
 
   @Schema(description = "성과", example = "우수상")
-  String result,
+  String result
 
-  @Schema(description = "파일")
-  FileResponse file
 ) {
 
-  public static GetActivityListResponse from(Activity activity, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
+  public static GetActivityListResponse from(Activity activity) {
 
     return new GetActivityListResponse(
         activity.getId(),
@@ -41,8 +36,7 @@ public record GetActivityListResponse(
         activity.getActivityRole(),
         activity.getActivityStartAt(),
         activity.getActivityEndAt(),
-        activity.getResult(),
-        file
+        activity.getResult()
     );
   }
 }

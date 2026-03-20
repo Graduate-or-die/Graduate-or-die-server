@@ -35,8 +35,7 @@ public class EtcService {
   // 기타 저장
   public SaveUpdateEtcResponse saveEtc(
       Long userId,
-      SaveEtcRequest request,
-      List<MultipartFile> files
+      SaveEtcRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
@@ -56,59 +55,29 @@ public class EtcService {
     Etc etc = request.toEntity(portfolio);
     etcRepository.save(etc);
 
-    attachmentService.uploadSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.ETCS,
-        etc.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.ETCS,
-        etc.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateEtcResponse.from(etc, attachment);
+    return SaveUpdateEtcResponse.from(etc);
   }
 
   // 기타 수정
   public SaveUpdateEtcResponse updateEtcResponse(
       Long userId,
-      Long etcId,
-      UpdateEtcRequest request,
-      List<MultipartFile> files
+      UpdateEtcRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
       throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
     }
 
-    Etc etc = etcRepository.findByIdAndPortfolio_User_Id(etcId, userId)
-        .orElseThrow(() -> new BaseException(BaseResponseStatus.ETC_NOT_FOUND));
+    Etc etc = etcRepository.findByPortfolio(portfolio)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.ETC_NOT_FOUND));
 
-    List<String> link = request.getLink() != null && !request.getLink().isEmpty()
-        ? request.getLink() : etc.getLink();
-    String memo = request.getMemo() != null && !request.getMemo().isEmpty()
-        ? request.getMemo() : etc.getMemo();
+    List<String> link = request.getLink() != null && !request.getLink().isEmpty() ? request.getLink() : etc.getLink();
+    String memo = request.getMemo() != null && !request.getMemo().isEmpty() ? request.getMemo() : etc.getMemo();
 
     etc.updateEtc(link, memo);
 
-    attachmentService.replaceSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.ETCS,
-        etc.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.ETCS,
-        etc.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateEtcResponse.from(etc, attachment);
+    return SaveUpdateEtcResponse.from(etc);
   }
 }

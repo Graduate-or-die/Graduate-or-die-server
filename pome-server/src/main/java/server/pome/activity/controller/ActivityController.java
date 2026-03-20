@@ -4,17 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.pome.activity.dto.request.SaveActivityRequest;
 import server.pome.activity.dto.request.UpdateActivityRequest;
@@ -32,14 +29,13 @@ public class ActivityController {
   private final ActivityService activityService;
 
   @Operation(summary = "대내외활동 저장")
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping
   public ResponseEntity<BaseResponse<SaveUpdateActivityResponse>> saveActivity(
       Authentication authentication,
-      @RequestPart("data") SaveActivityRequest request,
-      @RequestPart(value = "file", required = false) List<MultipartFile> files
+      @Valid @RequestBody SaveActivityRequest request
   ) {
     User user = (User) authentication.getPrincipal();
-    SaveUpdateActivityResponse result = activityService.saveActivity(user.getId(), request, files);
+    SaveUpdateActivityResponse result = activityService.saveActivity(user.getId(), request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(BaseResponse.success(result));
@@ -47,15 +43,14 @@ public class ActivityController {
 
   @Operation(summary = "대내외활동 수정")
   @Parameter(name = "blockId", description = "대내외활동 블록 ID", required = true)
-  @PatchMapping(value = "/{blockId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PatchMapping("/{blockId}")
   public ResponseEntity<BaseResponse<SaveUpdateActivityResponse>> updateActivity(
       Authentication authentication,
       @PathVariable("blockId") Long blockId,
-      @RequestPart("data") UpdateActivityRequest request,
-      @RequestPart(value = "file", required = false) List<MultipartFile> files
+      @Valid @RequestBody UpdateActivityRequest request
   ) {
     User user = (User) authentication.getPrincipal();
-    SaveUpdateActivityResponse result = activityService.updateActivity(user.getId(), blockId, request, files);
+    SaveUpdateActivityResponse result = activityService.updateActivity(user.getId(), blockId, request);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
 }

@@ -25,15 +25,7 @@ public class EtcSectionQueryHandler implements PortfolioSectionQueryHandler {
   public Object query(Long portfolioId, Long userId) {
     var items = etcRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(etc -> {
-          var attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-              portfolioId,
-              TypeEnum.ETCS,
-              etc.getId()
-          );
-
-          return GetEtcListResponse.from(etc, attachment);
-        })
+            .map(GetEtcListResponse::from)
         .toList();
 
     return new EtcSectionResponse(items);

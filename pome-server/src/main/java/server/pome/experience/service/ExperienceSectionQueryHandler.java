@@ -14,8 +14,6 @@ import server.pome.portfolio.service.PortfolioSectionQueryHandler;
 public class ExperienceSectionQueryHandler implements PortfolioSectionQueryHandler {
 
   private final ExperienceRepository experienceRepository;
-  private final AttachmentService attachmentService;
-
   @Override
   public TypeEnum supports() {
     return TypeEnum.EXPERIENCES;
@@ -25,15 +23,7 @@ public class ExperienceSectionQueryHandler implements PortfolioSectionQueryHandl
   public Object query(Long portfolioId, Long userId) {
     var items = experienceRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(experience -> {
-          var attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-              portfolioId,
-              TypeEnum.EXPERIENCES,
-              experience.getId()
-          );
-
-          return GetExperienceListResponse.from(experience, attachment);
-        })
+            .map(GetExperienceListResponse::from)
         .toList();
 
     return new ExperienceSectionResponse(items);
