@@ -1,5 +1,6 @@
 package server.pome.like.repository;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,19 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
   VALUES (:targetId, :fromId, NOW())
   """, nativeQuery = true)
   int saveIfNotExists(@Param("fromId") Long fromId, @Param("targetId") Long targetId);
+
+  // 특정 유저가 대상 유저에게 좋아요를 눌렀는지 여부
+  boolean existsByFromUser_IdAndTargetUser_Id(Long fromUserId, Long targetUserId);
+
+  // 특정 유저가 여러 대상 유저 중 좋아요를 누른 유저 ID 목록 조회
+  @Query("""
+      SELECT l.targetUser.id
+      FROM Like l
+      WHERE l.fromUser.id = :fromUserId
+        AND l.targetUser.id IN :targetUserIds
+      """)
+  List<Long> findLikedTargetUserIds(@Param("fromUserId") Long fromUserId,
+      @Param("targetUserIds") List<Long> targetUserIds);
 
   // 좋아요 데이터 삭제
   @Modifying

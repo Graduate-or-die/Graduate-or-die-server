@@ -3,6 +3,7 @@ package server.pome.matching.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.util.List;
+import server.pome.file.FileDownloadUrls;
 import server.pome.global.domain.User;
 
 public record RecommendUserResponse(
@@ -13,14 +14,18 @@ public record RecommendUserResponse(
     String nickName,
 
     @Schema(
-        description = "추천 유저 프로필 이미지 URL",
-        example = "https://example.com/profile.png",
+        description = "추천 유저 프로필 이미지 다운로드 URL",
+        example = "/files/profile/2",
         requiredMode = RequiredMode.NOT_REQUIRED
     )
     String profileImage,
 
     @Schema(description = "추천 유저 좋아요 수", example = "12", requiredMode = RequiredMode.REQUIRED)
     int likeCount,
+
+    @Schema(description = "해당 추천 회원에게 좋아요를 눌렀는지 여부", example = "true",
+        requiredMode = RequiredMode.REQUIRED)
+    boolean liked,
 
     @Schema(
         description = "추천 유저 태그 목록",
@@ -47,16 +52,24 @@ public record RecommendUserResponse(
     int similarityPercent
 ) {
 
-  public static RecommendUserResponse from(User user, int similarityPercent) {
+  public static RecommendUserResponse from(User user, boolean liked, int similarityPercent) {
     return new RecommendUserResponse(
         user.getId(),
         user.getNickName(),
-        user.getProfileImage(),
+        buildProfileImageUrl(user),
         user.getLikeCount(),
+        liked,
         user.getTags(),
         user.getIntroduction(),
         user.getJob(),
         similarityPercent
     );
+  }
+
+  private static String buildProfileImageUrl(User user) {
+    if (user.getProfileImage() == null || user.getProfileImage().isBlank()) {
+      return null;
+    }
+    return FileDownloadUrls.profileImage(user.getId());
   }
 }

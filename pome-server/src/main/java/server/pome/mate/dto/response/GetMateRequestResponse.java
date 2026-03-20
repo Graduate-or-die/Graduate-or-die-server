@@ -23,16 +23,17 @@ public class GetMateRequestResponse {
   @Schema(description = "메이트 신청자 닉네임", example = "구준회", requiredMode = RequiredMode.REQUIRED)
   private String mateNickname;
 
-  @Schema(description = "메이트 신청자 프로필 URL", example = "/files/profile", requiredMode = RequiredMode.NOT_REQUIRED)
+  @Schema(description = "메이트 신청자 프로필 이미지 다운로드 URL", example = "/files/profile/1",
+      requiredMode = RequiredMode.NOT_REQUIRED)
   private String mateProfileImage;
 
   public static GetMateRequestResponse from(Mate mate) {
     User mateUser = mate.getFromUser();
     return GetMateRequestResponse.builder()
-            .mateId(mateUser.getId())
-            .mateNickname(mateUser.getNickName())
-            .mateProfileImage(buildProfileImageUrl(mateUser))
-            .build();
+        .mateId(mateUser.getId())
+        .mateNickname(mateUser.getNickName())
+        .mateProfileImage(buildProfileImageUrl(mateUser))
+        .build();
   }
 
   private static String buildProfileImageUrl(User user) {
