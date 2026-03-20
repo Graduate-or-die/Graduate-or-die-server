@@ -56,7 +56,7 @@ public class DevAuthService {
         String nickName = resolveNickName(request);
         String email = resolveEmail(request);
         Long kakaoId = resolveKakaoId();
-        boolean matching = request == null || request.getMatching() == null || request.getMatching();
+        boolean matching = request != null && request.getMatching() != null && request.getMatching();
         List<String> tags = resolveTags(request);
 
         User newUser = User.builder()
