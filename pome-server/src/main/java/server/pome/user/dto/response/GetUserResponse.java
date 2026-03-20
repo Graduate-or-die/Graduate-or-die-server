@@ -29,6 +29,9 @@ public class GetUserResponse {
   @Schema(description = "좋아요 수", example = "57", requiredMode = RequiredMode.REQUIRED)
   private int likeCount;
 
+  @Schema(description = "해당 회원에게 좋아요를 눌렀는지 여부", example = "true", requiredMode = RequiredMode.REQUIRED)
+  private boolean liked;
+
   @Schema(
       description = "태그 목록",
       example = "[\"대학재학생\", \"IT\", \"개발자\"]",
@@ -49,15 +52,20 @@ public class GetUserResponse {
   private String profileImage;
 
   public static GetUserResponse from(User user) {
-    return from(user, false);
+    return from(user, false, false);
   }
 
   public static GetUserResponse from(User user, boolean targetUserProfileImage) {
+    return from(user, targetUserProfileImage, false);
+  }
+
+  public static GetUserResponse from(User user, boolean targetUserProfileImage, boolean liked) {
     return GetUserResponse.builder()
         .userId(user.getId())
         .userName(user.getUserName())
         .nickName(user.getNickName())
         .likeCount(user.getLikeCount())
+        .liked(liked)
         .tags(user.getTags())
         .matching(user.getMatching())
         .introduction(user.getIntroduction())

@@ -1,11 +1,12 @@
 package server.pome.user.service;
 
-import static server.pome.global.exception.BaseResponseStatus.*;
+import static server.pome.global.exception.BaseResponseStatus.CANNOT_MATE_SELF_REQUEST;
+import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 
 import java.util.List;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,13 +14,15 @@ import server.pome.attachment.dto.response.UploadedFileInfo;
 import server.pome.attachment.repository.AttachmentRepository;
 import server.pome.attachment.service.AttachmentService;
 import server.pome.attachment.service.AwsS3Service;
-import server.pome.global.exception.BaseResponseStatus;
-import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
+import server.pome.like.repository.LikeRepository;
+import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.user.dto.request.UpdateUserRequest;
-import server.pome.user.dto.response.*;
+import server.pome.user.dto.response.GetUserResponse;
+import server.pome.user.dto.response.UpdateUserResponse;
 import server.pome.user.repository.UserRepository;
 
 @Transactional
@@ -33,11 +36,12 @@ public class UserService {
   private final AttachmentService attachmentService;
   private final AttachmentRepository attachmentRepository;
   private final AwsS3Service awsS3Service;
+  private final LikeRepository likeRepository;
 
   // 회원 정보 조회
   public GetUserResponse getUserInfo(Long userId) {
     User user = findUserById(userId);
-    return buildUserResponse(user);
+    return buildUserResponse(user, false);
   }
 
   // 회원 정보 수정
@@ -60,10 +64,7 @@ public class UserService {
       user.updateProfileImage(null);
     }
 
-    if (Boolean.TRUE.equals(request.getRemoveProfileImage())
-            && files != null
-            && !files.isEmpty()) {
-
+    if (Boolean.TRUE.equals(request.getRemoveProfileImage()) && files != null && !files.isEmpty()) {
       throw new BaseException(BaseResponseStatus.INVALID_PROFILE_IMAGE_REQUEST);
     }
 
@@ -78,9 +79,7 @@ public class UserService {
 
       awsS3Service.deleteFile(user.getProfileImage());
 
-      UploadedFileInfo uploaded =
-              awsS3Service.uploadFile(file, "profile");
-
+      UploadedFileInfo uploaded = awsS3Service.uploadFile(file, "profile");
       user.updateProfileImage(uploaded.getStoredKey());
     }
 
@@ -88,7 +87,7 @@ public class UserService {
   }
 
   // 회원 검색
-  public GetUserResponse searchUser (Long userId, String name) {
+  public GetUserResponse searchUser(Long userId, String name) {
     User user = findUserById(userId);
 
     User searchMate = userRepository.findByNickName(name);
@@ -100,15 +99,14 @@ public class UserService {
       throw new BaseException(CANNOT_MATE_SELF_REQUEST);
     }
 
-    return buildUserResponse(searchMate);
+    boolean liked = likeRepository.existsByFromUser_IdAndTargetUser_Id(userId, searchMate.getId());
+    return buildUserResponse(searchMate, liked);
   }
 
   // 공통 응답 생성 메서드
-  private GetUserResponse buildUserResponse(User user) {
+  private GetUserResponse buildUserResponse(User user, boolean liked) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(user.getId());
-    //List<String> tags = (portfolio != null) ? portfolio.getTag() : new ArrayList<>();
-
-    return GetUserResponse.from(user);
+    return GetUserResponse.from(user, false, liked);
   }
 
   // 유저 조회 메서드
