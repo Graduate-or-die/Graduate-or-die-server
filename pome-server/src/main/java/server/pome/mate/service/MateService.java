@@ -76,6 +76,14 @@ public class MateService {
     ensureNoMate(user, mateUser);
     ensureCanMatching(user, mateUser);
 
+    int resumedRequest = mateRepository.updateStatusTo(user, mateUser, REJECTED, PENDING);
+    if (resumedRequest == 0) {
+      resumedRequest = mateRepository.updateStatusTo(user, mateUser, UNMATCHED, PENDING);
+    }
+    if (resumedRequest > 0) {
+      return userId + "가 " + mateId + "에게 메이트를 신청했습니다";
+    }
+
     // 신청 대기(PENDING) 상태로 저장
     Mate newMate = new Mate(null, mateUser, user, PENDING);
     mateRepository.save(newMate);
