@@ -17,23 +17,17 @@ public record GetEducationListResponse(
   String major,
 
   @Schema(description = "학위", example = "학사")
-  String degree,
+  String degree
 
-  @Schema(description = "파일")
-  FileResponse file
 ) {
 
-  public static GetEducationListResponse from(Education education, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
+  public static GetEducationListResponse from(Education education) {
 
     return new GetEducationListResponse(
         education.getId(),
         education.getSchool(),
         education.getMajor(),
-        education.getDegree(),
-        file
+        education.getDegree()
     );
   }
 }

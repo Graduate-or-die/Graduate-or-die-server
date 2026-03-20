@@ -15,21 +15,13 @@ public record GetEtcListResponse(
   List<String> link,
 
   @Schema(description = "메모", example = "입주한 경험이 있음")
-  String memo,
-
-  @Schema(description = "파일")
-  FileResponse file
+  String memo
 ) {
-  public static GetEtcListResponse from(Etc etc, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
-
+  public static GetEtcListResponse from(Etc etc) {
     return new GetEtcListResponse(
         etc.getId(),
         etc.getLink(),
-        etc.getMemo(),
-        file
+        etc.getMemo()
     );
   }
 }

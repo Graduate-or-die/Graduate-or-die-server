@@ -14,8 +14,6 @@ import server.pome.portfolio.service.PortfolioSectionQueryHandler;
 public class EducationSectionQueryHandler implements PortfolioSectionQueryHandler {
 
   private final EducationRepository educationRepository;
-  private final AttachmentService attachmentService;
-
   @Override
   public TypeEnum supports() {
     return TypeEnum.EDUCATIONS;
@@ -25,15 +23,7 @@ public class EducationSectionQueryHandler implements PortfolioSectionQueryHandle
   public Object query(Long portfolioId, Long userId) {
     var items = educationRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(education -> {
-          var attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-              portfolioId,
-              TypeEnum.EDUCATIONS,
-              education.getId()
-          );
-
-          return GetEducationListResponse.from(education, attachment);
-        })
+            .map(GetEducationListResponse::from)
         .toList();
 
     return new EducationSectionResponse(items);

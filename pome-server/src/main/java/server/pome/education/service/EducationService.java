@@ -29,14 +29,12 @@ public class EducationService {
   private final EducationRepository educationRepository;
   private final PortfolioRepository portfolioRepository;
   private final UserRepository userRepository;
-  private final AttachmentService attachmentService;
   private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
   // 학력 저장
   public SaveUpdateEducationResponse saveEducation(
       Long userId,
-      SaveEducationRequest request,
-      List<MultipartFile> files
+      SaveEducationRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
 
@@ -51,60 +49,31 @@ public class EducationService {
     Education education = request.toEntity(portfolio);
     educationRepository.save(education);
 
-    attachmentService.uploadSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.EDUCATIONS,
-        education.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.EDUCATIONS,
-        education.getId()
-    );
 
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateEducationResponse.from(education, attachment);
+    return SaveUpdateEducationResponse.from(education);
   }
 
+  // 학력 수정
   public SaveUpdateEducationResponse updateEducation(
       Long userId,
-      Long educationId,
-      UpdateEducationRequest request,
-      List<MultipartFile> files
+      UpdateEducationRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
       throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
     }
 
-    Education education = educationRepository.findByIdAndPortfolio_User_Id(educationId, userId)
-        .orElseThrow(() -> new BaseException(BaseResponseStatus.EDUCATION_NOT_FOUND));
+    Education education = educationRepository.findByPortfolio(portfolio)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.EDUCATION_NOT_FOUND));
 
-    String school = request.getSchool() != null && !request.getSchool().isEmpty()
-        ? request.getSchool() : education.getSchool();
-    String major = request.getMajor() != null && !request.getMajor().isEmpty()
-        ? request.getMajor() : education.getMajor();
-    String degree = request.getDegree() != null && !request.getDegree().isEmpty()
-        ? request.getDegree() : education.getDegree();
+    String school = request.getSchool() != null && !request.getSchool().isEmpty() ? request.getSchool() : education.getSchool();
+    String major = request.getMajor() != null && !request.getMajor().isEmpty() ? request.getMajor() : education.getMajor();
+    String degree = request.getDegree() != null && !request.getDegree().isEmpty() ? request.getDegree() : education.getDegree();
 
     education.updateEducation(school, major, degree);
 
-    attachmentService.replaceSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.EDUCATIONS,
-        education.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.EDUCATIONS,
-        education.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateEducationResponse.from(education, attachment);
+    return SaveUpdateEducationResponse.from(education);
   }
 }

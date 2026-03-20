@@ -24,19 +24,13 @@ public class SaveUpdateEtcResponse {
   @Schema(description = "메모", example = "호주워홀경험있음")
   private String memo;
 
-  @Schema(description = "파일")
-  private FileResponse file;
 
-  public static SaveUpdateEtcResponse from(Etc etc, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
+  public static SaveUpdateEtcResponse from(Etc etc) {
 
     return SaveUpdateEtcResponse.builder()
         .blockId(etc.getId())
         .link(etc.getLink())
         .memo(etc.getMemo())
-        .file(file)
         .build();
   }
 }

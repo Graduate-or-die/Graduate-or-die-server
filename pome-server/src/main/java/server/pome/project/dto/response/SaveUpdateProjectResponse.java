@@ -36,14 +36,8 @@ public class SaveUpdateProjectResponse {
   @Schema(description = "프로젝트 성과", example = "졸업가능상태")
   private String projectAward;
 
-  @Schema(description = "파일")
-  private FileResponse file;
 
-  public static SaveUpdateProjectResponse from(Project project, Optional<Attachment> attachment) {
-    FileResponse file = attachment
-        .map(FileResponse::from)
-        .orElse(null);
-
+  public static SaveUpdateProjectResponse from(Project project) {
     return SaveUpdateProjectResponse.builder()
         .blockId(project.getId())
         .projectName(project.getProjectName())
@@ -52,7 +46,6 @@ public class SaveUpdateProjectResponse {
         .projectRole(project.getProjectRole())
         .projectDescription(project.getProjectDescription())
         .projectAward(project.getProjectAward())
-        .file(file)
         .build();
   }
 }

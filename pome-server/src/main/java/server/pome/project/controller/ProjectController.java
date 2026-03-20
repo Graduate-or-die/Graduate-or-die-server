@@ -4,17 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.pome.global.domain.BaseResponse;
 import server.pome.global.domain.User;
@@ -32,14 +29,13 @@ public class ProjectController {
   private final ProjectService projectService;
 
   @Operation(summary = "프로젝트 저장")
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping
   public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> saveProject(
       Authentication authentication,
-      @RequestPart("data") SaveProjectRequest request,
-      @RequestPart(value = "file", required = false) List<MultipartFile> files
+      @Valid @RequestBody SaveProjectRequest request
   ) {
     User user = (User) authentication.getPrincipal();
-    SaveUpdateProjectResponse result = projectService.saveProject(user.getId(), request, files);
+    SaveUpdateProjectResponse result = projectService.saveProject(user.getId(), request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(BaseResponse.success(result));
@@ -47,15 +43,14 @@ public class ProjectController {
 
   @Operation(summary = "프로젝트 수정")
   @Parameter(name = "blockId", description = "프로젝트 블록 ID", required = true)
-  @PatchMapping(value = "/{blockId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PatchMapping("/{blockId}")
   public ResponseEntity<BaseResponse<SaveUpdateProjectResponse>> updateProject(
       Authentication authentication,
       @PathVariable("blockId") Long blockId,
-      @RequestPart("data") UpdateProjectRequest request,
-      @RequestPart(value = "file", required = false) List<MultipartFile> files
+      @Valid @RequestBody UpdateProjectRequest request
   ) {
     User user = (User) authentication.getPrincipal();
-    SaveUpdateProjectResponse result = projectService.updateProject(user.getId(), blockId, request, files);
+    SaveUpdateProjectResponse result = projectService.updateProject(user.getId(), blockId, request);
     return ResponseEntity.ok(BaseResponse.success(result));
   }
 }

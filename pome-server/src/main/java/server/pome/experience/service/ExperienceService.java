@@ -30,14 +30,12 @@ public class ExperienceService {
   private final ExperienceRepository experienceRepository;
   private final PortfolioRepository portfolioRepository;
   private final UserRepository userRepository;
-  private final AttachmentService attachmentService;
   private final PortfolioUpdateNotifier portfolioUpdateNotifier;
 
   // 경력 저장
   public SaveUpdateExperienceResponse saveExperience(
       Long userId,
-      SaveExperienceRequest request,
-      List<MultipartFile> files
+      SaveExperienceRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
@@ -49,29 +47,15 @@ public class ExperienceService {
     Experience experience = request.toEntity(portfolio);
     experienceRepository.save(experience);
 
-    attachmentService.uploadSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.EXPERIENCES,
-        experience.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.EXPERIENCES,
-        experience.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateExperienceResponse.from(experience, attachment);
+    return SaveUpdateExperienceResponse.from(experience);
   }
 
   // 경력 수정
   public SaveUpdateExperienceResponse updateExperience(
       Long userId,
       Long experienceId,
-      UpdateExperienceRequest request,
-      List<MultipartFile> files
+      UpdateExperienceRequest request
   ) {
     Portfolio portfolio = portfolioRepository.findByUser_Id(userId);
     if (!userRepository.existsById(userId)) {
@@ -94,21 +78,8 @@ public class ExperienceService {
 
     experience.updateExperience(workplace, spot, experienceStartAt, experienceEndAt);
 
-    attachmentService.replaceSingle(
-        userId,
-        portfolio.getId(),
-        TypeEnum.EXPERIENCES,
-        experience.getId(),
-        files
-    );
-    Optional<Attachment> attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-        portfolio.getId(),
-        TypeEnum.EXPERIENCES,
-        experience.getId()
-    );
-
     portfolioUpdateNotifier.notifyUpdated(userId);
-    return SaveUpdateExperienceResponse.from(experience, attachment);
+    return SaveUpdateExperienceResponse.from(experience);
   }
 
   // 경력 삭제
@@ -117,7 +88,6 @@ public class ExperienceService {
         .findByIdAndPortfolio_User_Id(blockId, userId)
         .orElseThrow(() -> new BaseException(BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND));
 
-    attachmentService.deleteByBlock(userId, TypeEnum.EXPERIENCES, blockId);
     experienceRepository.delete(experience);
   }
 

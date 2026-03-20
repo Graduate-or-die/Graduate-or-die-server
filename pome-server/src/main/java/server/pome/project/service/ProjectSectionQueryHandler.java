@@ -25,15 +25,7 @@ public class ProjectSectionQueryHandler implements PortfolioSectionQueryHandler 
   public Object query(Long portfolioId, Long userId) {
     var items = projectRepository.findAllByPortfolio_Id(portfolioId)
         .stream()
-        .map(project -> {
-          var attachment = attachmentService.findByPortfolioAndTypeAndBlock(
-              portfolioId,
-              TypeEnum.PROJECTS,
-              project.getId()
-          );
-
-          return GetProjectListResponse.from(project, attachment);
-        })
+            .map(GetProjectListResponse::from)
         .toList();
 
     return new ProjectSectionResponse(items);
