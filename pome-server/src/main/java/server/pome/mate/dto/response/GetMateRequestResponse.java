@@ -39,6 +39,6 @@ public class GetMateRequestResponse {
     if (user.getProfileImage() == null || user.getProfileImage().isBlank()) {
       return null;
     }
-    return FileDownloadUrls.profileImage();
+    return FileDownloadUrls.profileImage(user.getId());
   }
 }

@@ -1,6 +1,11 @@
 package server.pome.mate.service;
 
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import server.pome.etc.repository.EtcRepository;
@@ -9,19 +14,17 @@ import server.pome.global.domain.Portfolio;
 import server.pome.global.domain.User;
 import server.pome.global.enums.MateRequestStatus;
 import server.pome.global.exception.BaseException;
-import server.pome.global.exception.BaseResponseStatus;
 import server.pome.mate.repository.MateRepository;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.portfolio.service.PortfolioService;
+import server.pome.user.dto.response.GetUserResponse;
 import server.pome.user.repository.UserRepository;
 
-import java.util.*;
-import java.util.stream.LongStream;
-
+import static server.pome.global.exception.BaseResponseStatus.MATCHING_DISABLED;
+import static server.pome.global.exception.BaseResponseStatus.NOT_MATCHED_MATE;
 import static server.pome.global.exception.BaseResponseStatus.PORTFOLIO_NOT_FOUND;
-import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -38,33 +41,21 @@ public class MateQueryService {
     public static final long END_TYPE = 7L;
 
     // 메이트 프로필 조회
-    public User getMateProfile(Long userId) {
-
+    public GetUserResponse getMateProfile(Long userId) {
         Long mateUserId = getMateUserId(userId);
-
-        return userRepository.findById(mateUserId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
+        User mate = userRepository.findById(mateUserId)
+                .orElseThrow(() -> new BaseException(NOT_MATCHED_MATE));
+        return GetUserResponse.from(mate, true);
     }
 
     // 메이트 포트폴리오 조회
     public Object getMatePortfolio(Long userId, Long typeId) {
-
-        Long mateUserId = mateRepository
-                .findMateIdByUserIdAndStatus(userId, MateRequestStatus.ACCEPTED)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.MATCHING_DISABLED));
-
+        Long mateUserId = getMateUserId(userId);
         return portfolioService.getPortfolioSection(mateUserId, typeId);
     }
 
-    private Long getMateUserId(Long userId) {
-        return mateRepository
-                .findMateIdByUserIdAndStatus(userId, MateRequestStatus.ACCEPTED)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.MATCHING_DISABLED));
-    }
-
     // 메이트 공개범위 여부 및 미리보기
-    public PreviewResponse getVisibilityAndPreview(Long userId, Integer limit,
-                                                   List<Long> typeIds) {
+    public PreviewResponse getVisibilityAndPreview(Long userId, Integer limit, List<Long> typeIds) {
         Long mateUserId = getMateUserId(userId);
 
         Portfolio portfolio = portfolioRepository.findByUser_Id(mateUserId);
@@ -146,8 +137,14 @@ public class MateQueryService {
                 .visibility(visibility)
                 .previews(previews)
                 .build();
+    }
 
-        }
+    private Long getMateUserId(Long userId) {
+        return mateRepository
+                .findMateIdByUserIdAndStatus(userId, MateRequestStatus.ACCEPTED)
+                .orElseThrow(() -> new BaseException(MATCHING_DISABLED));
+    }
+
     private int capForType(Long typeId, int requested) {
         return switch (typeId.intValue()) {
             case 1 -> Math.min(1, requested);
