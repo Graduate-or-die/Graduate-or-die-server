@@ -47,13 +47,12 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   @Transactional
   @Override
   public void markReadUpToLatest(Long portfolioOwnerId, Long userId, ReadRequest request) {
-    // 요청 본문, 경로 대상, 참여 권한 검증
-    validateReadRequest(request);
+    // 참여 권한 검증
     validateParticipant(portfolioOwnerId, userId);
 
     Long fieldId = getFieldIdByReadRequest(portfolioOwnerId, request);
 
-    // 가장 최신 메시지 Id 조회 (없으면 0 반환)
+    // 가장 최신 메시지 ID 조회 (없으면 0 반환)
     Long latestId = chatMessageRepository.findTopByField_IdOrderByIdDesc(fieldId)
         .map(ChatMessage::getId)
         .orElse(0L);
@@ -72,8 +71,7 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   @Transactional
   @Override
   public void markReadUpTo(Long portfolioOwnerId, Long userId, Long messageId, ReadRequest request) {
-    // 요청 본문, 경로 대상, 참여 권한 검증
-    validateReadRequest(request);
+    // 참여 권한 검증
     validateParticipant(portfolioOwnerId, userId);
 
     Long fieldId = getFieldIdByReadRequest(portfolioOwnerId, request);
@@ -90,24 +88,22 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   // 타입별 필드들의 미읽음 여부 조회
   @Transactional(readOnly = true)
   public List<UnreadResponse> GetUnreadList(Long portfolioOwnerId, Long userId, UnreadRequest request) {
-    // 요청 본문, 경로 대상, 참여 권한 검증
-    TypeEnum.fromId(request.getTypeId());
+    // 참여 권한 검증
     validateParticipant(portfolioOwnerId, userId);
 
     // 포트폴리오 항목 내 모든 필드 리스트 조회
-    TypeEnum portfolioType = TypeEnum.fromId(request.getTypeId());
     List<ChatField> fields = chatFieldRepository.findByOwner_IdAndPortfolioType(portfolioOwnerId,
-        portfolioType);
+        TypeEnum.fromId(request.getTypeId()));
 
     // 코멘트가 존재하는 필드가 존재하지 않는 경우 빈 리스트 반환
     if (fields.isEmpty()) {
       return List.of();
     }
 
-    // field Id 목록
+    // field ID 목록
     List<Long> fieldIds = fields.stream().map(ChatField::getId).toList();
 
-    // 미읽음 메시지가 있는 field Id 목록
+    // 미읽음 메시지가 있는 field ID 목록
     List<Long> unreadFieldIds = chatMessageRepository.findUnreadFieldIds(fieldIds, userId);
     Set<Long> unreadSet = new HashSet<>(unreadFieldIds);
 
@@ -176,18 +172,6 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
         request.getTypeId(),
         request.getBlockId(),
         request.getFieldKey()).getId();
-  }
-
-  // Request 타입별 유효성 검사
-  private void validateReadRequest(ReadRequest request) {
-    if (request == null
-        || request.getTypeId() == null
-        || request.getBlockId() == null
-        || request.getFieldKey() == null
-        || request.getFieldKey().isBlank()) {
-      throw new BaseException(INVALID_REQUEST_FORM);
-    }
-    TypeEnum.fromId(request.getTypeId());
   }
 
   // 포트폴리오 소유자 본인 또는 매칭된 메이트만 읽음 상태를 조회/갱신 가능

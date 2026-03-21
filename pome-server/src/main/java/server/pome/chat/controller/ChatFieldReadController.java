@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class ChatFieldReadController {
   public ResponseEntity<Void> readUpToLatest(
       @PathVariable Long portfolioOwnerId,
       Authentication authentication,
-      @RequestBody ReadRequest request
+      @Valid @RequestBody ReadRequest request
   ) {
     User user = (User) authentication.getPrincipal();
     Long userId = user.getId();
@@ -52,7 +53,7 @@ public class ChatFieldReadController {
       @PathVariable Long portfolioOwnerId,
       @PathVariable Long messageId,
       Authentication authentication,
-      @RequestBody ReadRequest request
+      @Valid @RequestBody ReadRequest request
   ) {
     User user = (User) authentication.getPrincipal();
     Long userId = user.getId();
@@ -66,7 +67,7 @@ public class ChatFieldReadController {
   public ResponseEntity<BaseResponse<List<UnreadResponse>>> getUnreadList(
       @PathVariable Long portfolioOwnerId,
       Authentication authentication,
-      @RequestBody UnreadRequest request
+      @Valid @RequestBody UnreadRequest request
   ) {
     User user = (User) authentication.getPrincipal();
     Long userId = user.getId();

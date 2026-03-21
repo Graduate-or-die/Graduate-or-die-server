@@ -2,7 +2,6 @@ package server.pome.chat.service;
 
 import static server.pome.global.exception.BaseResponseStatus.CHAT_DELETE_DISABLED;
 import static server.pome.global.exception.BaseResponseStatus.CHAT_NOT_FOUND;
-import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_FOUND;
 import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
 
@@ -43,12 +42,7 @@ public class ChatMessageService {
     User sender = userRepository.findById(senderId)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
 
-    // 채팅 내용 검증
-    String content = createChatRequest.getContent();
-    if (content == null || content.isBlank()) {
-      throw new BaseException(INVALID_REQUEST_FORM);
-    }
-    content = content.strip();
+    String content = createChatRequest.getContent().strip();
 
     // 포트폴리오 필드 기준 채팅방 조회 또는 생성
     ChatField field = chatFieldService.getOrCreate(
@@ -65,9 +59,11 @@ public class ChatMessageService {
     chatMessageRepository.save(message);
 
     // 발송자의 읽음 포인터를 새 메시지까지 전진
-    ReadRequest readRequest = new ReadRequest(portfolioOwnerId,
-        createChatRequest.getTypeId(), createChatRequest.getBlockId(),
-        createChatRequest.getFieldKey());
+    ReadRequest readRequest = new ReadRequest(
+        createChatRequest.getTypeId(),
+        createChatRequest.getBlockId(),
+        createChatRequest.getFieldKey()
+    );
     chatFieldReadService.markReadUpTo(portfolioOwnerId, senderId, message.getId(), readRequest);
 
     return CreateChatResponse.from(message.getId(), field.getFieldKey(), senderId, content);
@@ -118,7 +114,7 @@ public class ChatMessageService {
     ChatMessage message = chatMessageRepository.findById(messageId)
         .orElseThrow(() -> new BaseException(CHAT_NOT_FOUND));
 
-    // 본인의 메시지만 삭제 가능
+    // 본인 메시지만 삭제 가능
     if (!message.getSender().getId().equals(userId)) {
       throw new BaseException(CHAT_DELETE_DISABLED);
     }
