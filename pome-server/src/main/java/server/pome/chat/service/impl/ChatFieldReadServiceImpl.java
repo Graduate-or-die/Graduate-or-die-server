@@ -3,7 +3,7 @@ package server.pome.chat.service.impl;
 import static java.time.LocalDateTime.now;
 import static server.pome.global.exception.BaseResponseStatus.CHAT_READ_ERROR;
 import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FORM;
-import static server.pome.global.exception.BaseResponseStatus.INVALID_TYPE_ENUM;
+import static server.pome.global.exception.BaseResponseStatus.USER_NOT_PARTICIPANT;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,9 +27,9 @@ import server.pome.global.domain.ChatField;
 import server.pome.global.domain.ChatFieldRead;
 import server.pome.global.domain.ChatMessage;
 import server.pome.global.domain.User;
+import server.pome.global.enums.TypeEnum;
 import server.pome.global.exception.BaseException;
 import server.pome.mate.service.MateService;
-import server.pome.global.enums.TypeEnum;
 import server.pome.user.repository.UserRepository;
 
 @Service
@@ -43,56 +43,61 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   private final ChatFieldService chatFieldService;
   private final MateService mateService;
 
-  // 최신까지 읽음
+  // 해당 필드의 최신 메시지까지 읽음 처리
   @Transactional
   @Override
-  public void markReadUpToLatest(Long mateId, Long userId, ReadRequest request) {
-    // request 유효성 검사
-    validCreateChatRequest(request);
+  public void markReadUpToLatest(Long portfolioOwnerId, Long userId, ReadRequest request) {
+    // 요청 본문, 경로 대상, 참여 권한 검증
+    validateReadRequest(request);
+    validateParticipant(portfolioOwnerId, userId);
 
-    Long fieldId = getFieldIdByReadRequest(mateId, request);
+    Long fieldId = getFieldIdByReadRequest(portfolioOwnerId, request);
 
     // 가장 최신 메시지 Id 조회 (없으면 0 반환)
     Long latestId = chatMessageRepository.findTopByField_IdOrderByIdDesc(fieldId)
         .map(ChatMessage::getId)
         .orElse(0L);
 
-    // 유효성 검증
+    // 메시지가 없는 필드여도 읽음 포인터 보장
     if (latestId <= 0L) {
       getReadPointer(fieldId, userId);
       return;
     }
 
-    // 가장 최신 메시지까지 읽음 표시
+    // 최신 메시지까지 읽음 표시
     markReadUpToFieldId(fieldId, userId, latestId);
   }
 
-  // 특정 메시지까지 읽음
+  // 특정 메시지까지 읽음 처리
   @Transactional
   @Override
-  public void markReadUpTo(Long mateId, Long userId, Long messageId, ReadRequest request) {
-    // request 유효성 검사
-    validCreateChatRequest(request);
+  public void markReadUpTo(Long portfolioOwnerId, Long userId, Long messageId, ReadRequest request) {
+    // 요청 본문, 경로 대상, 참여 권한 검증
+    validateReadRequest(request);
+    validateParticipant(portfolioOwnerId, userId);
 
-    Long fieldId = getFieldIdByReadRequest(mateId, request);
+    Long fieldId = getFieldIdByReadRequest(portfolioOwnerId, request);
 
     if (messageId == null || messageId <= 0L) {
       getReadPointer(fieldId, userId);
       throw new BaseException(INVALID_REQUEST_FORM);
     }
 
+    // 지정한 메시지까지 읽음 처리
     markReadUpToFieldId(fieldId, userId, messageId);
   }
 
-  // 필드별 미읽음 개수
+  // 타입별 필드들의 미읽음 여부 조회
   @Transactional(readOnly = true)
-  public List<UnreadResponse> GetUnreadList(Long mateId, Long userId, UnreadRequest request) {
-    // request 유효성 검사
-    validUnreadRequest(request);
+  public List<UnreadResponse> GetUnreadList(Long portfolioOwnerId, Long userId, UnreadRequest request) {
+    // 요청 본문, 경로 대상, 참여 권한 검증
+    TypeEnum.fromId(request.getTypeId());
+    validateParticipant(portfolioOwnerId, userId);
 
     // 포트폴리오 항목 내 모든 필드 리스트 조회
-    List<ChatField> fields = chatFieldRepository.findByOwner_IdAndPortfolioType(mateId,
-        request.getPortfolioType());
+    TypeEnum portfolioType = TypeEnum.fromId(request.getTypeId());
+    List<ChatField> fields = chatFieldRepository.findByOwner_IdAndPortfolioType(portfolioOwnerId,
+        portfolioType);
 
     // 코멘트가 존재하는 필드가 존재하지 않는 경우 빈 리스트 반환
     if (fields.isEmpty()) {
@@ -106,15 +111,15 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     List<Long> unreadFieldIds = chatMessageRepository.findUnreadFieldIds(fieldIds, userId);
     Set<Long> unreadSet = new HashSet<>(unreadFieldIds);
 
+    // 필드는 존재하면서 미읽음은 존재하지 않으면 false / 있으면 true
     List<UnreadResponse> responses = new ArrayList<>(fields.size());
     for (ChatField chatField : fields) {
-      TypeEnum portfolioType = chatField.getPortfolioType();
-      Long blockId = chatField.getBlockId();
-      String fieldKey = chatField.getFieldKey();
-      // 필드는 존재하면서 미읽음은 존재하지 않으면 false / 있으면 true
-      boolean unread = unreadSet.contains(chatField.getId());
-
-      responses.add(UnreadResponse.from(portfolioType, blockId, fieldKey, unread));
+      responses.add(UnreadResponse.from(
+          chatField.getPortfolioType().getId(),
+          chatField.getBlockId(),
+          chatField.getFieldKey(),
+          unreadSet.contains(chatField.getId())
+      ));
     }
 
     // blockId 기준 오름차순 정렬
@@ -125,12 +130,15 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     return responses;
   }
 
+  // 읽음 포인터를 messageId까지 전진
   @Transactional
   protected void markReadUpToFieldId(Long fieldId, Long userId, Long messageId) {
+    // 포인터 row가 없으면 생성
     getReadPointer(fieldId, userId);
 
     int updated = chatFieldReadRepository.advancePointer(fieldId, userId, messageId, now());
     if (updated == 0) {
+      // 동시성 상황에서 update가 실패하면 row를 다시 읽어 전진
       ChatFieldRead row = chatFieldReadRepository.findByField_IdAndUser_Id(fieldId, userId)
           .orElseThrow(() -> new BaseException(CHAT_READ_ERROR));
       row.advanceTo(messageId, now());
@@ -138,8 +146,6 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     }
   }
 
-
-  /** 헬퍼 메서드 */
   // 포인터가 존재하는지 보장
   private void getReadPointer(Long fieldId, Long userId) {
     chatFieldReadRepository.findByField_IdAndUser_Id(fieldId, userId)
@@ -156,6 +162,7 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
         });
   }
 
+  // 동시성 충돌 시 포인터 다시 조회
   @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
   protected ChatFieldRead reloadRow(Long fieldId, Long userId) {
     return chatFieldReadRepository.findByField_IdAndUser_Id(fieldId, userId)
@@ -163,35 +170,30 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
   }
 
   // 항목-블록-필드명으로 fieldId 조회
-  private Long getFieldIdByReadRequest(Long userId, ReadRequest request) {
+  private Long getFieldIdByReadRequest(Long portfolioOwnerId, ReadRequest request) {
     return chatFieldService.getOrCreate(
-        userId, request.getPortfolioType(),
+        portfolioOwnerId,
+        request.getTypeId(),
         request.getBlockId(),
         request.getFieldKey()).getId();
   }
 
-
   // Request 타입별 유효성 검사
-  private void validCreateChatRequest(ReadRequest request) {
-    if (request == null) {
+  private void validateReadRequest(ReadRequest request) {
+    if (request == null
+        || request.getTypeId() == null
+        || request.getBlockId() == null
+        || request.getFieldKey() == null
+        || request.getFieldKey().isBlank()) {
       throw new BaseException(INVALID_REQUEST_FORM);
     }
-    if (request.getPortfolioType() == null) {
-      throw new BaseException(INVALID_TYPE_ENUM);
-    }
-    if (request.getBlockId() == null || request.getFieldKey() == null || request.getFieldKey()
-        .isBlank()) {
-      throw new BaseException(INVALID_REQUEST_FORM);
-    }
+    TypeEnum.fromId(request.getTypeId());
   }
 
-  private void validUnreadRequest(UnreadRequest request) {
-    if (request == null) {
-      throw new BaseException(INVALID_REQUEST_FORM);
-    }
-    if (request.getPortfolioType() == null) {
-      throw new BaseException(INVALID_TYPE_ENUM);
+  // 포트폴리오 소유자 본인 또는 매칭된 메이트만 읽음 상태를 조회/갱신 가능
+  private void validateParticipant(Long portfolioOwnerId, Long userId) {
+    if (!portfolioOwnerId.equals(userId) && !mateService.isAcceptedMates(userId, portfolioOwnerId)) {
+      throw new BaseException(USER_NOT_PARTICIPANT);
     }
   }
-
 }
