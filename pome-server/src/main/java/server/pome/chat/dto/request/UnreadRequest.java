@@ -1,13 +1,13 @@
 package server.pome.chat.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import server.pome.global.enums.TypeEnum;
 
 @Getter
 public class UnreadRequest {
 
-  @Schema(description = "항목명", example = "ACTIVITY")
-  private TypeEnum portfolioType;
-
+  @NotNull
+  @Schema(description = "타입 ID", example = "3")
+  private Long typeId;
 }

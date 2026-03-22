@@ -36,7 +36,7 @@ public enum TypeEnum {
     // 기본 구조 (비공개)
     public static Map<Long, Boolean> defaultVisibilityMap() {
         Map<Long, Boolean> m = new HashMap<>();
-        for (TypeEnum t : values()) m.put(t.getId(), false);
+        for (TypeEnum t : values()) m.put(t.getId(), true);
         return m;
     }
 }

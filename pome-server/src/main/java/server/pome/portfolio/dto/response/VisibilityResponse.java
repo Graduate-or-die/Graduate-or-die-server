@@ -11,6 +11,6 @@ public class VisibilityResponse {
     @Schema(description = "항목 ID", example = "1")
     private Long typeId;
 
-    @Schema(description = "공개 여부", example = "false")
+    @Schema(description = "공개 여부", example = "true")
     private boolean visible;
 }
