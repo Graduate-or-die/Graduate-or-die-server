@@ -86,7 +86,7 @@ public class PortfolioService {
 
         // 1L 2L -> 학력경력
         if (typeId.equals(1L) || typeId.equals(2L)) {
-            boolean current = visibilityMap.getOrDefault(1L, false);
+            boolean current = visibilityMap.getOrDefault(1L, true);
             boolean newValue = !current;
 
             visibilityMap.put(1L, newValue);
@@ -94,7 +94,7 @@ public class PortfolioService {
             return newValue;
         }
 
-        boolean current = visibilityMap.getOrDefault(typeId, false);
+        boolean current = visibilityMap.getOrDefault(typeId, true);
         boolean newValue = !current;
         visibilityMap.put(typeId, newValue);
         return newValue;
@@ -109,7 +109,7 @@ public class PortfolioService {
         Map<Long, Boolean> visibilityMap = portfolio.getVisibilityMap();
         List<VisibilityResponse> visibility = new ArrayList<>((int) END_TYPE);
         for (long typeId = START_TYPE; typeId <= END_TYPE; typeId++) {
-            boolean isVisible = visibilityMap.getOrDefault(typeId, false);
+            boolean isVisible = visibilityMap.getOrDefault(typeId, true);
             visibility.add(new VisibilityResponse(typeId, isVisible));
         }
 
