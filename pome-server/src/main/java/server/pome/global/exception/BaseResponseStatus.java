@@ -75,6 +75,7 @@ public enum BaseResponseStatus {
   CHAT_READ_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 2043, "메시지 읽음 처리 중 오류가 발생했습니다."),
   CHAT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2044, "존재하지 않는 메시지입니다."),
   CHAT_DELETE_DISABLED(false, HttpStatus.BAD_REQUEST, 2045, "다른 유저의 메시지를 삭제할 수 없습니다."),
+  INVALID_FIELD_KEY(false, HttpStatus.BAD_REQUEST, 2046, "존재하지 않는 fieldKey입니다."),
 
   // message
   USER_CANNOT_SAME(false, HttpStatus.BAD_REQUEST, 2060, "채팅방의 두 참여자가 동일할 수 없습니다"),
