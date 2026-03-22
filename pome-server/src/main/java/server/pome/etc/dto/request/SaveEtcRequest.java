@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 public class SaveEtcRequest {
 
-    @Schema(description = "링크", example = "https://github.com/")
+    @Schema(description = "링크", example = "[\"https://github.com/\"]")
     private List<String> link;
 
     @Schema(description = "메모", example = "호주워홀경험있음")
