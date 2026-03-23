@@ -20,7 +20,7 @@ import server.pome.global.enums.MateRequestStatus;
 import server.pome.global.exception.BaseException;
 import server.pome.like.repository.LikeRepository;
 import server.pome.mate.repository.MateRepository;
-import server.pome.portfolio.dto.response.PreviewResponse;
+import server.pome.portfolio.dto.response.PreviewMateResponse;
 import server.pome.portfolio.dto.response.VisibilityResponse;
 import server.pome.portfolio.repository.PortfolioRepository;
 import server.pome.portfolio.service.PortfolioService;
@@ -58,7 +58,7 @@ public class MateQueryService {
   }
 
   // 메이트 공개범위 여부 및 미리보기
-  public PreviewResponse getVisibilityAndPreview(Long userId, Integer limit, List<Long> typeIds) {
+  public PreviewMateResponse getVisibilityAndPreview(Long userId, Integer limit, List<Long> typeIds) {
     Long mateUserId = getMateUserId(userId);
 
     Portfolio portfolio = portfolioRepository.findByUser_Id(mateUserId);
@@ -80,12 +80,12 @@ public class MateQueryService {
 
     // 미리보기
     int req = (limit == null ? 3 : limit);
-    Map<String, PreviewResponse.PreviewBucket> previews = new LinkedHashMap<>();
+    Map<String, PreviewMateResponse.PreviewBucket> previews = new LinkedHashMap<>();
 
     for (Long typeId : targets) {
       int n = capForType(typeId, req);
       if (n == 0) {
-        previews.put(typeId.toString(), PreviewResponse.PreviewBucket.empty());
+        previews.put(typeId.toString(), PreviewMateResponse.PreviewBucket.empty());
         continue;
       }
 
@@ -93,7 +93,7 @@ public class MateQueryService {
         Etc etc = etcRepository.findByPortfolio(portfolio).orElse(null);
 
         if (etc == null || etc.getLink() == null || etc.getLink().isEmpty()) {
-          previews.put(typeId.toString(), PreviewResponse.PreviewBucket.empty());
+          previews.put(typeId.toString(), PreviewMateResponse.PreviewBucket.empty());
           continue;
         }
 
@@ -101,9 +101,9 @@ public class MateQueryService {
         int toIndex = Math.min(n, links.size());
         List<String> previewLinks = links.subList(0, toIndex);
 
-        List<PreviewResponse.PreviewItem> items = new ArrayList<>(previewLinks.size());
+        List<PreviewMateResponse.PreviewItem> items = new ArrayList<>(previewLinks.size());
         for (String link : previewLinks) {
-          items.add(PreviewResponse.PreviewItem.builder()
+          items.add(PreviewMateResponse.PreviewItem.builder()
               .id(etc.getId())
               .title(link)
               .awardGrade(null)
@@ -111,7 +111,7 @@ public class MateQueryService {
         }
 
         previews.put(typeId.toString(),
-            PreviewResponse.PreviewBucket.builder()
+            PreviewMateResponse.PreviewBucket.builder()
                 .items(items)
                 .build());
         continue;
@@ -119,9 +119,9 @@ public class MateQueryService {
 
       // 상위 n개
       List<Object[]> rows = portfolioRepository.findPreviewTopN(portfolio.getId(), typeId, n);
-      List<PreviewResponse.PreviewItem> items = new ArrayList<>(rows.size());
+      List<PreviewMateResponse.PreviewItem> items = new ArrayList<>(rows.size());
       for (Object[] r : rows) {
-        items.add(PreviewResponse.PreviewItem.builder()
+        items.add(PreviewMateResponse.PreviewItem.builder()
             .id((Long) r[0])
             .title((String) r[1])
             .awardGrade((String) r[2])
@@ -129,12 +129,13 @@ public class MateQueryService {
       }
 
       previews.put(typeId.toString(),
-          PreviewResponse.PreviewBucket.builder()
+          PreviewMateResponse.PreviewBucket.builder()
               .items(items)
               .build());
     }
 
-    return PreviewResponse.builder()
+    return PreviewMateResponse.builder()
+            .mateId(mateUserId)
         .visibility(visibility)
         .previews(previews)
         .build();
