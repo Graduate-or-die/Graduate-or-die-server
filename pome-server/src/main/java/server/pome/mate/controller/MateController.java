@@ -20,6 +20,7 @@ import server.pome.global.domain.User;
 import server.pome.mate.dto.response.GetMateRequestResponse;
 import server.pome.mate.service.MateQueryService;
 import server.pome.mate.service.MateService;
+import server.pome.portfolio.dto.response.PreviewMateResponse;
 import server.pome.portfolio.dto.response.PreviewResponse;
 import server.pome.user.dto.response.GetUserResponse;
 
@@ -117,7 +118,7 @@ public class MateController {
     @Operation(summary = "메이트 포트폴리오 공개범위 여부 리스트 조회")
     @Parameter(name = "limit", description = "미리보기 개수 (최대 3개)", required = false)
     @GetMapping("/visibility")
-    public ResponseEntity<BaseResponse<PreviewResponse>> getVisibilityAndPreview(
+    public ResponseEntity<BaseResponse<PreviewMateResponse>> getVisibilityAndPreview(
             Authentication authentication,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) List<Long> typeIds
@@ -125,7 +126,7 @@ public class MateController {
         User user = (User) authentication.getPrincipal();
         Long userId = user.getId();
 
-        PreviewResponse response = mateQueryService.getVisibilityAndPreview(userId, limit, typeIds);
+        PreviewMateResponse response = mateQueryService.getVisibilityAndPreview(userId, limit, typeIds);
         return ResponseEntity.ok(BaseResponse.success(response));
     }
 
