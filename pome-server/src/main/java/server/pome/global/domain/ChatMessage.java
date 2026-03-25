@@ -1,6 +1,7 @@
 package server.pome.global.domain;
 
 import static jakarta.persistence.FetchType.LAZY;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
