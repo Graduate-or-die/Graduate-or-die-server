@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -199,7 +200,7 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
         .stream()
         .filter(field -> request.getBlockId().equals(field.getBlockId()))
         .filter(field -> syncedKeys.contains(field.getFieldKey()))
-        .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private Set<String> getSyncedFieldKeys(String fieldKey) {
