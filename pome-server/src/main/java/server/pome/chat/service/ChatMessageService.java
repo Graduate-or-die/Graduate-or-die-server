@@ -52,7 +52,7 @@ public class ChatMessageService {
         createChatRequest.getFieldKey());
 
     // 참가한 유저인지 검증
-    validateParticipant(field, senderId);
+    validateParticipant(field.getOwner().getId(), senderId);
 
     // 메시지 생성, 저장
     ChatMessage message = new ChatMessage(field, sender, content);
@@ -77,12 +77,19 @@ public class ChatMessageService {
     userRepository.findById(userId)
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
 
-    // 포트폴리오 필드 기준 채팅방 조회 또는 생성
-    ChatField field = chatFieldService.getOrCreate(portfolioOwnerId, readRequest.getTypeId(),
-        readRequest.getBlockId(), readRequest.getFieldKey());
-
     // 참가한 유저인지 검증
-    validateParticipant(field, userId);
+    validateParticipant(portfolioOwnerId, userId);
+
+    // 포트폴리오 필드 기준 채팅방 조회 또는 생성
+    ChatField field = chatFieldService.findExisting(
+            portfolioOwnerId,
+            readRequest.getTypeId(),
+            readRequest.getBlockId(),
+            readRequest.getFieldKey())
+        .orElse(null);
+    if (field == null) {
+      return List.of();
+    }
 
     // 필드에 속한 메시지 목록 조회
     Page<ChatMessage> page = chatMessageRepository
@@ -104,11 +111,14 @@ public class ChatMessageService {
         .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
 
     // 포트폴리오 필드 기준 채팅방 조회 또는 생성
-    ChatField field = chatFieldService.getOrCreate(portfolioOwnerId, readRequest.getTypeId(),
-        readRequest.getBlockId(), readRequest.getFieldKey());
+    ChatField field = chatFieldService.getOrCreate(
+        portfolioOwnerId,
+        readRequest.getTypeId(),
+        readRequest.getBlockId(),
+        readRequest.getFieldKey());
 
     // 참여 권한 검증
-    validateParticipant(field, userId);
+    validateParticipant(field.getOwner().getId(), userId);
 
     // 삭제 대상 메시지 조회
     ChatMessage message = chatMessageRepository.findById(messageId)
@@ -129,8 +139,7 @@ public class ChatMessageService {
   }
 
   // 조회한 채팅방에 권한이 있는 유저인지 검증
-  private void validateParticipant(ChatField field, Long userId) {
-    Long ownerId = field.getOwner().getId();
+  private void validateParticipant(Long ownerId, Long userId) {
     if (!Objects.equals(ownerId, userId) && !mateService.isAcceptedMates(userId, ownerId)) {
       throw new BaseException(USER_NOT_PARTICIPANT);
     }

@@ -5,6 +5,7 @@ import static server.pome.global.exception.BaseResponseStatus.INVALID_REQUEST_FO
 import static server.pome.global.exception.BaseResponseStatus.PORTFOLIO_BLOCK_NOT_FOUND;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,15 +48,29 @@ public class ChatFieldService {
     validateBlock(ownerId, portfolioType, blockId);
 
     // 포트폴리오 소유자 ID - 항목 - 블록ID - 필드명으로 field 생성 또는 조회
-    return chatFieldRepository.findByOwner_IdAndPortfolioTypeAndBlockIdAndFieldKey(ownerId,
-            portfolioType, blockId, fieldKey)
+    return chatFieldRepository.findByOwner_IdAndPortfolioTypeAndBlockIdAndFieldKey(
+            ownerId, portfolioType, blockId, fieldKey)
         .orElseGet(() -> {
-
           // 조회 실패 시 생성
           User ownerRef = userRepository.getReferenceById(ownerId);
           return chatFieldRepository.save(
               new ChatField(ownerRef, portfolioType, blockId, fieldKey));
         });
+  }
+
+  @Transactional(readOnly = true)
+  public Optional<ChatField> findExisting(Long ownerId, Long typeId, Long blockId, String fieldKey) {
+    TypeEnum portfolioType = TypeEnum.fromId(typeId);
+
+    validateFieldKey(portfolioType, fieldKey);
+    validateBlockId(blockId);
+
+    if (!blockExists(ownerId, portfolioType, blockId)) {
+      return Optional.empty();
+    }
+
+    return chatFieldRepository.findByOwner_IdAndPortfolioTypeAndBlockIdAndFieldKey(
+        ownerId, portfolioType, blockId, fieldKey);
   }
 
   // 타입별 허용 필드가 아니면 예외 처리
@@ -72,11 +87,21 @@ public class ChatFieldService {
 
   // blockId가 실제 포트폴리오 블록을 가리키는지 검증
   private void validateBlock(Long ownerId, TypeEnum portfolioType, Long blockId) {
+    validateBlockId(blockId);
+
+    if (!blockExists(ownerId, portfolioType, blockId)) {
+      throw new BaseException(PORTFOLIO_BLOCK_NOT_FOUND);
+    }
+  }
+
+  private void validateBlockId(Long blockId) {
     if (blockId == null || blockId <= 0L) {
       throw new BaseException(INVALID_REQUEST_FORM);
     }
+  }
 
-    boolean exists = switch (portfolioType) {
+  private boolean blockExists(Long ownerId, TypeEnum portfolioType, Long blockId) {
+    return switch (portfolioType) {
       case EDUCATIONS -> educationRepository.findByIdAndPortfolio_User_Id(blockId, ownerId).isPresent();
       case EXPERIENCES -> experienceRepository.findByIdAndPortfolio_User_Id(blockId, ownerId).isPresent();
       case ACTIVITIES -> activityRepository.findByIdAndPortfolio_User_Id(blockId, ownerId).isPresent();
@@ -85,10 +110,6 @@ public class ChatFieldService {
       case PROJECTS -> projectRepository.findByIdAndPortfolio_User_Id(blockId, ownerId).isPresent();
       case ETCS -> etcRepository.findByIdAndPortfolio_User_Id(blockId, ownerId).isPresent();
     };
-
-    if (!exists) {
-      throw new BaseException(PORTFOLIO_BLOCK_NOT_FOUND);
-    }
   }
 
   // 타입별로 채팅이 허용되는 실제 포트폴리오 필드 목록
