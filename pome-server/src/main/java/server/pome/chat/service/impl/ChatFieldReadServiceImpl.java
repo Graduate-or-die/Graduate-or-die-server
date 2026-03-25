@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -50,21 +51,22 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     // 참여 권한 검증
     validateParticipant(portfolioOwnerId, userId);
 
-    Long fieldId = getFieldIdByReadRequest(portfolioOwnerId, request);
-
     // 가장 최신 메시지 ID 조회 (없으면 0 반환)
-    Long latestId = chatMessageRepository.findTopByField_IdOrderByIdDesc(fieldId)
-        .map(ChatMessage::getId)
-        .orElse(0L);
+    ChatField currentField = chatFieldService.getOrCreate(
+        portfolioOwnerId,
+        request.getTypeId(),
+        request.getBlockId(),
+        request.getFieldKey());
 
-    // 메시지가 없는 필드여도 읽음 포인터 보장
-    if (latestId <= 0L) {
-      getReadPointer(fieldId, userId);
-      return;
+    List<ChatField> syncedFields = getSyncedFields(portfolioOwnerId, request);
+    if (syncedFields.stream().noneMatch(field -> field.getId().equals(currentField.getId()))) {
+      syncedFields.add(currentField);
     }
 
     // 최신 메시지까지 읽음 표시
-    markReadUpToFieldId(fieldId, userId, latestId);
+    for (ChatField field : syncedFields) {
+      markFieldReadUpToLatest(field.getId(), userId);
+    }
   }
 
   // 특정 메시지까지 읽음 처리
@@ -74,15 +76,26 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     // 참여 권한 검증
     validateParticipant(portfolioOwnerId, userId);
 
-    Long fieldId = getFieldIdByReadRequest(portfolioOwnerId, request);
+    ChatField currentField = chatFieldService.getOrCreate(
+        portfolioOwnerId,
+        request.getTypeId(),
+        request.getBlockId(),
+        request.getFieldKey());
 
     if (messageId == null || messageId <= 0L) {
-      getReadPointer(fieldId, userId);
+      getReadPointer(currentField.getId(), userId);
       throw new BaseException(INVALID_REQUEST_FORM);
     }
 
     // 지정한 메시지까지 읽음 처리
-    markReadUpToFieldId(fieldId, userId, messageId);
+    markReadUpToFieldId(currentField.getId(), userId, messageId);
+
+    for (ChatField field : getSyncedFields(portfolioOwnerId, request)) {
+      if (field.getId().equals(currentField.getId())) {
+        continue;
+      }
+      markFieldReadUpToLatest(field.getId(), userId);
+    }
   }
 
   // 타입별 필드들의 미읽음 여부 조회
@@ -92,8 +105,8 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     validateParticipant(portfolioOwnerId, userId);
 
     // 포트폴리오 항목 내 모든 필드 리스트 조회
-    List<ChatField> fields = chatFieldRepository.findByOwner_IdAndPortfolioType(portfolioOwnerId,
-        TypeEnum.fromId(request.getTypeId()));
+    List<ChatField> fields = chatFieldRepository.findByOwner_IdAndPortfolioType(
+        portfolioOwnerId, TypeEnum.fromId(request.getTypeId()));
 
     // 코멘트가 존재하는 필드가 존재하지 않는 경우 빈 리스트 반환
     if (fields.isEmpty()) {
@@ -165,19 +178,49 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
         .orElseThrow(() -> new BaseException(CHAT_READ_ERROR));
   }
 
-  // 항목-블록-필드명으로 fieldId 조회
-  private Long getFieldIdByReadRequest(Long portfolioOwnerId, ReadRequest request) {
-    return chatFieldService.getOrCreate(
-        portfolioOwnerId,
-        request.getTypeId(),
-        request.getBlockId(),
-        request.getFieldKey()).getId();
+  private void markFieldReadUpToLatest(Long fieldId, Long userId) {
+    Long latestId = chatMessageRepository.findTopByField_IdOrderByIdDesc(fieldId)
+        .map(ChatMessage::getId)
+        .orElse(0L);
+
+    if (latestId <= 0L) {
+      getReadPointer(fieldId, userId);
+      return;
+    }
+
+    markReadUpToFieldId(fieldId, userId, latestId);
   }
 
-  // 포트폴리오 소유자 본인 또는 매칭된 메이트만 읽음 상태를 조회/갱신 가능
+  private List<ChatField> getSyncedFields(Long portfolioOwnerId, ReadRequest request) {
+    TypeEnum portfolioType = TypeEnum.fromId(request.getTypeId());
+    Set<String> syncedKeys = getSyncedFieldKeys(request.getFieldKey());
+
+    return chatFieldRepository.findByOwner_IdAndPortfolioType(portfolioOwnerId, portfolioType)
+        .stream()
+        .filter(field -> request.getBlockId().equals(field.getBlockId()))
+        .filter(field -> syncedKeys.contains(field.getFieldKey()))
+        .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+  }
+
+  private Set<String> getSyncedFieldKeys(String fieldKey) {
+    return SYNCED_FIELD_KEYS.getOrDefault(fieldKey, Set.of(fieldKey));
+  }
+
+  // 포트폴리오 본인 또는 매칭된 메이트만 읽음 상태를 조회/갱신 가능
   private void validateParticipant(Long portfolioOwnerId, Long userId) {
     if (!portfolioOwnerId.equals(userId) && !mateService.isAcceptedMates(userId, portfolioOwnerId)) {
       throw new BaseException(USER_NOT_PARTICIPANT);
     }
   }
+
+  private static final Map<String, Set<String>> SYNCED_FIELD_KEYS = Map.ofEntries(
+      Map.entry("experienceStartAt", Set.of("experienceStartAt", "experienceEndAt")),
+      Map.entry("experienceEndAt", Set.of("experienceStartAt", "experienceEndAt")),
+      Map.entry("activityStartAt", Set.of("activityStartAt", "activityEndAt")),
+      Map.entry("activityEndAt", Set.of("activityStartAt", "activityEndAt")),
+      Map.entry("qualificationStartAt", Set.of("qualificationStartAt", "qualificationEndAt")),
+      Map.entry("qualificationEndAt", Set.of("qualificationStartAt", "qualificationEndAt")),
+      Map.entry("projectStartAt", Set.of("projectStartAt", "projectEndAt")),
+      Map.entry("projectEndAt", Set.of("projectStartAt", "projectEndAt"))
+  );
 }
