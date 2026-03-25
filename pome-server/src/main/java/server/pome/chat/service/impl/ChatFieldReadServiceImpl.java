@@ -149,7 +149,8 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
     int updated = chatFieldReadRepository.advancePointer(fieldId, userId, messageId, now());
     if (updated == 0) {
       // 동시성 상황에서 update가 실패하면 row를 다시 읽어 전진
-      ChatFieldRead row = chatFieldReadRepository.findByField_IdAndUser_Id(fieldId, userId)
+      ChatFieldRead row = chatFieldReadRepository
+          .findFirstByField_IdAndUser_IdOrderByLastReadMessageIdDescIdDesc(fieldId, userId)
           .orElseThrow(() -> new BaseException(CHAT_READ_ERROR));
       row.advanceTo(messageId, now());
       chatFieldReadRepository.save(row);
@@ -158,24 +159,37 @@ public class ChatFieldReadServiceImpl implements ChatFieldReadService {
 
   // 포인터가 존재하는지 보장
   private void getReadPointer(Long fieldId, Long userId) {
-    chatFieldReadRepository.findByField_IdAndUser_Id(fieldId, userId)
-        .orElseGet(() -> {
-          ChatField fieldRef = chatFieldRepository.getReferenceById(fieldId);
-          User userRef = userRepository.getReferenceById(userId);
-          try {
-            // 즉시 flush하여 제약 위반을 여기서 감지
-            return chatFieldReadRepository.saveAndFlush(new ChatFieldRead(fieldRef, userRef));
-          } catch (DataIntegrityViolationException e) {
-            // 다른 트랜잭션이 먼저 넣었음 → 새 트랜잭션에서 재조회
-            return reloadRow(fieldId, userId);
-          }
-        });
+    if (chatFieldReadRepository
+        .findFirstByField_IdAndUser_IdOrderByLastReadMessageIdDescIdDesc(fieldId, userId)
+        .isPresent()) {
+      return;
+    }
+
+    chatFieldRepository.findByIdForUpdate(fieldId)
+        .orElseThrow(() -> new BaseException(CHAT_READ_ERROR));
+
+    if (chatFieldReadRepository
+        .findFirstByField_IdAndUser_IdOrderByLastReadMessageIdDescIdDesc(fieldId, userId)
+        .isPresent()) {
+      return;
+    }
+
+    ChatField fieldRef = chatFieldRepository.getReferenceById(fieldId);
+    User userRef = userRepository.getReferenceById(userId);
+    try {
+      // 즉시 flush하여 제약 위반을 여기서 감지
+      chatFieldReadRepository.saveAndFlush(new ChatFieldRead(fieldRef, userRef));
+    } catch (DataIntegrityViolationException e) {
+      // 다른 트랜잭션이 먼저 넣었음 → 새 트랜잭션에서 재조회
+      reloadRow(fieldId, userId);
+    }
   }
 
   // 동시성 충돌 시 포인터 다시 조회
   @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
   protected ChatFieldRead reloadRow(Long fieldId, Long userId) {
-    return chatFieldReadRepository.findByField_IdAndUser_Id(fieldId, userId)
+    return chatFieldReadRepository
+        .findFirstByField_IdAndUser_IdOrderByLastReadMessageIdDescIdDesc(fieldId, userId)
         .orElseThrow(() -> new BaseException(CHAT_READ_ERROR));
   }
 

@@ -11,7 +11,8 @@ import server.pome.global.domain.ChatFieldRead;
 @Repository
 public interface ChatFieldReadRepository extends JpaRepository<ChatFieldRead, Long> {
 
-  Optional<ChatFieldRead> findByField_IdAndUser_Id(Long fieldId, Long userId);
+  Optional<ChatFieldRead> findFirstByField_IdAndUser_IdOrderByLastReadMessageIdDescIdDesc(
+      Long fieldId, Long userId);
 
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
@@ -27,4 +28,3 @@ public interface ChatFieldReadRepository extends JpaRepository<ChatFieldRead, Lo
       @Param("messageId") Long messageId,
       @Param("now") java.time.LocalDateTime now);
 }
-
