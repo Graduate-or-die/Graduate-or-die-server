@@ -135,7 +135,10 @@ public class ChatMessageService {
     }
 
     // 메시지 삭제
-    chatMessageRepository.delete(message);
+    int deleted = chatMessageRepository.deleteOwnedMessage(messageId, field.getId(), userId);
+    if (deleted == 0) {
+      throw new BaseException(CHAT_NOT_FOUND);
+    }
   }
 
   // 조회한 채팅방에 권한이 있는 유저인지 검증
