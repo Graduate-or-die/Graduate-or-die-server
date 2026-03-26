@@ -27,12 +27,17 @@ public class GetMateRequestResponse {
       requiredMode = RequiredMode.NOT_REQUIRED)
   private String mateProfileImage;
 
+  @Schema(description = "메이트 신청자 자기소개", example = "백엔드 개발 같이 하실 분 찾고 있어요.",
+      requiredMode = RequiredMode.NOT_REQUIRED)
+  private String mateIntroduction;
+
   public static GetMateRequestResponse from(Mate mate) {
     User mateUser = mate.getFromUser();
     return GetMateRequestResponse.builder()
         .mateId(mateUser.getId())
         .mateNickname(mateUser.getNickName())
         .mateProfileImage(buildProfileImageUrl(mateUser))
+        .mateIntroduction(mateUser.getIntroduction())
         .build();
   }
 
