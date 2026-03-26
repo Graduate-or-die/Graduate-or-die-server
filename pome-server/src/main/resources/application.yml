@@ -101,6 +101,6 @@ springdoc:
 
 app:
   frontend:
-    kakao-callback-url: https://2026-pome.vercel.app/auth/callback
+    kakao-callback-url: http://localhost:3000/auth/callback
   dev-auth:
     enabled: ${DEV_AUTH_ENABLED:true}
