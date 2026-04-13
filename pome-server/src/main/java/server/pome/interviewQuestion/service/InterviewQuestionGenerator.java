@@ -13,7 +13,7 @@ public class InterviewQuestionGenerator {
     // LLM 호출
     private final InterviewLlmClient llmClient;
 
-    public String generateQuestion(
+    public List<String> generateQuestion(
             String portfolio,
             List<String> similarQuestions
     ) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface InterviewLlmClient {
 
-    String generateQuestion(
+    List<String> generateQuestion(
             String portfolio,
             List<String> similarQuestions
     );

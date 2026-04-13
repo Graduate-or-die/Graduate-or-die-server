@@ -55,7 +55,7 @@ public class InterviewQuestionAdminController {
 
     @Operation(summary = "AI 면접 질문 생성")
     @PostMapping("/generate")
-    public String generateInterview(
+    public List<String> generateInterview(
             Authentication authentication
     ) {
         User user = (User) authentication.getPrincipal();

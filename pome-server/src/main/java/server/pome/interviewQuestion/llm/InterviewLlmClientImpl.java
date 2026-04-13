@@ -1,14 +1,20 @@
 package server.pome.interviewQuestion.llm;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import server.pome.global.exception.BaseException;
+import server.pome.global.exception.BaseResponseStatus;
+import server.pome.interviewQuestion.service.QuestionFilterService;
 import server.pome.tag.dto.request.ChatCompletionRequest;
 import server.pome.tag.dto.response.ChatCompletionResponse;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -19,9 +25,18 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
     private static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     private final WebClient openAiWebClient;
+    private final QuestionFilterService questionFilterService;
 
     @Override
-    public String generateQuestion(String portfolio, List<String> similarQuestions) {
+    public List<String> generateQuestion(String portfolio, List<String> similarQuestions) {
+
+        final int TARGET_COUNT = 7;
+        final int MAX_RETRY = 2;
+
+        List<String> finalQuestions = new ArrayList<>();
+        int attempt = 0;
+
+        while (attempt <= MAX_RETRY) {
 
         String systemPrompt = buildSystemPrompt(7);
         String userPrompt = buildUserPrompt(portfolio, similarQuestions);
@@ -44,11 +59,32 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
                 .timeout(TIMEOUT)
                 .block();
 
-        if (resp == null || resp.choices().isEmpty()) {
-            throw new RuntimeException("LLM response empty");
+            if (resp == null || resp.choices().isEmpty()) {
+                throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+            }
+
+        List<String> questions = parseJsonArray(resp.choices().get(0).message().content());
+
+        List<String> filteredQuestions =
+                questionFilterService.filterWithHistory(
+                        questions,
+                        similarQuestions
+                );
+
+        finalQuestions.addAll(filteredQuestions);
+
+        if (finalQuestions.size() >= TARGET_COUNT) {
+            break;
         }
 
-        return resp.choices().get(0).message().content();
+        attempt++;
+    }
+        
+    return finalQuestions.stream()
+            .distinct()
+            .limit(TARGET_COUNT)
+            .toList();
+
     }
 
     // 역할 정의
@@ -124,4 +160,28 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
         );
     }
 
+    private List<String> parseJsonArray(String content) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            content = content.replaceAll("```json", "")
+                    .replaceAll("```", "")
+                    .trim();
+
+            int start = content.indexOf("[");
+            int end = content.lastIndexOf("]");
+
+            if (start != -1 && end != -1) {
+                content = content.substring(start, end + 1);
+            }
+
+            return objectMapper.readValue(
+                    content,
+                    new TypeReference<List<String>>() {}
+            );
+
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        }
+    }
 }
