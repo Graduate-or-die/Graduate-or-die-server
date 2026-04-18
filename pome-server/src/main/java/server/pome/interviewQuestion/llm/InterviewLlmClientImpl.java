@@ -38,8 +38,13 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
 
         while (attempt <= MAX_RETRY) {
 
-        String systemPrompt = buildSystemPrompt(7);
-        String userPrompt = buildUserPrompt(portfolio, similarQuestions);
+            List<String> context = new ArrayList<>(similarQuestions);
+            context.addAll(finalQuestions);
+
+            int remain = TARGET_COUNT - finalQuestions.size();
+
+        String systemPrompt = buildSystemPrompt(remain);
+        String userPrompt = buildUserPrompt(portfolio, context);
 
         ChatCompletionRequest req = new ChatCompletionRequest(
                 "gpt-5.1-chat-latest",
@@ -68,10 +73,15 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
         List<String> filteredQuestions =
                 questionFilterService.filterWithHistory(
                         questions,
-                        similarQuestions
+                        context
                 );
 
-        finalQuestions.addAll(filteredQuestions);
+
+            for (String q : filteredQuestions) {
+                if (!finalQuestions.contains(q)) {
+                    finalQuestions.add(q);
+                }
+            }
 
         if (finalQuestions.size() >= TARGET_COUNT) {
             break;
@@ -79,7 +89,7 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
 
         attempt++;
     }
-        
+
     return finalQuestions.stream()
             .distinct()
             .limit(TARGET_COUNT)

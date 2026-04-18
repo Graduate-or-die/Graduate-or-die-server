@@ -68,6 +68,7 @@ public class InterviewQuestionAdminController {
                 interviewSearchService.findSimilarQuestions(portfolio);
 
         return interviewQuestiongenerator.generateQuestion(
+                user,
                 portfolio,
                 similarQuestions
         );
