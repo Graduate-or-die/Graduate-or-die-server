@@ -33,7 +33,7 @@ public class InterviewQuestionGenerator {
 
         // LLM 호출
         List<String> questions =
-                llmClient.generateQuestion(portfolio, contextQuestions);
+                llmClient.generateQuestion(userId, portfolio, contextQuestions);
 
         interviewHistoryService.saveAll(user, questions);
 

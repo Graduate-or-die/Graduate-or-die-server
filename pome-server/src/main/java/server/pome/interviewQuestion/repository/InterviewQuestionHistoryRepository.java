@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface InterviewQuestionHistoryRepository extends JpaRepository<InterviewQuestionHistory, Long> {
 
-    List<InterviewQuestionHistory> findTop20ByUser_IdOrderByCreatedAtDesc(Long userId);
+    List<InterviewQuestionHistory> findTop5ByUser_IdOrderByCreatedAtDesc(Long userId);
 
 }

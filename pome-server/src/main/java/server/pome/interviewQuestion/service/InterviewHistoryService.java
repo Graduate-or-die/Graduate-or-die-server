@@ -17,7 +17,7 @@ public class InterviewHistoryService {
 
     // 최근 20개 조회 (LLM 입력용)
     public List<String> getRecentQuestions(Long userId) {
-        return repository.findTop20ByUser_IdOrderByCreatedAtDesc(userId)
+        return repository.findTop5ByUser_IdOrderByCreatedAtDesc(userId)
                 .stream()
                 .map(InterviewQuestionHistory::getQuestionText)
                 .toList();

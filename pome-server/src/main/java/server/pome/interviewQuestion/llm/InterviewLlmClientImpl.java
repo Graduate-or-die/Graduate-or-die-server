@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import server.pome.global.exception.BaseException;
 import server.pome.global.exception.BaseResponseStatus;
+import server.pome.interviewQuestion.service.InterviewHistoryService;
 import server.pome.interviewQuestion.service.QuestionFilterService;
 import server.pome.tag.dto.request.ChatCompletionRequest;
 import server.pome.tag.dto.response.ChatCompletionResponse;
@@ -26,15 +27,19 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
 
     private final WebClient openAiWebClient;
     private final QuestionFilterService questionFilterService;
+    private final InterviewHistoryService interviewHistoryService;
 
     @Override
-    public List<String> generateQuestion(String portfolio, List<String> similarQuestions) {
+    public List<String> generateQuestion(Long userId, String portfolio, List<String> similarQuestions) {
 
         final int TARGET_COUNT = 7;
         final int MAX_RETRY = 2;
 
         List<String> finalQuestions = new ArrayList<>();
         int attempt = 0;
+
+        List<String> historyQuestions =
+                interviewHistoryService.getRecentQuestions(userId);
 
         while (attempt <= MAX_RETRY) {
 
@@ -70,12 +75,20 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
 
         List<String> questions = parseJsonArray(resp.choices().get(0).message().content());
 
-        List<String> filteredQuestions =
-                questionFilterService.filterWithHistory(
-                        questions,
-                        context
-                );
+            List<String> combinedHistory;
 
+            if (attempt == 0) {
+                combinedHistory = new ArrayList<>(historyQuestions);
+                combinedHistory.addAll(finalQuestions);
+            } else {
+                combinedHistory = new ArrayList<>(finalQuestions);
+            }
+
+            List<String> filteredQuestions =
+                    questionFilterService.filterWithHistory(
+                            questions,
+                            combinedHistory
+                    );
 
             for (String q : filteredQuestions) {
                 if (!finalQuestions.contains(q)) {
@@ -112,7 +125,8 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
 
     질문 생성 규칙:
     - 정확히 %d개의 면접 질문을 생성한다.
-    - 모든 질문은 서로 중복되지 않아야 한다.
+    - 반드시 서로 다른 유형의 질문을 생성한다.
+    - 이전 질문과 의미적으로 겹치면 안 된다.
     - 질문은 지원자의 경험이나 활동, 프로젝트 등을 기반으로 해야 한다.
     - 지나치게 일반적인 질문은 최소화한다.
       예: "자기소개 해주세요", "지원 동기는 무엇인가요"
@@ -161,6 +175,7 @@ public class InterviewLlmClientImpl implements InterviewLlmClient {
 
     위 질문들은 참고용 예시일 뿐이며,
     질문을 그대로 복사하거나 단순히 변형해서는 안 된다.
+    절대 위 질문들과 의미적으로 유사한 질문을 생성하지 마라.
 
     포트폴리오에 나타난 경험, 활동, 프로젝트 등을 기반으로
     지원자에게 적합한 새로운 면접 질문들을 생성하라.

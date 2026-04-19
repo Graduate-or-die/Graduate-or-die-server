@@ -14,19 +14,12 @@ public class QuestionFilterService {
 
     private final EmbeddingClient embeddingClient;
 
-    // 0.8 이상이면 중복
-    private static final double SIMILARITY_THRESHOLD = 0.8;
-
     private double[] toDoubleArray(List<Float> vector) {
         double[] arr = new double[vector.size()];
         for (int i = 0; i < vector.size(); i++) {
             arr[i] = vector.get(i);
         }
         return arr;
-    }
-
-    public List<String> filterSimilarQuestions(List<String> questions) {
-        return filterWithHistory(questions, new ArrayList<>());
     }
 
     public List<String> filterWithHistory(List<String> newQuestions, List<String> oldQuestions) {
@@ -39,7 +32,9 @@ public class QuestionFilterService {
         List<double[]> oldEmbeddings = new ArrayList<>();
 
         if (oldQuestions != null && !oldQuestions.isEmpty()) {
-            oldEmbeddings = oldQuestions.stream()
+            int limit = Math.min(5, oldQuestions.size());
+            List<String> limitedOldQuestions = oldQuestions.subList(0, limit);
+            oldEmbeddings = limitedOldQuestions.stream()
                     .map(q -> toDoubleArray(embeddingClient.embed(q)))
                     .toList();
         }
@@ -63,7 +58,7 @@ public class QuestionFilterService {
             for (int j = 0; j < oldEmbeddings.size(); j++) {
                 double sim = SimilarityUtils.cosineSimilarity(currentEmb, oldEmbeddings.get(j));
 
-                if (sim >= SIMILARITY_THRESHOLD) {
+                if (sim >= 0.85) {
                     isDuplicate = true;
                     break;
                 }
@@ -75,7 +70,7 @@ public class QuestionFilterService {
             for (double[] fEmb : filteredEmbeddings) {
                 double sim = SimilarityUtils.cosineSimilarity(currentEmb, fEmb);
 
-                if (sim >= SIMILARITY_THRESHOLD) {
+                if (sim >= 0.9) {
                     isDuplicate = true;
                     break;
                 }
