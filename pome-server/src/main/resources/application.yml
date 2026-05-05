@@ -28,7 +28,7 @@ kakao:
     client-id: ${KAKAO_REST_API_KEY}
     client-secret: ${KAKAO_CLIENT_SECRET:}
     # redirect-uri: http://localhost:8080/auth/login
-    redirect-uri: http://43.203.188.196/auth/login
+    redirect-uri: http://43.203.185.79/auth/login
     token-uri: https://kauth.kakao.com/oauth/token
 
 jwt:
@@ -104,3 +104,7 @@ app:
     kakao-callback-url: http://localhost:3000/auth/callback
   dev-auth:
     enabled: ${DEV_AUTH_ENABLED:true}
+  latex:
+    command: ${LATEX_COMMAND:xelatex}
+    timeout-seconds: ${LATEX_TIMEOUT_SECONDS:20}
+    enable-installer: ${LATEX_ENABLE_INSTALLER:true}
