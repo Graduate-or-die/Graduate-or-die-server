@@ -67,7 +67,6 @@ public class PortfolioLatexRenderer {
   private String header(PortfolioLatexProfile profile) {
     String name = firstNonBlank(profile.name(), profile.email(), "Portfolio");
     String meta = joinHeader(profile.email(), profile.job());
-    String introduction = escape(profile.introduction());
 
     StringBuilder builder = new StringBuilder()
         .append("\\begin{center}\n")
@@ -75,9 +74,6 @@ public class PortfolioLatexRenderer {
 
     if (!meta.isBlank()) {
       builder.append("{").append(escape(meta)).append("}\\\\[3pt]\n");
-    }
-    if (!introduction.isBlank()) {
-      builder.append("{\\small ").append(introduction).append("}\\\\[4pt]\n");
     }
 
     return builder

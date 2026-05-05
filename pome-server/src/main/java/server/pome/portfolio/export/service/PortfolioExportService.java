@@ -86,8 +86,7 @@ public class PortfolioExportService {
     return new PortfolioLatexProfile(
         firstNonBlank(user.getUserName(), user.getNickName()),
         user.getEmail(),
-        user.getJob(),
-        user.getIntroduction()
+        user.getJob()
     );
   }
 
