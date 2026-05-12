@@ -53,6 +53,7 @@ public class PortfolioLatexRenderer {
         \\IfFontExistsTF{Noto Sans CJK KR}{\\setmainfont{Noto Sans CJK KR}}{\\IfFontExistsTF{Malgun Gothic}{\\setmainfont{Malgun Gothic}}{\\IfFontExistsTF{NanumGothic}{\\setmainfont{NanumGothic}}{\\IfFontExistsTF{Noto Sans CJK JP}{\\setmainfont{Noto Sans CJK JP}}{\\IfFontExistsTF{Noto Sans}{\\setmainfont{Noto Sans}}{}}}}}
         \\setlength{\\parindent}{0pt}
         \\setlength{\\parskip}{0pt}
+        \\raggedbottom
         \\newcommand{\\psection}[1]{\\vspace{10pt}{\\large\\bfseries #1}\\par\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{5pt}}
         \\pagestyle{empty}
         \\begin{document}
