@@ -3,6 +3,7 @@ package server.pome.portfolio.export.latex;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Component;
 import server.pome.portfolio.export.dto.PortfolioExportFormat;
 import server.pome.portfolio.export.latex.filedata.LatexDocument;
@@ -51,14 +52,10 @@ public class PortfolioLatexRenderer {
         \\usepackage{fontspec}
         \\usepackage{xeCJK}
         \\usepackage[hidelinks]{hyperref}
-        \\usepackage{enumitem}
-        \\usepackage{titlesec}
-        \\usepackage{xcolor}
         \\IfFontExistsTF{Noto Sans CJK KR}{\\setmainfont{Noto Sans CJK KR}\\setCJKmainfont{Noto Sans CJK KR}}{\\IfFontExistsTF{Malgun Gothic}{\\setmainfont{Malgun Gothic}\\setCJKmainfont{Malgun Gothic}}{\\IfFontExistsTF{NanumGothic}{\\setmainfont{NanumGothic}\\setCJKmainfont{NanumGothic}}{}}}
         \\setlength{\\parindent}{0pt}
-        \\setlist[itemize]{leftmargin=1.2em, topsep=0pt, itemsep=4.5pt, parsep=0pt, partopsep=0pt}
-        \\titleformat{\\section}{\\large\\bfseries\\uppercase}{}{0em}{}[\\titlerule]
-        \\titlespacing*{\\section}{0pt}{10pt}{5pt}
+        \\setlength{\\parskip}{0pt}
+        \\newcommand{\\psection}[1]{\\vspace{10pt}{\\large\\bfseries #1}\\par\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{5pt}}
         \\pagestyle{empty}
         \\begin{document}
         """;
@@ -87,14 +84,19 @@ public class PortfolioLatexRenderer {
       return;
     }
 
-    builder.append("\\section*{").append(escape(section.title())).append("}\n");
-    builder.append("\\vspace{2pt}\n");
-    for (PortfolioLatexItem item : section.items()) {
-      appendItem(builder, item, summaryOnly);
+    builder.append("\\psection{").append(escape(section.title()).toUpperCase(Locale.ROOT)).append("}\n");
+    List<PortfolioLatexItem> items = section.items();
+    for (int index = 0; index < items.size(); index++) {
+      appendItem(builder, items.get(index), summaryOnly, index < items.size() - 1);
     }
   }
 
-  private void appendItem(StringBuilder builder, PortfolioLatexItem item, boolean summaryOnly) {
+  private void appendItem(
+      StringBuilder builder,
+      PortfolioLatexItem item,
+      boolean summaryOnly,
+      boolean addBottomSpacing
+  ) {
     boolean hasTitle = item.title() != null && !item.title().isBlank();
 
     if (hasTitle) {
@@ -110,7 +112,10 @@ public class PortfolioLatexRenderer {
       if (hasTitle) {
         builder.append("\\vspace{-5pt}\n");
       }
-      builder.append("\\begin{itemize}\n");
+      builder.append("\\begin{itemize}\n")
+          .append("  \\setlength{\\itemsep}{2pt}\n")
+          .append("  \\setlength{\\parskip}{0pt}\n")
+          .append("  \\setlength{\\parsep}{0pt}\n");
       if (item.subtitle() != null && !item.subtitle().isBlank()) {
         builder.append("  \\item ").append(escape(item.subtitle())).append("\n");
       }
@@ -122,8 +127,8 @@ public class PortfolioLatexRenderer {
       builder.append("\\end{itemize}\n");
     }
 
-    if (!summaryOnly) {
-      builder.append("\\vspace{9pt}\n");
+    if (!summaryOnly && addBottomSpacing) {
+      builder.append("\\vspace{3pt}\n");
     }
   }
 
