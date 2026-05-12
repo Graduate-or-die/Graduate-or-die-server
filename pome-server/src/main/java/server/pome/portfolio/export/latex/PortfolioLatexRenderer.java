@@ -50,8 +50,7 @@ public class PortfolioLatexRenderer {
         \\documentclass[10pt,a4paper]{article}
         \\usepackage[margin=0.65in]{geometry}
         \\usepackage{fontspec}
-        \\usepackage[hidelinks]{hyperref}
-        \\IfFontExistsTF{Noto Sans CJK KR}{\\setmainfont{Noto Sans CJK KR}}{\\IfFontExistsTF{Malgun Gothic}{\\setmainfont{Malgun Gothic}}{\\IfFontExistsTF{NanumGothic}{\\setmainfont{NanumGothic}}{}}}
+        \\IfFontExistsTF{Noto Sans CJK KR}{\\setmainfont{Noto Sans CJK KR}}{\\IfFontExistsTF{Malgun Gothic}{\\setmainfont{Malgun Gothic}}{\\IfFontExistsTF{NanumGothic}{\\setmainfont{NanumGothic}}{\\IfFontExistsTF{Noto Sans CJK JP}{\\setmainfont{Noto Sans CJK JP}}{\\IfFontExistsTF{Noto Sans}{\\setmainfont{Noto Sans}}{}}}}}
         \\setlength{\\parindent}{0pt}
         \\setlength{\\parskip}{0pt}
         \\newcommand{\\psection}[1]{\\vspace{10pt}{\\large\\bfseries #1}\\par\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{5pt}}
@@ -101,9 +100,8 @@ public class PortfolioLatexRenderer {
     if (hasTitle) {
       builder
           .append("\\textbf{").append(escapeTitle(item.title())).append("}")
-          .append("\\hfill ")
-          .append(escape(dateRange(item.startAt(), item.endAt())))
-          .append(summaryOnly ? "\\\\[7pt]\n" : "\\\\[-2pt]\n");
+          .append(dateRangeText(item))
+          .append(summaryOnly ? "\\\\[6pt]\n" : "\\\\[-2pt]\n");
     }
 
     // resume 요약본은 날짜와 제목만 노출하고, 상세 버전은 subtitle과 details를 bullet로 렌더링함
@@ -155,6 +153,11 @@ public class PortfolioLatexRenderer {
     return date == null ? "" : DATE_FORMATTER.format(date);
   }
 
+  private String dateRangeText(PortfolioLatexItem item) {
+    String dateRange = dateRange(item.startAt(), item.endAt());
+    return dateRange.isBlank() ? "" : "\\hfill " + escape(dateRange);
+  }
+
   // 사용자가 입력한 특수문자가 LaTeX 명령으로 해석되지 않도록 치환
   private String escape(String value) {
     if (value == null || value.isBlank()) {
@@ -162,6 +165,8 @@ public class PortfolioLatexRenderer {
     }
 
     return value
+        .replace("\r\n", "\n")
+        .replace("\r", "\n")
         .replace("\\", "\\textbackslash{}")
         .replace("&", "\\&")
         .replace("%", "\\%")

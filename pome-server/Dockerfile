@@ -4,7 +4,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         fontconfig \
         fonts-noto-cjk \
-        texlive-lang-korean \
         texlive-xetex \
     && rm -rf /var/lib/apt/lists/*
 
