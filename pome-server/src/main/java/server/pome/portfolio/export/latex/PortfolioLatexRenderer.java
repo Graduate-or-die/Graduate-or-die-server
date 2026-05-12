@@ -50,9 +50,8 @@ public class PortfolioLatexRenderer {
         \\documentclass[10pt,a4paper]{article}
         \\usepackage[margin=0.65in]{geometry}
         \\usepackage{fontspec}
-        \\usepackage{xeCJK}
         \\usepackage[hidelinks]{hyperref}
-        \\IfFontExistsTF{Noto Sans CJK KR}{\\setmainfont{Noto Sans CJK KR}\\setCJKmainfont{Noto Sans CJK KR}}{\\IfFontExistsTF{Malgun Gothic}{\\setmainfont{Malgun Gothic}\\setCJKmainfont{Malgun Gothic}}{\\IfFontExistsTF{NanumGothic}{\\setmainfont{NanumGothic}\\setCJKmainfont{NanumGothic}}{}}}
+        \\IfFontExistsTF{Noto Sans CJK KR}{\\setmainfont{Noto Sans CJK KR}}{\\IfFontExistsTF{Malgun Gothic}{\\setmainfont{Malgun Gothic}}{\\IfFontExistsTF{NanumGothic}{\\setmainfont{NanumGothic}}{}}}
         \\setlength{\\parindent}{0pt}
         \\setlength{\\parskip}{0pt}
         \\newcommand{\\psection}[1]{\\vspace{10pt}{\\large\\bfseries #1}\\par\\noindent\\rule{\\linewidth}{0.4pt}\\vspace{5pt}}
