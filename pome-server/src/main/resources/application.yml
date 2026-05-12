@@ -107,4 +107,4 @@ app:
   latex:
     command: ${LATEX_COMMAND:xelatex}
     timeout-seconds: ${LATEX_TIMEOUT_SECONDS:20}
-    enable-installer: ${LATEX_ENABLE_INSTALLER:true}
+    enable-installer: ${LATEX_ENABLE_INSTALLER:false}
