@@ -56,24 +56,36 @@ public class LatexCompileService {
 
       if (!completed) {
         process.destroyForcibly();
+        log.warn("LaTeX compile timed out. command={}, timeoutSeconds={}, log={}",
+            command, timeout.toSeconds(), readTail(processLogFile));
+
         throw new BaseException(BaseResponseStatus.SERVER_ERROR);
       }
 
       if (process.exitValue() != 0) {
+        log.warn("LaTeX compile failed. command={}, exitCode={}, log={}",
+            command, process.exitValue(), readTail(processLogFile));
+
         throw new BaseException(BaseResponseStatus.SERVER_ERROR);
       }
 
       Path pdfFile = workDir.resolve(replaceExtension(document.fileName(), "pdf"));
       if (!Files.exists(pdfFile)) {
+        log.warn("LaTeX compile completed without PDF. command={}, log={}",
+            command, readTail(processLogFile));
+
         throw new BaseException(BaseResponseStatus.SERVER_ERROR);
       }
 
       byte[] pdfContent = Files.readAllBytes(pdfFile);
       return new PdfDocument(pdfFile.getFileName().toString(), pdfContent);
     } catch (IOException e) {
+      log.warn("Failed to run LaTeX compiler. command={}, message={}",
+          latexCommand, e.getMessage(), e);
       throw new BaseException(BaseResponseStatus.SERVER_ERROR);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+      log.warn("LaTeX compile interrupted. command={}", latexCommand, e);
       throw new BaseException(BaseResponseStatus.SERVER_ERROR);
     } finally {
       deleteQuietly(workDir);
