@@ -58,12 +58,14 @@ public class LatexCompileService {
         process.destroyForcibly();
         log.warn("LaTeX compile timed out. command={}, timeoutSeconds={}, log={}",
             command, timeout.toSeconds(), readTail(processLogFile));
+
         throw new BaseException(BaseResponseStatus.SERVER_ERROR);
       }
 
       if (process.exitValue() != 0) {
         log.warn("LaTeX compile failed. command={}, exitCode={}, log={}",
             command, process.exitValue(), readTail(processLogFile));
+
         throw new BaseException(BaseResponseStatus.SERVER_ERROR);
       }
 
@@ -71,6 +73,7 @@ public class LatexCompileService {
       if (!Files.exists(pdfFile)) {
         log.warn("LaTeX compile completed without PDF. command={}, log={}",
             command, readTail(processLogFile));
+
         throw new BaseException(BaseResponseStatus.SERVER_ERROR);
       }
 
