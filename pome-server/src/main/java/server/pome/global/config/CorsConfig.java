@@ -16,7 +16,10 @@ public class CorsConfig {
     c.setAllowedOriginPatterns(List.of(
         "http://localhost:*",
         "http://127.0.0.1:*",
-        "http://alb-spring-722955680.ap-northeast-2.elb.amazonaws.com"
+        "http://43.203.185.79",
+        "http://43.203.185.79:*",
+        "http://alb-spring-722955680.ap-northeast-2.elb.amazonaws.com",
+        "http://*.ap-northeast-2.elb.amazonaws.com"
     ));
     c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
     c.setAllowedHeaders(List.of("*"));
@@ -29,4 +32,3 @@ public class CorsConfig {
     return source;
   }
 }
-
