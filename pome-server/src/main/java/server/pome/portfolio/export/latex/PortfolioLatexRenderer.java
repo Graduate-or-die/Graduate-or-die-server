@@ -115,11 +115,11 @@ public class PortfolioLatexRenderer {
           .append("  \\setlength{\\parskip}{0pt}\n")
           .append("  \\setlength{\\parsep}{0pt}\n");
       if (item.subtitle() != null && !item.subtitle().isBlank()) {
-        builder.append("  \\item ").append(escape(item.subtitle())).append("\n");
+        builder.append("  \\item ").append(escapeInline(item.subtitle())).append("\n");
       }
       for (String detail : item.details()) {
         if (detail != null && !detail.isBlank()) {
-          builder.append("  \\item ").append(escape(detail)).append("\n");
+          builder.append("  \\item ").append(escapeInline(detail)).append("\n");
         }
       }
       builder.append("\\end{itemize}\n");
@@ -165,6 +165,20 @@ public class PortfolioLatexRenderer {
       return "";
     }
 
+    return escapeNormalized(value.strip());
+  }
+
+  private String escapeInline(String value) {
+    if (value == null || value.isBlank()) {
+      return "";
+    }
+
+    return escapeNormalized(value.strip()
+        .replaceAll("[\\r\\n]+", " ")
+        .replaceAll("\\s{2,}", " "));
+  }
+
+  private String escapeNormalized(String value) {
     return value
         .replace("\r\n", "\n")
         .replace("\r", "\n")
@@ -181,7 +195,16 @@ public class PortfolioLatexRenderer {
   }
 
   private String escapeTitle(String value) {
-    return escape(value).replace("\n", "}\\\\\n\\textbf{");
+    if (value == null || value.isBlank()) {
+      return "";
+    }
+
+    return value.lines()
+        .map(String::strip)
+        .filter(line -> !line.isBlank())
+        .map(this::escapeNormalized)
+        .reduce((left, right) -> left + "}\\\\\n\\textbf{" + right)
+        .orElse("");
   }
 
   private String firstNonBlank(String... values) {
